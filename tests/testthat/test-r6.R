@@ -6,4 +6,6 @@ test_that("R6 creation works", {
   expect_is(my_dock, "Dockerfile")
   my_dock$RUN("mkdir /usr/scripts")
   expect_length(my_dock, 22)
+  my_dock$ADD("from", "/usr/scripts")
+  expect_length(my_dock, 22)
 })

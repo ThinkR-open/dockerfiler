@@ -19,7 +19,7 @@ Dockerfile <- R6Class("Dockerfile",
                            self$Dockerfile <- glue('{self$Dockerfile}\n {add_run(cmd)}')
                          },
                          ADD = function(from, to){
-                           self$Dockerfile <- glue('{self$Dockerfile}\n {add_add(cmd)}')
+                           self$Dockerfile <- glue('{self$Dockerfile}\n {add_add(from, to)}')
                          },
                          COPY = function(from, to){
                            self$Dockerfile <- glue('{self$Dockerfile}\n {add_copy(from, to)}')

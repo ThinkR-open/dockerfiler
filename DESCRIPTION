@@ -1,0 +1,14 @@
+Package: dockerfiler
+Title: Easy Dockerfile Creation from R
+Version: 0.0.0.9000
+Authors@R: person('Colin', 'Fay', email = 'contact@colinfay.me', role = c('cre', 'aut'))
+Description: Create a Dockerfile straight from your R session.
+License: MIT + file LICENSE
+LazyData: true
+URL: {{ URL }}
+BugReports: https://github.com/ColinFay/dockerfiler/issues
+Encoding: UTF-8
+Imports: 
+    attempt,
+    glue
+RoxygenNote: 6.0.1

@@ -37,6 +37,10 @@ use_lifecycle_badge("Experimental")
 use_news_md()
 use_readme_rmd()
 
+# Test that
+use_testthat()
+use_test("R6")
+
 # Get the dependencies
 use_package("attempt")
 use_package("glue")

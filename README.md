@@ -5,7 +5,7 @@
 
 # dockerfiler
 
-Easy creation of Dockerfiles.
+Easy Dockerfile Creation from R.
 
 ## Installation
 

@@ -4,10 +4,10 @@
 \alias{r_this}
 \title{Turn an R call into an Unix call}
 \usage{
-r_this(call)
+r_this(code)
 }
 \arguments{
-\item{call}{the function to call}
+\item{code}{the function to call}
 }
 \value{
 an unix R call

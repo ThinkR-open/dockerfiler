@@ -10,7 +10,8 @@ BugReports: https://github.com/ColinFay/dockerfiler/issues
 Encoding: UTF-8
 Imports: 
     attempt,
-    glue
+    glue,
+    R6
 RoxygenNote: 6.0.1
 Suggests: 
     testthat

@@ -6,9 +6,10 @@
 #' @export
 #'
 #' @examples
-#' r_this(print("yeay"))
+#' r(print("yeay"))
+#' r(install.packages("plumber", repo = "http://cran.irsn.fr/"))
 
-r_this <- function(code){
-  code <- substitute(code)
+r <- function(code){
+  code <- deparse(substitute(code))
   glue("R -e '{code}'")
 }

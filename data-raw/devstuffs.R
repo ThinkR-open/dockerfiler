@@ -46,5 +46,10 @@ use_package("attempt")
 use_package("glue")
 use_package("R6")
 
+#
+use_travis()
+use_appveyor()
+use_coverage()
+
 # Clean your description
 use_tidy_description()

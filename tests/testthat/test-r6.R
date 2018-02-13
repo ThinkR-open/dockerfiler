@@ -41,3 +41,9 @@ test_that("R6 creation works", {
   my_dock$SHELL("plop /usr/scripts")
   expect_captured_length(my_dock, 17)
 })
+
+test_that("warning works", {
+  my_dock <- Dockerfile$new()
+  expect_warning(my_dock$COPY("nfi", "norifi", force = FALSE))
+  expect_warning(my_dock$EXPOSE("9000"))
+})

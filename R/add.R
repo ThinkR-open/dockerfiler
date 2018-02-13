@@ -1,18 +1,32 @@
 #' @importFrom glue glue
+#' @importFrom attempt warn_if_not
 
-create_dockerfile <- function(FROM = "rocker/r-base"){
-  glue("FROM {FROM}")
+create_dockerfile <- function(FROM = "rocker/r-base", AS = NULL){
+  if (is.null(AS)) {
+    glue("FROM {FROM}")
+  } else {
+    glue("FROM {FROM} AS {AS}")
+  }
+
 }
 
 add_run <- function(cmd){
   glue("RUN {cmd}")
 }
 
-add_add <- function(from, to){
+add_add <- function(from, to, force = TRUE){
+  if (!force) {
+    warn_if_not(normalizePath(from), file.exists, "The file `from` doesn't seem to exists")
+    warn_if_not(normalizePath(to), file.exists, "The file `to` doesn't seem to exists.")
+  }
   glue("ADD {from} {to}")
 }
 
-add_copy <- function(from, to){
+add_copy <- function(from, to, force = TRUE){
+  if (!force) {
+    warn_if_not(normalizePath(from), file.exists, "The file `from` doesn't seem to exists")
+    warn_if_not(normalizePath(to), file.exists, "The file `to` doesn't seem to exists.")
+  }
   glue("COPY {from} {to}")
 }
 
@@ -21,6 +35,7 @@ add_workdir <- function(where){
 }
 
 add_expose <- function(port){
+  warn_if_not(port, is.numeric, "You've entered a character vector")
   glue("EXPOSE {port}")
 }
 

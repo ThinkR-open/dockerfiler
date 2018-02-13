@@ -2,6 +2,10 @@
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 [![lifecycle](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
+[![Travis build
+status](https://travis-ci.org/ColinFay/dockerfiler.svg?branch=master)](https://travis-ci.org/ColinFay/dockerfiler)
+[![AppVeyor Build
+Status](https://ci.appveyor.com/ColinFay/dockerfiler)](https://ci.appveyor.com/api/projects/status/github//ColinFay/dockerfiler/?branch=master&svg=true)
 
 # dockerfiler
 
@@ -27,11 +31,12 @@ library(dockerfiler)
 my_dock <- Dockerfile$new()
 ```
 
-Wrap your R Code with the r\_this() function to turn it into a bash
-command.
+Wrap your raw R Code inside the `r()` function to turn it into a bash
+command with `R
+-e`.
 
 ``` r
-my_dock$RUN(r_this('install.packages("plumber", repo = "http://cran.irsn.fr/")'))
+my_dock$RUN(r(install.packages("attempt", repo = "http://cran.irsn.fr/")))
 ```
 
 Classical Docker stuffs:
@@ -41,7 +46,7 @@ my_dock$RUN("mkdir /usr/scripts")
 my_dock$RUN("cd /usr/scripts")
 my_dock$COPY("plumberfile.R", "/usr/scripts/plumber.R")
 my_dock$COPY("torun.R", "/usr/scripts/torun.R")
-my_dock$EXPOSE("8000")
+my_dock$EXPOSE(8000)
 my_dock$CMD("Rscript /usr/scripts/torun.R ")
 ```
 
@@ -50,7 +55,7 @@ See your Dockerfile :
 ``` r
 my_dock
 #> FROM rocker/r-base
-#> RUN R -e 'install.packages("plumber", repo = "http://cran.irsn.fr/")'
+#> RUN R -e 'install.packages("attempt", repo = "http://cran.irsn.fr/")'
 #> RUN mkdir /usr/scripts
 #> RUN cd /usr/scripts
 #> COPY plumberfile.R /usr/scripts/plumber.R

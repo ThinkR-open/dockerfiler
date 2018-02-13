@@ -2,10 +2,6 @@
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 [![lifecycle](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
-[![Travis build
-status](https://travis-ci.org/ColinFay/dockerfiler.svg?branch=master)](https://travis-ci.org/ColinFay/dockerfiler)
-[![AppVeyor Build
-Status](https://ci.appveyor.com/ColinFay/dockerfiler)](https://ci.appveyor.com/api/projects/status/github//ColinFay/dockerfiler/?branch=master&svg=true)
 
 # dockerfiler
 

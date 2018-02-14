@@ -92,7 +92,11 @@ my_dock
 #> COPY plumberfile.R /usr/scripts/plumber.R
 #> COPY torun.R /usr/scripts/torun.R
 #> CMD Rscript /usr/scripts/torun.R
-# This also works with a vector
+```
+
+This also works with a vector
+
+``` r
 my_dock$remove_cmd(5:7)
 my_dock
 #> FROM rocker/r-base

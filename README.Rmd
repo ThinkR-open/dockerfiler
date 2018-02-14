@@ -75,7 +75,10 @@ You can also remove a cmd with `remove_cmd` :
 ```{r}
 my_dock$remove_cmd(8)
 my_dock
-# This also works with a vector
+```
+
+This also works with a vector
+```{r}
 my_dock$remove_cmd(5:7)
 my_dock
 ```

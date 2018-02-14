@@ -8,7 +8,7 @@
 #' @examples
 #' my_dock <- Dockerfile$new()
 
-Dockerfile <- R6Class("Dockerfile",
+Dockerfile <- R6::R6Class("Dockerfile",
                       public = list(
                         Dockerfile = character(),
                         ## Either from a file, or from a character vector
@@ -72,6 +72,11 @@ Dockerfile <- R6Class("Dockerfile",
                         },
                         write = function(as = "Dockerfile"){
                           base::write(self$Dockerfile, file = as)
+                        },
+                        switch_cmd = function(a,b){
+                          self$Dockerfile <- switch_them(self$Dockerfile, a, b)
+                        },
+                        remove_cmd = function(where){
+                          self$Dockerfile <- remove_from(self$Dockerfile, where)
                         }
-
                       ))

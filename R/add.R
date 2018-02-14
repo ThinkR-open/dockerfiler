@@ -82,3 +82,14 @@ add_healthcheck <- function(check){
 add_shell <- function(shell){
   glue("SHELL {shell}")
 }
+
+switch_them <- function(vec, a, b){
+  what <- vec[a]
+  whbt <- vec[b]
+  vec[b] <- what
+  vec[a] <- whbt
+  vec
+}
+remove_from <- function(vec, what){
+  vec[-what]
+}

@@ -13,7 +13,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-  [![lifecycle](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental) 
+  [![lifecycle](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)   [![Travis build status](https://travis-ci.org/ColinFay/dockerfiler.svg?branch=master)](https://travis-ci.org/ColinFay/dockerfiler)
   
 # dockerfiler
 
@@ -59,6 +59,24 @@ my_dock$CMD("Rscript /usr/scripts/torun.R ")
 See your Dockerfile : 
 
 ```{r}
+my_dock
+```
+
+If you've made a mistake in your script, you can switch lines with the `switch_cmd` method. This function takes as arguments the positions of the two cmd you want to switch : 
+
+```{r}
+# Switch line 8 and 7
+my_dock$switch_cmd(8, 7)
+my_dock
+```
+
+You can also remove a cmd with `remove_cmd` : 
+
+```{r}
+my_dock$remove_cmd(8)
+my_dock
+# This also works with a vector
+my_dock$remove_cmd(5:7)
 my_dock
 ```
 

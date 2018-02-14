@@ -16,7 +16,7 @@ test_that("R6 creation works", {
   expect_captured_length(my_dock, 4)
   my_dock$WORKDIR("/usr/scripts")
   expect_captured_length(my_dock, 5)
-  my_dock$EXPOSE("888")
+  my_dock$EXPOSE(888)
   expect_captured_length(my_dock, 6)
   my_dock$VOLUME(" /usr/scripts")
   expect_captured_length(my_dock, 7)
@@ -40,6 +40,10 @@ test_that("R6 creation works", {
   expect_captured_length(my_dock, 16)
   my_dock$SHELL("plop /usr/scripts")
   expect_captured_length(my_dock, 17)
+  my_dock$remove_cmd(1)
+  expect_captured_length(my_dock, 16)
+  my_dock$switch_cmd(5,6)
+  expect_captured_length(my_dock, 16)
 })
 
 test_that("warning works", {

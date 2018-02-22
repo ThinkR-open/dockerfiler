@@ -83,6 +83,10 @@ add_shell <- function(shell){
   glue("SHELL {shell}")
 }
 
+add_maintainer <- function(name, email){
+  glue("MAINTAINER {name} <{email}>")
+}
+
 switch_them <- function(vec, a, b){
   what <- vec[a]
   whbt <- vec[b]

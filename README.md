@@ -27,6 +27,7 @@ set another FROM in `new()`
 library(dockerfiler)
 # Create a dockerfile template
 my_dock <- Dockerfile$new()
+my_dock$MAINTAINER("Colin FAY", "contact@colinfay.me")
 ```
 
 Wrap your raw R Code inside the `r()` function to turn it into a bash
@@ -53,6 +54,7 @@ See your Dockerfile :
 ``` r
 my_dock
 #> FROM rocker/r-base
+#> MAINTAINER Colin FAY <contact@colinfay.me>
 #> RUN R -e 'install.packages("attempt", repo = "http://cran.irsn.fr/")'
 #> RUN mkdir /usr/scripts
 #> RUN cd /usr/scripts
@@ -71,13 +73,14 @@ the two cmd you want to switch :
 my_dock$switch_cmd(8, 7)
 my_dock
 #> FROM rocker/r-base
+#> MAINTAINER Colin FAY <contact@colinfay.me>
 #> RUN R -e 'install.packages("attempt", repo = "http://cran.irsn.fr/")'
 #> RUN mkdir /usr/scripts
 #> RUN cd /usr/scripts
 #> COPY plumberfile.R /usr/scripts/plumber.R
-#> COPY torun.R /usr/scripts/torun.R
-#> CMD Rscript /usr/scripts/torun.R 
 #> EXPOSE 8000
+#> COPY torun.R /usr/scripts/torun.R
+#> CMD Rscript /usr/scripts/torun.R
 ```
 
 You can also remove a cmd with `remove_cmd` :
@@ -86,11 +89,12 @@ You can also remove a cmd with `remove_cmd` :
 my_dock$remove_cmd(8)
 my_dock
 #> FROM rocker/r-base
+#> MAINTAINER Colin FAY <contact@colinfay.me>
 #> RUN R -e 'install.packages("attempt", repo = "http://cran.irsn.fr/")'
 #> RUN mkdir /usr/scripts
 #> RUN cd /usr/scripts
 #> COPY plumberfile.R /usr/scripts/plumber.R
-#> COPY torun.R /usr/scripts/torun.R
+#> EXPOSE 8000
 #> CMD Rscript /usr/scripts/torun.R
 ```
 
@@ -100,9 +104,10 @@ This also works with a vector
 my_dock$remove_cmd(5:7)
 my_dock
 #> FROM rocker/r-base
+#> MAINTAINER Colin FAY <contact@colinfay.me>
 #> RUN R -e 'install.packages("attempt", repo = "http://cran.irsn.fr/")'
 #> RUN mkdir /usr/scripts
-#> RUN cd /usr/scripts
+#> CMD Rscript /usr/scripts/torun.R
 ```
 
 Save your Dockerfile

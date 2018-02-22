@@ -37,6 +37,7 @@ You can set another FROM in `new()`
 library(dockerfiler)
 # Create a dockerfile template
 my_dock <- Dockerfile$new()
+my_dock$MAINTAINER("Colin FAY", "contact@colinfay.me")
 ```
 
 Wrap your raw R Code inside the `r()` function to turn it into a bash command with `R -e`.

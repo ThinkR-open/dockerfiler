@@ -38,12 +38,14 @@ test_that("R6 creation works", {
   expect_captured_length(my_dock, 15)
   my_dock$HEALTHCHECK("plop /usr/scripts")
   expect_captured_length(my_dock, 16)
-  my_dock$SHELL("plop /usr/scripts")
+  my_dock$MAINTAINER("colin", "contact@colinfay.me")
   expect_captured_length(my_dock, 17)
+  my_dock$SHELL("plop /usr/scripts")
+  expect_captured_length(my_dock, 18)
   my_dock$remove_cmd(1)
-  expect_captured_length(my_dock, 16)
+  expect_captured_length(my_dock, 17)
   my_dock$switch_cmd(5,6)
-  expect_captured_length(my_dock, 16)
+  expect_captured_length(my_dock, 17)
 })
 
 test_that("warning works", {

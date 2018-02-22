@@ -67,6 +67,9 @@ Dockerfile <- R6::R6Class("Dockerfile",
                         SHELL = function(shell){
                           self$Dockerfile <- c(self$Dockerfile,add_shell(shell))
                         },
+                        MAINTAINER = function(name, email){
+                          self$Dockerfile <- c(self$Dockerfile,add_maintainer(name, email))
+                        },
                         print = function(){
                           cat(self$Dockerfile, sep = '\n')
                         },

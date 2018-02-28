@@ -1,9 +1,11 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-[![lifecycle](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
+[![lifecycle](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://www.tidyverse.org/lifecycle/#stable)
 [![Travis build
 status](https://travis-ci.org/ColinFay/dockerfiler.svg?branch=master)](https://travis-ci.org/ColinFay/dockerfiler)
+[![Coverage
+status](https://codecov.io/gh/ColinFay/dockerfiler/branch/master/graph/badge.svg)](https://codecov.io/github/ColinFay/dockerfiler?branch=master)
 
 # dockerfiler
 
@@ -83,7 +85,7 @@ my_dock
 #> CMD Rscript /usr/scripts/torun.R
 ```
 
-You can also remove a cmd with `remove_cmd` :
+You can also remove a cmd with `remove_cmd`:
 
 ``` r
 my_dock$remove_cmd(8)
@@ -98,7 +100,7 @@ my_dock
 #> CMD Rscript /usr/scripts/torun.R
 ```
 
-This also works with a vector
+This also works with a vector:
 
 ``` r
 my_dock$remove_cmd(5:7)
@@ -110,11 +112,20 @@ my_dock
 #> CMD Rscript /usr/scripts/torun.R
 ```
 
-Save your Dockerfile
+Save your Dockerfile:
 
 ``` r
 my_dock$write()
 ```
+
+## Contact
+
+Questions and feedbacks [welcome](mailto:contact@colinfay.me)\!
+
+You want to contribute ? Open a
+[PR](https://github.com/ColinFay/dockerfiler/pulls) :) If you encounter
+a bug or want to suggest an enhancement, please [open an
+issue](https://github.com/ColinFay/dockerfiler/issues).
 
 Please note that this project is released with a [Contributor Code of
 Conduct](CODE_OF_CONDUCT.md). By participating in this project you agree

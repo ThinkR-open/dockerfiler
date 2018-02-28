@@ -40,16 +40,25 @@ use_readme_rmd()
 # Test that
 use_testthat()
 use_test("R6")
+use_test("r")
 
 # Get the dependencies
 use_package("attempt")
 use_package("glue")
 use_package("R6")
 
-#
+# Vignette
+use_vignette("dockerfiler")
+build_vignettes()
+
+# Codecov
 use_travis()
 use_appveyor()
 use_coverage()
 
 # Clean your description
 use_tidy_description()
+
+# Test with rhub
+rhub::check_for_cran()
+

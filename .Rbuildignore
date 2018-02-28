@@ -4,6 +4,7 @@
 ^LICENSE\.md$
 ^CODE_OF_CONDUCT\.md$
 ^README\.Rmd$
+^README\.md$
 ^\.travis\.yml$
 ^codecov\.yml$
 ^appveyor\.yml$

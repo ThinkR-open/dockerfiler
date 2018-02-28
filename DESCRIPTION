@@ -1,18 +1,23 @@
 Package: dockerfiler
 Title: Easy Dockerfile Creation from R
-Version: 0.0.0.9000
+Version: 0.1.0
 Authors@R: person('Colin', 'Fay', email = 'contact@colinfay.me', role = c('cre', 'aut'))
-Description: Create a Dockerfile straight from your R session.
+Description: Build a Dockerfile straight from your R session. 'dockerfiler' allows 
+    you to create step by step a Dockerfile, and provide convenient tools to wrap 
+    R code inside this Dockerfile. 
 License: MIT + file LICENSE
-LazyData: true
 URL: {{ URL }}
 BugReports: https://github.com/ColinFay/dockerfiler/issues
-Encoding: UTF-8
 Imports: 
     attempt,
     glue,
     R6
-RoxygenNote: 6.0.1
 Suggests: 
+    covr,
     testthat,
-    covr
+    knitr,
+    rmarkdown
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 6.0.1
+VignetteBuilder: knitr

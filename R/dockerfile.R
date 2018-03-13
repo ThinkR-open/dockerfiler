@@ -13,7 +13,7 @@ Dockerfile <- R6::R6Class("Dockerfile",
                         Dockerfile = character(),
                         ## Either from a file, or from a character vector
                         initialize = function(FROM = "rocker/r-base", AS = NULL){
-                          self$Dockerfile <- create_dockerfile("rocker/r-base", AS)
+                          self$Dockerfile <- create_dockerfile(FROM, AS)
                         },
                         RUN = function(cmd){
                           self$Dockerfile <- c(self$Dockerfile, add_run(cmd))

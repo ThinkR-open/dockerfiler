@@ -6,7 +6,7 @@ Description: Build a Dockerfile straight from your R session. 'dockerfiler' allo
     you to create step by step a Dockerfile, and provide convenient tools to wrap 
     R code inside this Dockerfile. 
 License: MIT + file LICENSE
-URL: {{ URL }}
+URL: https://github.com/ColinFay/dockerfiler
 BugReports: https://github.com/ColinFay/dockerfiler/issues
 Imports: 
     attempt,

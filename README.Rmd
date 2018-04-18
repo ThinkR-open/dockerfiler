@@ -13,7 +13,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-[![lifecycle](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://www.tidyverse.org/lifecycle/#stable)   [![Travis build status](https://travis-ci.org/ColinFay/dockerfiler.svg?branch=master)](https://travis-ci.org/ColinFay/dockerfiler)   [![Coverage status](https://codecov.io/gh/ColinFay/dockerfiler/branch/master/graph/badge.svg)](https://codecov.io/github/ColinFay/dockerfiler?branch=master)
+![status](http://www.repostatus.org/badges/latest/active.svg)   [![Travis build status](https://travis-ci.org/ColinFay/dockerfiler.svg?branch=master)](https://travis-ci.org/ColinFay/dockerfiler)   [![Coverage status](https://codecov.io/gh/ColinFay/dockerfiler/branch/master/graph/badge.svg)](https://codecov.io/github/ColinFay/dockerfiler?branch=master)
 
 # dockerfiler
 
@@ -24,13 +24,20 @@ Easy Dockerfile Creation from R.
 You can install dockerfiler from GitHub with:
 
 ```{r gh-installation, eval = FALSE}
-# install.packages("devtools")
-devtools::install_github("colinfay/dockerfiler")
+# install.packages("remotes")
+remotes::install_github("colinfay/dockerfiler")
+```
+
+Or from CRAN with : 
+
+```{r, eval = FALSE}
+install.packages("dockerfiler")
 ```
 
 ## Basic worflow 
 
 By default, Dockerfiles are created with `FROM "rocker/r-base"`.
+
 You can set another FROM in `new()`
 
 ```{r}

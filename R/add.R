@@ -87,6 +87,10 @@ add_maintainer <- function(name, email){
   glue("MAINTAINER {name} <{email}>")
 }
 
+add_custom <- function(base, cmd){
+  glue("{base} {cmd}")
+}
+
 switch_them <- function(vec, a, b){
   what <- vec[a]
   whbt <- vec[b]

@@ -14,6 +14,35 @@ A dockerfile template
 \description{
 A Dockerfile template
 }
+\section{Methods}{
+
+\describe{
+  \item{\code{RUN}}{add a RUN command}
+  \item{\code{ADD}}{add a ADD command}
+  \item{\code{COPY}}{add a COPY command}
+  \item{\code{WORKDIR}}{add a WORKDIR command}
+  \item{\code{EXPOSE}}{add an EXPOSE command}
+  \item{\code{VOLUME}}{add a VOLUME command}
+  \item{\code{CMD}}{add a CMD command}
+  \item{\code{LABEL}}{add a LABEL command}
+  \item{\code{ENV}}{add a ENV command}
+  \item{\code{ENTRYPOINT}}{add a ENTRYPOINT command}
+  \item{\code{VOLUME}}{add a VOLUME command}
+  \item{\code{USER}}{add a USER command}
+  \item{\code{ARG}}{add an ARG command}
+  \item{\code{ONBUILD}}{add a ONBUILD command}
+  \item{\code{STOPSIGNAL}}{add a STOPSIGNAL command}
+  \item{\code{HEALTHCHECK}}{add a HEALTHCHECK command}
+  \item{\code{STOPSIGNAL}}{add a STOPSIGNAL command}
+  \item{\code{SHELL}}{add a SHELL command}
+  \item{\code{MAINTAINER}}{add a MAINTAINER command}
+  \item{\code{custom}}{add a custom command}
+  \item{\code{write}}{save the Dockerfile}
+  \item{\code{switch_cmd}}{switch two command}
+  \item{\code{remove_cmd}}{remove_cmd one or more command(s)}
+}
+}
+
 \examples{
 my_dock <- Dockerfile$new()
 }

@@ -1,29 +1,34 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
+![status](http://www.repostatus.org/badges/latest/active.svg) [![Travis build status](https://travis-ci.org/ColinFay/dockerfiler.svg?branch=master)](https://travis-ci.org/ColinFay/dockerfiler) [![Coverage status](https://codecov.io/gh/ColinFay/dockerfiler/branch/master/graph/badge.svg)](https://codecov.io/github/ColinFay/dockerfiler?branch=master)
 
-[![lifecycle](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://www.tidyverse.org/lifecycle/#stable)
-[![Travis build
-status](https://travis-ci.org/ColinFay/dockerfiler.svg?branch=master)](https://travis-ci.org/ColinFay/dockerfiler)
-[![Coverage
-status](https://codecov.io/gh/ColinFay/dockerfiler/branch/master/graph/badge.svg)](https://codecov.io/github/ColinFay/dockerfiler?branch=master)
-
-# dockerfiler
+dockerfiler
+===========
 
 Easy Dockerfile Creation from R.
 
-## Installation
+Installation
+------------
 
 You can install dockerfiler from GitHub with:
 
 ``` r
-# install.packages("devtools")
-devtools::install_github("colinfay/dockerfiler")
+# install.packages("remotes")
+remotes::install_github("colinfay/dockerfiler")
 ```
 
-## Basic worflow
+Or from CRAN with :
 
-By default, Dockerfiles are created with `FROM "rocker/r-base"`. You can
-set another FROM in `new()`
+``` r
+install.packages("dockerfiler")
+```
+
+Basic worflow
+-------------
+
+By default, Dockerfiles are created with `FROM "rocker/r-base"`.
+
+You can set another FROM in `new()`
 
 ``` r
 library(dockerfiler)
@@ -32,9 +37,7 @@ my_dock <- Dockerfile$new()
 my_dock$MAINTAINER("Colin FAY", "contact@colinfay.me")
 ```
 
-Wrap your raw R Code inside the `r()` function to turn it into a bash
-command with `R
--e`.
+Wrap your raw R Code inside the `r()` function to turn it into a bash command with `R -e`.
 
 ``` r
 my_dock$RUN(r(install.packages("attempt", repo = "http://cran.irsn.fr/")))
@@ -66,9 +69,7 @@ my_dock
 #> CMD Rscript /usr/scripts/torun.R
 ```
 
-If you’ve made a mistake in your script, you can switch lines with the
-`switch_cmd` method. This function takes as arguments the positions of
-the two cmd you want to switch :
+If you've made a mistake in your script, you can switch lines with the `switch_cmd` method. This function takes as arguments the positions of the two cmd you want to switch :
 
 ``` r
 # Switch line 8 and 7
@@ -118,15 +119,11 @@ Save your Dockerfile:
 my_dock$write()
 ```
 
-## Contact
+Contact
+-------
 
-Questions and feedbacks [welcome](mailto:contact@colinfay.me)\!
+Questions and feedbacks [welcome](mailto:contact@colinfay.me)!
 
-You want to contribute ? Open a
-[PR](https://github.com/ColinFay/dockerfiler/pulls) :) If you encounter
-a bug or want to suggest an enhancement, please [open an
-issue](https://github.com/ColinFay/dockerfiler/issues).
+You want to contribute ? Open a [PR](https://github.com/ColinFay/dockerfiler/pulls) :) If you encounter a bug or want to suggest an enhancement, please [open an issue](https://github.com/ColinFay/dockerfiler/issues).
 
-Please note that this project is released with a [Contributor Code of
-Conduct](CODE_OF_CONDUCT.md). By participating in this project you agree
-to abide by its terms.
+Please note that this project is released with a [Contributor Code of Conduct](CODE_OF_CONDUCT.md). By participating in this project you agree to abide by its terms.

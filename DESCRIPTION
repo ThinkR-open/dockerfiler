@@ -1,6 +1,6 @@
 Package: dockerfiler
 Title: Easy Dockerfile Creation from R
-Version: 0.1.0
+Version: 0.1.1
 Authors@R: person('Colin', 'Fay', email = 'contact@colinfay.me', role = c('cre', 'aut'))
 Description: Build a Dockerfile straight from your R session. 'dockerfiler' allows 
     you to create step by step a Dockerfile, and provide convenient tools to wrap 

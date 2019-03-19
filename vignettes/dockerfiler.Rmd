@@ -16,6 +16,8 @@ knitr::opts_chunk$set(
 )
 ```
 
+# dockerfiler
+
 Easy Dockerfile Creation from R.
 
 ## Installation
@@ -23,13 +25,20 @@ Easy Dockerfile Creation from R.
 You can install dockerfiler from GitHub with:
 
 ```{r gh-installation, eval = FALSE}
-# install.packages("devtools")
-devtools::install_github("colinfay/dockerfiler")
+# install.packages("remotes")
+remotes::install_github("colinfay/dockerfiler")
+```
+
+Or from CRAN with : 
+
+```{r, eval = FALSE}
+install.packages("dockerfiler")
 ```
 
 ## Basic worflow 
 
 By default, Dockerfiles are created with `FROM "rocker/r-base"`.
+
 You can set another FROM in `new()`
 
 ```{r}
@@ -84,14 +93,36 @@ my_dock$remove_cmd(5:7)
 my_dock
 ```
 
+`add_after` add a command after a given line. 
+
+```{r}
+my_dock$add_after(
+  cmd = "RUN R -e 'remotes::install_cran(\"rlang\")'", 
+  after = 3
+)
+```
+
+
 Save your Dockerfile:
 
 ```{r eval = FALSE}
 my_dock$write()
 ```
 
-## Contact
+## Create a Dockerfile from a DESCRIPTION 
 
-Questions and feedbacks [welcome](mailto:contact@colinfay.me)!
+You can use a DESCRIPTION file to create a Dockerfile that installs the dependencies and the package.
 
-You want to contribute ? Open a [PR](https://github.com/ColinFay/dockerfiler/pulls) :) If you encounter a bug or want to suggest an enhancement, please [open an issue](https://github.com/ColinFay/dockerfiler/issues).
+```{r}
+my_dock <- dock_from_desc("DESCRIPTION")
+my_dock
+
+my_dock$CMD(r(library(dockerfiler)))
+
+my_dock$add_after(
+  cmd = "RUN R -e 'remotes::install_cran(\"rlang\")'", 
+  after = 3
+)
+my_dock
+```
+

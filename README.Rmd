@@ -92,11 +92,39 @@ my_dock$remove_cmd(5:7)
 my_dock
 ```
 
+`add_after` add a command after a given line. 
+
+```{r}
+my_dock$add_after(
+  cmd = "RUN R -e 'remotes::install_cran(\"rlang\")'", 
+  after = 3
+)
+```
+
+
 Save your Dockerfile:
 
 ```{r eval = FALSE}
 my_dock$write()
 ```
+
+## Create a Dockerfile from a DESCRIPTION 
+
+You can use a DESCRIPTION file to create a Dockerfile that installs the dependencies and the package.
+
+```{r}
+my_dock <- dock_from_desc("DESCRIPTION")
+my_dock
+
+my_dock$CMD(r(library(dockerfiler)))
+
+my_dock$add_after(
+  cmd = "RUN R -e 'remotes::install_cran(\"rlang\")'", 
+  after = 3
+)
+my_dock
+```
+
 
 ## Contact
 

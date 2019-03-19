@@ -1,3 +1,4 @@
-# dockerfiler 0.0.0.9000
+# dockerfiler 0.1.3
 
-* Added a `NEWS.md` file to track changes to the package.
+* Added the `add_after()` R6 method
+* Added `dock_from_desc()`, to create a Dockerfile from a DESCRIPTION

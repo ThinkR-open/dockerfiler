@@ -14,8 +14,29 @@ dock_from_desc(path = "DESCRIPTION", FROM = "rocker/r-base",
 
 \item{AS}{AS of the Dockerfile}
 }
+\value{
+A Dockerfile Object.
+}
 \description{
 This function will parse a DESCRIPTION file and
 create a Dockerfile that remotes::install_cran
-all the functions from the Imports section.
+all the functions from the Imports section, add
+the COPY of the tar.gz of the package, and install
+the package.
+}
+\note{
+After this Dockerfile is created, the package
+    should be built and be put in the same directory
+    as the dockerfile.
+}
+\examples{
+\dontrun{
+my_dock <- dock_from_desc("DESCRIPTION")
+my_dock
+my_dock$CMD(r(library(dockerfiler)))
+my_dock$add_after(
+cmd = "RUN R -e 'remotes::install_cran(\\"rlang\\")'",
+after = 3
+)
+}
 }

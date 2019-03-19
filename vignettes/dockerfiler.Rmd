@@ -113,9 +113,8 @@ my_dock$write()
 
 You can use a DESCRIPTION file to create a Dockerfile that installs the dependencies and the package.
 
-```{r}
+```{r, eval = FALSE}
 my_dock <- dock_from_desc("DESCRIPTION")
-my_dock
 
 my_dock$CMD(r(library(dockerfiler)))
 
@@ -123,6 +122,5 @@ my_dock$add_after(
   cmd = "RUN R -e 'remotes::install_cran(\"rlang\")'", 
   after = 3
 )
-my_dock
 ```
 

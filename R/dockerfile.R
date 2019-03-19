@@ -111,5 +111,8 @@ Dockerfile <- R6::R6Class("Dockerfile",
                         },
                         remove_cmd = function(where){
                           self$Dockerfile <- remove_from(self$Dockerfile, where)
+                        },
+                        add_after = function(cmd, after){
+                          self$Dockerfile <- add_to(self$Dockerfile, cmd, after)
                         }
                       ))

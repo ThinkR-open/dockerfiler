@@ -1,3 +1,7 @@
+# dockerfiler 0.1.3.9000
+
+* Corrected bug in `rthis()`
+
 # dockerfiler 0.1.3
 
 * Added the `add_after()` R6 method

@@ -1,6 +1,7 @@
 # dockerfiler 0.1.3.9000
 
 * Corrected bug in `rthis()`
+* `add_arg` can now receive an optional default value (@antoine-sachet, #8)
 
 # dockerfiler 0.1.3
 

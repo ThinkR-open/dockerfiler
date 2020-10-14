@@ -94,8 +94,9 @@ add_user <- function(user){
   glue("USER {user}")
 }
 
-add_arg <- function(arg){
-  glue("ARG {arg}")
+add_arg <- function(arg, default = NULL){
+  default <- if (!is.null(default)) glue('="{default}"') else ""
+  glue("ARG {arg}{default}")
 }
 
 add_onbuild <- function(cmd){

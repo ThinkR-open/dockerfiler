@@ -1,13 +1,15 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-![status](http://www.repostatus.org/badges/latest/active.svg) [![Travis
-build
+<!-- badges: start -->
+[![R-CMD-check](https://github.com/ColinFay/dockerfiler/workflows/R-CMD-check/badge.svg)](https://github.com/ColinFay/dockerfiler/actions)![status](http://www.repostatus.org/badges/latest/active.svg)
+[![Travis build
 status](https://travis-ci.org/ColinFay/dockerfiler.svg?branch=master)](https://travis-ci.org/ColinFay/dockerfiler)
 [![Coverage
 status](https://codecov.io/gh/ColinFay/dockerfiler/branch/master/graph/badge.svg)](https://codecov.io/github/ColinFay/dockerfiler?branch=master)
+<!-- badges: end -->
 
-# dockerfiler
+# `{dockerfiler}`
 
 Easy Dockerfile Creation from R.
 
@@ -40,8 +42,7 @@ my_dock$MAINTAINER("Colin FAY", "contact@colinfay.me")
 ```
 
 Wrap your raw R Code inside the `r()` function to turn it into a bash
-command with `R
--e`.
+command with `R -e`.
 
 ``` r
 my_dock$RUN(r(install.packages("attempt", repo = "http://cran.irsn.fr/")))

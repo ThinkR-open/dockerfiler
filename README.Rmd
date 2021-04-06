@@ -13,9 +13,12 @@ knitr::opts_chunk$set(
 )
 ```
 
-![status](http://www.repostatus.org/badges/latest/active.svg)   [![Travis build status](https://travis-ci.org/ColinFay/dockerfiler.svg?branch=master)](https://travis-ci.org/ColinFay/dockerfiler)   [![Coverage status](https://codecov.io/gh/ColinFay/dockerfiler/branch/master/graph/badge.svg)](https://codecov.io/github/ColinFay/dockerfiler?branch=master)
+  <!-- badges: start -->
+  [![R-CMD-check](https://github.com/ColinFay/dockerfiler/workflows/R-CMD-check/badge.svg)](https://github.com/ColinFay/dockerfiler/actions)![status](http://www.repostatus.org/badges/latest/active.svg)   [![Travis build status](https://travis-ci.org/ColinFay/dockerfiler.svg?branch=master)](https://travis-ci.org/ColinFay/dockerfiler)   [![Coverage status](https://codecov.io/gh/ColinFay/dockerfiler/branch/master/graph/badge.svg)](https://codecov.io/github/ColinFay/dockerfiler?branch=master)
+  <!-- badges: end -->
 
-# dockerfiler
+
+# `{dockerfiler}`
 
 Easy Dockerfile Creation from R.
 

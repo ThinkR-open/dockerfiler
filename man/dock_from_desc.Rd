@@ -4,8 +4,7 @@
 \alias{dock_from_desc}
 \title{Docker file from DESCRIPTION}
 \usage{
-dock_from_desc(path = "DESCRIPTION", FROM = "rocker/r-base",
-  AS = NULL)
+dock_from_desc(path = "DESCRIPTION", FROM = "rocker/r-base", AS = NULL)
 }
 \arguments{
 \item{path}{Path to DESCRIPTION}
@@ -35,7 +34,7 @@ my_dock <- dock_from_desc("DESCRIPTION")
 my_dock
 my_dock$CMD(r(library(dockerfiler)))
 my_dock$add_after(
-cmd = "RUN R -e 'remotes::install_cran(\\"rlang\\")'",
+cmd = "RUN R -e 'remotes::install_cran(\"rlang\")'",
 after = 3
 )
 }

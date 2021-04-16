@@ -5,15 +5,15 @@
 #' @section Methods:
 #' \describe{
 #'   \item{\code{RUN}}{add a RUN command}
-#'   \item{\code{ADD}}{add a ADD command}
+#'   \item{\code{ADD}}{add an ADD command with optional default value}
 #'   \item{\code{COPY}}{add a COPY command}
 #'   \item{\code{WORKDIR}}{add a WORKDIR command}
 #'   \item{\code{EXPOSE}}{add an EXPOSE command}
 #'   \item{\code{VOLUME}}{add a VOLUME command}
 #'   \item{\code{CMD}}{add a CMD command}
 #'   \item{\code{LABEL}}{add a LABEL command}
-#'   \item{\code{ENV}}{add a ENV command}
-#'   \item{\code{ENTRYPOINT}}{add a ENTRYPOINT command}
+#'   \item{\code{ENV}}{add an ENV command}
+#'   \item{\code{ENTRYPOINT}}{add an ENTRYPOINT command}
 #'   \item{\code{VOLUME}}{add a VOLUME command}
 #'   \item{\code{USER}}{add a USER command}
 #'   \item{\code{ARG}}{add an ARG command}
@@ -75,11 +75,11 @@ Dockerfile <- R6::R6Class("Dockerfile",
                         USER = function(user){
                           self$Dockerfile <- c(self$Dockerfile, add_user(user))
                         },
-                        ARG = function(arg, ahead = FALSE){
+                        ARG = function(arg, ahead = FALSE, default = NULL){
                           if (ahead) {
-                            self$Dockerfile <- c(add_arg(arg), self$Dockerfile)
+                            self$Dockerfile <- c(add_arg(arg, default = default), self$Dockerfile)
                           } else {
-                            self$Dockerfile <- c(self$Dockerfile,add_arg(arg))
+                            self$Dockerfile <- c(self$Dockerfile, add_arg(arg, default = default))
                           }
                         },
                         ONBUILD = function(cmd){

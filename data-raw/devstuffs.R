@@ -10,7 +10,7 @@ my_desc <- description$new("!new")
 # Set your package name
 my_desc$set("Package", "dockerfiler")
 
-#Set your name
+# Set your name
 my_desc$set("Authors@R", "person('Colin', 'Fay', email = 'contact@colinfay.me', role = c('cre', 'aut'))")
 
 # Remove some author fields
@@ -61,4 +61,3 @@ use_tidy_description()
 
 # Test with rhub
 rhub::check_for_cran()
-

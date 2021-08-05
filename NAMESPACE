@@ -2,6 +2,7 @@
 
 export(Dockerfile)
 export(dock_from_desc)
+export(dock_from_renv)
 export(r)
 importFrom(R6,R6Class)
 importFrom(attempt,warn_if_not)

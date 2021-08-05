@@ -1,7 +1,11 @@
 Package: dockerfiler
 Title: Easy Dockerfile Creation from R
 Version: 0.1.3.9000
-Authors@R: person('Colin', 'Fay', email = 'contact@colinfay.me', role = c('cre', 'aut'))
+Authors@R: c(
+    person('Colin', 'Fay', email = 'contact@colinfay.me', role = c('cre', 'aut')),
+    person('Josiah', 'Parry', email = 'josiah.parry@gmail.com', role = 'aut',
+           comment = c(ORCID = "0000-0001-9910-865X"))
+    )
 Description: Build a Dockerfile straight from your R session. 'dockerfiler' allows 
     you to create step by step a Dockerfile, and provide convenient tools to wrap 
     R code inside this Dockerfile. 
@@ -12,7 +16,8 @@ Imports:
     attempt,
     glue,
     R6, 
-    utils
+    utils,
+    pak
 Suggests: 
     covr,
     testthat,
@@ -20,5 +25,5 @@ Suggests:
     rmarkdown
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 6.1.0
+RoxygenNote: 7.1.1
 VignetteBuilder: knitr

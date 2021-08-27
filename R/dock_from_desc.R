@@ -53,6 +53,7 @@ base_pkg_ <- c(
 #' @importFrom remotes dev_package_deps
 #' @importFrom desc desc_get_deps desc_get
 #' @importFrom usethis use_build_ignore
+#' @importFrom pkgbuild build
 #'
 #' @export
 dock_from_desc <- function(
@@ -145,7 +146,7 @@ dock_from_desc <- function(
     packages_with_version$package
   )
 
-  dock <- dockerfiler::Dockerfile$new(
+  dock <- Dockerfile$new(
     FROM = FROM,
     AS = AS
   )
@@ -274,7 +275,7 @@ dock_from_desc <- function(
           )
         )
       ) {
-        out <- pkgbuild::build(
+        out <- build(
           path = ".",
           dest_path = ".",
           vignettes = FALSE
@@ -282,7 +283,7 @@ dock_from_desc <- function(
         if (missing(out)) {
           cat_red_bullet("Error during tar.gz building")
         } else {
-          usethis::use_build_ignore(files = out)
+          use_build_ignore(files = out)
           cat_green_tick(
             sprintf(
               " %s_%s.tar.gz created.",

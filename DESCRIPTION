@@ -17,7 +17,7 @@ Imports:
     glue,
     R6, 
     utils,
-    pak (>= 0.12.9001),
+    pak,
     renv (>= 0.14.0)
 Suggests: 
     covr,

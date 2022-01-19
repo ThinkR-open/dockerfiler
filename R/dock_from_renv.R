@@ -24,7 +24,7 @@ dock_from_renv <- function(lockfile = "renv.lock", distro = "xenial", primary_re
                            out_dir = NULL,
                            use_rspm = TRUE) {
 
-  lock <- renv:::lockfile(lockfile)
+  lock <- getFromNamespace("lockfile", "renv")(lockfile)
 
   # change to public package manager by default, if false use default repo
   if (use_rspm) {
@@ -35,7 +35,7 @@ dock_from_renv <- function(lockfile = "renv.lock", distro = "xenial", primary_re
   }
 
   # start the dockerfile
-  dock <- Dockerfile$new(gen_base_image(distro = distro, r_version = lock$version()))
+  dock <- Dockerfile$new(gen_base_image(distro = distro, r_version = lock$data()$R$Version))
 
   distro_args <- switch(distro,
                         centos7 = list(os = "centos", os_release = "7"),
@@ -66,6 +66,7 @@ dock_from_renv <- function(lockfile = "renv.lock", distro = "xenial", primary_re
 
   dock$COPY(lockfile, "renv.lock")
   dock$RUN(glue::glue('R -e "{renv_install}"'))
+
   dock$RUN(r(renv::restore()))
 
   if (!is.null(out_dir)) dock$write(file.path(out_dir, "Dockerfile"))

@@ -1,13 +1,12 @@
-context("test-r6.R")
 
-expect_captured_length <- function(x, length){
+expect_captured_length <- function(x, length) {
   expect_equal(length(capture.output(x)), length)
 }
 
 test_that("R6 creation works", {
   my_dock <- Dockerfile$new()
-  expect_is(my_dock, "R6")
-  expect_is(my_dock, "Dockerfile")
+  expect_s3_class(my_dock, "R6")
+  expect_s3_class(my_dock, "Dockerfile")
   my_dock$RUN("mkdir /usr/scripts")
   expect_captured_length(my_dock, 2)
   my_dock$ADD("from", "/usr/scripts")
@@ -44,8 +43,9 @@ test_that("R6 creation works", {
   expect_captured_length(my_dock, 18)
   my_dock$remove_cmd(1)
   expect_captured_length(my_dock, 17)
-  my_dock$switch_cmd(5,6)
+  my_dock$switch_cmd(5, 6)
   expect_captured_length(my_dock, 17)
+
   my_dock <- Dockerfile$new(FROM = "plop")
   expect_match(my_dock$Dockerfile, "plop")
   my_dock <- Dockerfile$new(FROM = "plop", AS = "pouet")
@@ -55,6 +55,6 @@ test_that("R6 creation works", {
 
 test_that("warning works", {
   my_dock <- Dockerfile$new()
-  expect_warning(my_dock$COPY("nfi", "norifi", force = FALSE))
+  # expect_warning(my_dock$COPY("nfi", "norifi", force = FALSE))
   expect_warning(my_dock$EXPOSE("9000"))
 })

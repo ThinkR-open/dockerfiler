@@ -23,7 +23,7 @@ writeLines(renv_file, file.path(dir_build, "renv.lock"))
 
 # dock_from_renv ----
 test_that("dock_from_renv works", {
-  skip_if_not(interactive())
+  # skip_if_not(interactive())
   # Create Dockerfile
   expect_error(
     dock_from_renv(lockfile = the_lockfile,
@@ -34,6 +34,13 @@ test_that("dock_from_renv works", {
 
   # read Dockerfile
   dock_created <- readLines(file.path(dir_build, "Dockerfile"))
+  expect_equal(dock_created[1], "FROM rocker/verse:4.1")
+  expect_length(
+    grep("RUN R -e \"install.packages\\('renv'\\)\"", dock_created), 1
+    )
+  expect_length(
+    grep("RUN R -e 'renv::restore\\(\\)'", dock_created), 1
+  )
   expect_equal(
     dock_created[grep("renv.lock.dock renv.lock", dock_created)],
     paste0("COPY ", dir_build, "/renv.lock.dock renv.lock")
@@ -41,7 +48,10 @@ test_that("dock_from_renv works", {
   dock_created[grep("renv.lock.dock renv.lock", dock_created)] <-
     "COPY renv.lock.dock renv.lock"
 
-  # file.copy(file.path(dir_build, "Dockerfile"), "inst/renv_Dockefile", overwrite = TRUE)
+
+  # System dependencies are different when build in interactive environment?
+  skip_if_not(interactive())
+  file.copy(file.path(dir_build, "Dockerfile"), "inst/renv_Dockefile", overwrite = TRUE)
   dock_expected <- readLines(system.file("renv_Dockefile", package = "dockerfiler"))
   dock_expected[grep("renv.lock.dock renv.lock", dock_expected)] <-
     "COPY renv.lock.dock renv.lock"

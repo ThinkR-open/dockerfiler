@@ -23,6 +23,7 @@ Authors:
 \itemize{
   \item Vincent Guyader \email{vincent@thinkr.fr} (\href{https://orcid.org/0000-0003-0671-9270}{ORCID})
   \item Josiah Parry \email{josiah.parry@gmail.com} (\href{https://orcid.org/0000-0001-9910-865X}{ORCID})
+  \item Sébastien Rochette \email{sebastien@thinkr.fr} (\href{https://orcid.org/0000-0002-1565-9313}{ORCID})
 }
 
 }

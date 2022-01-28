@@ -30,58 +30,67 @@ base_pkg_ <- c(
   "utils"
 )
 
-test_that("dock_from_desc works", {
-  my_dock <- dock_from_desc()
+descdir <- tempfile(pattern = "desc")
+dir.create(descdir)
+file.copy("DESCRIPTION", descdir)
 
-  expect_s3_class(my_dock, "R6")
-  expect_s3_class(my_dock, "Dockerfile")
+usethis::with_project(descdir, {
+  test_that("dock_from_desc works", {
+    my_dock <- dock_from_desc(file.path(descdir, "DESCRIPTION"))
 
-  tpf <- tempfile()
+    expect_s3_class(my_dock, "R6")
+    expect_s3_class(my_dock, "Dockerfile")
 
-  my_dock$write(tpf)
+    tpf <- tempfile()
 
-  tpf <- paste(
-    readLines(tpf),
-    collapse = " "
-  )
+    my_dock$write(tpf)
 
-  expect_true(
-    grepl(
-      "rocker/r-ver",
-      tpf
+    tpf <- paste(
+      readLines(tpf),
+      collapse = " "
     )
-  )
-  expect_true(
-    grepl(
-      "apt-get update && apt-get install",
-      tpf
-    )
-  )
-  expect_true(
-    grepl(
-      "mkdir /build_zone",
-      tpf
-    )
-  )
-  expect_true(
-    grepl(
-      "rm -rf /build_zone",
-      tpf
-    )
-  )
-  browser()
-  x <- desc::desc_get_deps()
-  x <- x[x$type == "Imports" & !(x$package %in% base_pkg_), ]
-  if (length(x) > 0){
-    for (i in x$package) {
-      cat(i)
-      expect_true(
-        grepl(
-          i,
-          tpf
-        )
+
+    expect_true(
+      grepl(
+        "rocker/r-ver",
+        tpf
       )
-    }
-  }
+    )
+    expect_true(
+      grepl(
+        "apt-get update && apt-get install",
+        tpf
+      )
+    )
+    expect_true(
+      grepl(
+        "mkdir /build_zone",
+        tpf
+      )
+    )
+    expect_true(
+      grepl(
+        "rm -rf /build_zone",
+        tpf
+      )
+    )
 
+    x <- desc::desc_get_deps()
+    x <- x[x$type == "Imports" & !(x$package %in% base_pkg_), ]
+    if (length(x) > 0) {
+      for (i in x$package) {
+        cat(i)
+        expect_true(
+          grepl(
+            i,
+            tpf
+          )
+        )
+      }
+    }
+
+    # Only if package I guess
+    # expect_true(file.exists(file.path(descdir, ".Rbuildignore")))
+    expect_true(file.exists(file.path(descdir, ".dockerignore")))
+  })
 })

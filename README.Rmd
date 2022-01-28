@@ -13,9 +13,10 @@ knitr::opts_chunk$set(
 )
 ```
 
-  <!-- badges: start -->
-  [![R-CMD-check](https://github.com/ColinFay/dockerfiler/workflows/R-CMD-check/badge.svg)](https://github.com/ColinFay/dockerfiler/actions)![status](http://www.repostatus.org/badges/latest/active.svg)   [![Travis build status](https://travis-ci.org/ColinFay/dockerfiler.svg?branch=master)](https://travis-ci.org/ColinFay/dockerfiler)   [![Coverage status](https://codecov.io/gh/ColinFay/dockerfiler/branch/master/graph/badge.svg)](https://codecov.io/github/ColinFay/dockerfiler?branch=master)
-  <!-- badges: end -->
+<!-- badges: start -->
+[![R-CMD-check](https://github.com/ColinFay/dockerfiler/workflows/R-CMD-check/badge.svg)](https://github.com/ColinFay/dockerfiler/actions)
+[![Coverage status](https://codecov.io/gh/ColinFay/dockerfiler/branch/master/graph/badge.svg)](https://codecov.io/github/ColinFay/dockerfiler?branch=master)
+<!-- badges: end -->
 
 
 # `{dockerfiler}`
@@ -128,6 +129,38 @@ my_dock$add_after(
 my_dock
 ```
 
+## Create a Dockerfile from renv.lock
+
+- Create renv.lock
+```{r, message=FALSE, results='hide'}
+dir_build <- tempfile(pattern = "renv")
+dir.create(dir_build)
+
+# Create a lockfile
+the_lockfile <- file.path(dir_build, "renv.lock")
+custom_packages <- c(
+  # attachment::att_from_description(),
+  "renv",
+  "cli", "glue", #"golem",
+  "shiny", "stats", "utils",
+  "testthat",
+  "knitr"
+)
+renv::snapshot(
+  packages = custom_packages,
+  lockfile = the_lockfile,
+  prompt = FALSE)
+```
+
+- Build Dockerfile
+```{r}
+my_dock <- dock_from_renv(lockfile = the_lockfile,
+                   distro = "focal",
+                   FROM = "rocker/verse",
+                   out_dir = dir_build
+    )
+my_dock
+```
 
 ## Contact
 

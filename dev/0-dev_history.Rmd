@@ -61,6 +61,8 @@ pkgload::load_all()
 attachment::att_amend_desc()
 
 # Check the package
+pkgload::load_all()
+devtools::test() # for interactive required
 devtools::check()
 ```
 

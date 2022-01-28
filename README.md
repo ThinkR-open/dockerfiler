@@ -1,10 +1,8 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-
 <!-- badges: start -->
-[![R-CMD-check](https://github.com/ColinFay/dockerfiler/workflows/R-CMD-check/badge.svg)](https://github.com/ColinFay/dockerfiler/actions)![status](http://www.repostatus.org/badges/latest/active.svg)
-[![Travis build
-status](https://travis-ci.org/ColinFay/dockerfiler.svg?branch=master)](https://travis-ci.org/ColinFay/dockerfiler)
+
+[![R-CMD-check](https://github.com/ColinFay/dockerfiler/workflows/R-CMD-check/badge.svg)](https://github.com/ColinFay/dockerfiler/actions)
 [![Coverage
 status](https://codecov.io/gh/ColinFay/dockerfiler/branch/master/graph/badge.svg)](https://codecov.io/github/ColinFay/dockerfiler?branch=master)
 <!-- badges: end -->
@@ -142,15 +140,34 @@ dependencies and the package.
 
 ``` r
 my_dock <- dock_from_desc("DESCRIPTION")
+#> ℹ Please wait while we compute system requirements...
+#> ✓ Done
+#> • .dockerignore already present, skipping its creation.
 my_dock
-#> FROM rocker/r-base
+#> FROM rocker/r-ver:4.1.2
+#> RUN apt-get update && apt-get install -y  git-core libcurl4-openssl-dev libgit2-dev libicu-dev libssl-dev make pandoc pandoc-citeproc && rm -rf /var/lib/apt/lists/*
+#> RUN echo "options(repos = c(CRAN = 'https://cran.rstudio.com/'), download.file.method = 'libcurl', Ncpus = 4)" >> /usr/local/lib/R/etc/Rprofile.site
 #> RUN R -e 'install.packages("remotes")'
-#> RUN R -e 'remotes::install_github("r-lib/remotes", ref = "6c8fdaa")'
-#> RUN R -e 'remotes::install_cran("attempt")'
-#> RUN R -e 'remotes::install_cran("glue")'
-#> RUN R -e 'remotes::install_cran("R6")'
-#> COPY dockerfiler_*.tar.gz /app.tar.gz
-#> RUN remotes::install_local('/app.tar.gz')
+#> RUN Rscript -e 'remotes::install_version("glue",upgrade="never", version = "1.5.0")'
+#> RUN Rscript -e 'remotes::install_version("cli",upgrade="never", version = "3.1.0")'
+#> RUN Rscript -e 'remotes::install_version("R6",upgrade="never", version = "2.5.1")'
+#> RUN Rscript -e 'remotes::install_version("desc",upgrade="never", version = "1.4.0")'
+#> RUN Rscript -e 'remotes::install_version("jsonlite",upgrade="never", version = "1.7.2")'
+#> RUN Rscript -e 'remotes::install_version("knitr",upgrade="never", version = "1.37")'
+#> RUN Rscript -e 'remotes::install_version("fs",upgrade="never", version = "1.5.0")'
+#> RUN Rscript -e 'remotes::install_version("testthat",upgrade="never", version = "3.0.0")'
+#> RUN Rscript -e 'remotes::install_version("rmarkdown",upgrade="never", version = "2.11")'
+#> RUN Rscript -e 'remotes::install_version("usethis",upgrade="never", version = "2.1.3")'
+#> RUN Rscript -e 'remotes::install_version("renv",upgrade="never", version = "0.13.2")'
+#> RUN Rscript -e 'remotes::install_version("pkgbuild",upgrade="never", version = "1.2.0")'
+#> RUN Rscript -e 'remotes::install_version("pak",upgrade="never", version = "0.2.1")'
+#> RUN Rscript -e 'remotes::install_version("attempt",upgrade="never", version = "0.3.1")'
+#> RUN Rscript -e 'remotes::install_github("dgkf/remotes@aa6f2a24b235c3e06cc603855fd250f44457abbf")'
+#> RUN mkdir /build_zone
+#> ADD . /build_zone
+#> WORKDIR /build_zone
+#> RUN R -e 'remotes::install_local(upgrade="never")'
+#> RUN rm -rf /build_zone
 
 my_dock$CMD(r(library(dockerfiler)))
 
@@ -159,21 +176,83 @@ my_dock$add_after(
   after = 3
 )
 my_dock
-#> FROM rocker/r-base
-#> RUN R -e 'install.packages("remotes")'
-#> RUN R -e 'remotes::install_github("r-lib/remotes", ref = "6c8fdaa")'
+#> FROM rocker/r-ver:4.1.2
+#> RUN apt-get update && apt-get install -y  git-core libcurl4-openssl-dev libgit2-dev libicu-dev libssl-dev make pandoc pandoc-citeproc && rm -rf /var/lib/apt/lists/*
+#> RUN echo "options(repos = c(CRAN = 'https://cran.rstudio.com/'), download.file.method = 'libcurl', Ncpus = 4)" >> /usr/local/lib/R/etc/Rprofile.site
 #> RUN R -e 'remotes::install_cran("rlang")'
-#> RUN R -e 'remotes::install_cran("attempt")'
-#> RUN R -e 'remotes::install_cran("glue")'
-#> RUN R -e 'remotes::install_cran("R6")'
-#> COPY dockerfiler_*.tar.gz /app.tar.gz
-#> RUN remotes::install_local('/app.tar.gz')
+#> RUN R -e 'install.packages("remotes")'
+#> RUN Rscript -e 'remotes::install_version("glue",upgrade="never", version = "1.5.0")'
+#> RUN Rscript -e 'remotes::install_version("cli",upgrade="never", version = "3.1.0")'
+#> RUN Rscript -e 'remotes::install_version("R6",upgrade="never", version = "2.5.1")'
+#> RUN Rscript -e 'remotes::install_version("desc",upgrade="never", version = "1.4.0")'
+#> RUN Rscript -e 'remotes::install_version("jsonlite",upgrade="never", version = "1.7.2")'
+#> RUN Rscript -e 'remotes::install_version("knitr",upgrade="never", version = "1.37")'
+#> RUN Rscript -e 'remotes::install_version("fs",upgrade="never", version = "1.5.0")'
+#> RUN Rscript -e 'remotes::install_version("testthat",upgrade="never", version = "3.0.0")'
+#> RUN Rscript -e 'remotes::install_version("rmarkdown",upgrade="never", version = "2.11")'
+#> RUN Rscript -e 'remotes::install_version("usethis",upgrade="never", version = "2.1.3")'
+#> RUN Rscript -e 'remotes::install_version("renv",upgrade="never", version = "0.13.2")'
+#> RUN Rscript -e 'remotes::install_version("pkgbuild",upgrade="never", version = "1.2.0")'
+#> RUN Rscript -e 'remotes::install_version("pak",upgrade="never", version = "0.2.1")'
+#> RUN Rscript -e 'remotes::install_version("attempt",upgrade="never", version = "0.3.1")'
+#> RUN Rscript -e 'remotes::install_github("dgkf/remotes@aa6f2a24b235c3e06cc603855fd250f44457abbf")'
+#> RUN mkdir /build_zone
+#> ADD . /build_zone
+#> WORKDIR /build_zone
+#> RUN R -e 'remotes::install_local(upgrade="never")'
+#> RUN rm -rf /build_zone
 #> CMD R -e 'library(dockerfiler)'
+```
+
+## Create a Dockerfile from renv.lock
+
+-   Create renv.lock
+
+``` r
+dir_build <- tempfile(pattern = "renv")
+dir.create(dir_build)
+
+# Create a lockfile
+the_lockfile <- file.path(dir_build, "renv.lock")
+custom_packages <- c(
+  # attachment::att_from_description(),
+  "renv",
+  "cli", "glue", #"golem",
+  "shiny", "stats", "utils",
+  "testthat",
+  "knitr"
+)
+renv::snapshot(
+  packages = custom_packages,
+  lockfile = the_lockfile,
+  prompt = FALSE)
+```
+
+-   Build Dockerfile
+
+``` r
+my_dock <- dock_from_renv(lockfile = the_lockfile,
+                   distro = "focal",
+                   FROM = "rocker/verse",
+                   out_dir = dir_build
+    )
+#> Fetching system dependencies for 57 package records.
+my_dock
+#> FROM rocker/verse:4.1
+#> RUN apt-get update -y
+#> RUN apt-get install -y make
+#> RUN apt-get install -y zlib1g-dev
+#> RUN apt-get install -y libicu-dev
+#> RUN apt-get install -y pandoc
+#> RUN echo "options(renv.config.pak.enabled = TRUE, repos = c(RSPM = 'https://packagemanager.rstudio.com/all/__linux__/focal}/latest', CRAN = 'https://cran.rstudio.com/'), download.file.method = 'libcurl', Ncpus = 4)" >> /usr/local/lib/R/etc/Rprofile.site
+#> COPY /tmp/RtmpegfGvg/renvcf2107bee05df/renv.lock.dock renv.lock
+#> RUN R -e "install.packages('renv')"
+#> RUN R -e 'renv::restore()'
 ```
 
 ## Contact
 
-Questions and feedbacks [welcome](mailto:contact@colinfay.me)\!
+Questions and feedbacks [welcome](mailto:contact@colinfay.me)!
 
 You want to contribute ? Open a
 [PR](https://github.com/ColinFay/dockerfiler/pulls) :) If you encounter

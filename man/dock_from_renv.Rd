@@ -6,10 +6,11 @@
 \usage{
 dock_from_renv(
   lockfile = "renv.lock",
-  distro = "xenial",
-  primary_repo = "CRAN",
+  distro = "focal",
   out_dir = NULL,
-  use_rspm = TRUE
+  FROM = "rocker/r-base",
+  repos = c(RSPM = paste0("https://packagemanager.rstudio.com/all/__linux__/", distro,
+    "}/latest"), CRAN = "https://cran.rstudio.com/")
 )
 }
 \arguments{
@@ -17,11 +18,11 @@ dock_from_renv(
 
 \item{distro}{One of "focal", "bionic", "xenial", "centos7", or "centos8". See available distributions at https://hub.docker.com/r/rstudio/r-base/.}
 
-\item{primary_repo}{Default "CRAN". Indicates which repository in the `renv.lock` file to install the renv package from.}
-
 \item{out_dir}{The directory where to write the `Dockerfile`. When `NULL` no file is written. `NULL` by default.}
 
-\item{use_rspm}{Utilize the Public RStudio Package Manager for Linux binaries. Default `TRUE`.}
+\item{FROM}{Docker image to start FROM}
+
+\item{repos}{CRAN repository to use inside the Dockerfile}
 }
 \value{
 A R6 object of class `Dockerfile`.
@@ -35,8 +36,9 @@ System requirements for packages are provided through RStudio Package Manager vi
 The R version is taken from the `renv.lock` file. Packages are installed using `renv::restore()` which ensures that the proper package version and source is used when installed.
 
 By default, `dock_from_renv()` will utilize the [public RStudio Package Manager](https://packagemanager.rstudio.com/) (PPM) to provide linux binaries. This dramatically improves install time. This is done when `use_rspm = TRUE`.  To do so, a new file `renv.lock.dock` will be created so as to not overwrite your existing `renv.lock` file. This new `renv.lock.dock` file is used to build the Docker image with PPM binaries.
-
-\donttest{
+}
+\examples{
+\dontrun{
 dock <- dock_from_renv("renv.lock", distro = "xenial", out_dir = getwd())
 dock
 }

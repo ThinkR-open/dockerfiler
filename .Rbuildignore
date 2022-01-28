@@ -1,3 +1,5 @@
+^renv$
+^renv\.lock$
 ^CRAN-RELEASE$
 ^.*\.Rproj$
 ^\.Rproj\.user$
@@ -10,3 +12,6 @@
 ^codecov\.yml$
 ^appveyor\.yml$
 ^\.github$
+^dev$
+^dockerfiler\.Rproj$
+^\.dockerignore$

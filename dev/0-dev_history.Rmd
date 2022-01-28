@@ -1,0 +1,77 @@
+---
+title: "Development actions history"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+All commands that you use to use when developing packages...
+
+# Start using git
+
+```{r, eval=FALSE}
+usethis::use_git()
+# Deal with classical files to ignore
+usethis::git_vaccinate()
+```
+
+# Set extra sources of documentation
+
+```{r, eval=FALSE}
+# README
+usethis::use_readme_rmd()
+# Code of Conduct
+usethis::use_code_of_conduct("contact@fake.com")
+# NEWS
+usethis::use_news_md()
+```
+
+**From now, you will need to "inflate" your package at least once to be able to use the following commands. Let's go to your flat template, and come back here later if/when needed.**
+
+
+# Package development tools
+## Use once
+
+```{r, eval=FALSE}
+# Pipe
+usethis::use_pipe()
+
+# package-level documentation
+usethis::use_package_doc()
+
+# Set CI
+# _GitHub
+usethis::use_github_action_check_standard()
+usethis::use_github_action("pkgdown")
+usethis::use_github_action("test-coverage")
+# _GitLab
+gitlabr::use_gitlab_ci(type = "check-coverage-pkgdown")
+
+# Add new flat template
+fusen::add_flat_template("add")
+```
+
+## Use everytime needed
+
+```{r}
+# Simulate package installation
+pkgload::load_all()
+
+# Generate documentation and deal with dependencies
+attachment::att_amend_desc()
+
+# Check the package
+devtools::check()
+```
+
+# Share the package
+
+```{r}
+# set and try pkgdown documentation website
+usethis::use_pkgdown()
+pkgdown::build_site()
+
+# build the tar.gz to share with others
+devtools::build()
+```
+

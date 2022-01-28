@@ -169,20 +169,7 @@ dock_from_desc <- function(
     }
   }
 
-
-  repos_as_character <- paste(
-    utils::capture.output(
-      dput(repos)
-    ),
-    collapse = ""
-  )
-
-  repos_as_character <- gsub(
-    pattern = '\"',
-    replacement = "'",
-    x = repos_as_character
-  )
-
+  repos_as_character <- repos_as_character(repos)
 
   dock$RUN(
     sprintf(
@@ -318,3 +305,22 @@ dock_from_desc <- function(
 
   dock
 }
+
+#' @noRd
+repos_as_character <- function(repos) {
+  repos_as_character <- paste(
+    utils::capture.output(
+      dput(repos)
+    ),
+    collapse = ""
+  )
+
+  repos_as_character <- gsub(
+    pattern = '\"',
+    replacement = "'",
+    x = repos_as_character
+  )
+
+  repos_as_character
+}
+

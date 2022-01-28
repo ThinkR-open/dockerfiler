@@ -4,7 +4,7 @@
 \alias{gen_base_image}
 \title{Generate base image name}
 \usage{
-gen_base_image(distro = "bionic", r_version = lock$version())
+gen_base_image(distro = "bionic", r_version = "4.0", FROM = "rstudio/r-base")
 }
 \description{
 Creates the base image name from the provided distro name and the R version found in the `renv.lock` file.

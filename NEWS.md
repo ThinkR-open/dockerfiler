@@ -1,3 +1,7 @@
+# dockerfile 0.1.5
+
+* Added `dock_from_renv()`, to create a Dockerfile from a renv.lock file (@JosiahParry, @statnmap)
+
 # dockerfiler 0.1.4
 
 * new version of `dock_from_desc()`

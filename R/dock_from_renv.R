@@ -11,6 +11,8 @@ available_distros <- c("xenial" , "bionic" , "focal" , "centos7" , "centos8")
 #' @param repos CRAN repository to use inside the Dockerfile
 #'
 #' @importFrom utils getFromNamespace
+#' @importFrom purrr possibly
+#' @importFrom pak pkg_system_requirements
 #' @return A R6 object of class `Dockerfile`.
 #' @details
 #'
@@ -71,7 +73,10 @@ dock_from_renv <- function(lockfile = "renv.lock",
 
   message(sprintf("Fetching system dependencies for %s package records.", length(pkgs)))
 
-  pkg_sysreqs <- lapply(pkg_os, function(x) do.call(pak::pkg_system_requirements, x))
+
+  psr <- purrr::possibly(pak::pkg_system_requirements,otherwise = character(0))
+  pkg_sysreqs <- lapply(pkg_os, function(x) do.call(psr, x))
+
 
   pkg_installs <- unique(unlist(pkg_sysreqs))
 

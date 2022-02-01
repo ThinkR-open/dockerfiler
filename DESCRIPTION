@@ -26,6 +26,7 @@ Imports:
     jsonlite (>= 1.7.2),
     pak (>= 0.2.0),
     pkgbuild (>= 1.2.0),
+    purrr,
     R6 (>= 2.5.0),
     remotes (>= 2.2.0),
     renv (>= 0.12.0),

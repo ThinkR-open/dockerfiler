@@ -14,8 +14,8 @@ knitr::opts_chunk$set(
 ```
 
 <!-- badges: start -->
-[![R-CMD-check](https://github.com/ColinFay/dockerfiler/workflows/R-CMD-check/badge.svg)](https://github.com/ColinFay/dockerfiler/actions)
-[![Coverage status](https://codecov.io/gh/ColinFay/dockerfiler/branch/master/graph/badge.svg)](https://codecov.io/github/ColinFay/dockerfiler?branch=master)
+[![R-CMD-check](https://github.com/ThinkR-open/dockerfiler/workflows/R-CMD-check/badge.svg)](https://github.com/ThinkR-open/dockerfiler/actions)
+[![Coverage status](https://codecov.io/gh/ThinkR-open/dockerfiler/branch/master/graph/badge.svg)](https://codecov.io/github/ThinkR-open/dockerfiler?branch=master)
 <!-- badges: end -->
 
 
@@ -29,7 +29,7 @@ You can install dockerfiler from GitHub with:
 
 ```{r gh-installation, eval = FALSE}
 # install.packages("remotes")
-remotes::install_github("colinfay/dockerfiler")
+remotes::install_github("ThinkR-open/dockerfiler")
 ```
 
 Or from CRAN with : 
@@ -166,7 +166,7 @@ my_dock
 
 Questions and feedbacks [welcome](mailto:contact@colinfay.me)!
 
-You want to contribute ? Open a [PR](https://github.com/ColinFay/dockerfiler/pulls) :) If you encounter a bug or want to suggest an enhancement, please [open an issue](https://github.com/ColinFay/dockerfiler/issues).
+You want to contribute ? Open a [PR](https://github.com/ThinkR-open/dockerfiler/pulls) :) If you encounter a bug or want to suggest an enhancement, please [open an issue](https://github.com/ThinkR-open/dockerfiler/issues).
 
 Please note that this project is released with a [Contributor Code of Conduct](CODE_OF_CONDUCT.md).
 By participating in this project you agree to abide by its terms.

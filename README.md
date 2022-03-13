@@ -2,9 +2,9 @@
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 <!-- badges: start -->
 
-[![R-CMD-check](https://github.com/ColinFay/dockerfiler/workflows/R-CMD-check/badge.svg)](https://github.com/ColinFay/dockerfiler/actions)
+[![R-CMD-check](https://github.com/ThinkR-open/dockerfiler/workflows/R-CMD-check/badge.svg)](https://github.com/ThinkR-open/dockerfiler/actions)
 [![Coverage
-status](https://codecov.io/gh/ColinFay/dockerfiler/branch/master/graph/badge.svg)](https://codecov.io/github/ColinFay/dockerfiler?branch=master)
+status](https://codecov.io/gh/ThinkR-open/dockerfiler/branch/master/graph/badge.svg)](https://codecov.io/github/ThinkR-open/dockerfiler?branch=master)
 <!-- badges: end -->
 
 # `{dockerfiler}`
@@ -17,7 +17,7 @@ You can install dockerfiler from GitHub with:
 
 ``` r
 # install.packages("remotes")
-remotes::install_github("colinfay/dockerfiler")
+remotes::install_github("ThinkR-open/dockerfiler")
 ```
 
 Or from CRAN with :
@@ -148,21 +148,21 @@ my_dock
 #> RUN apt-get update && apt-get install -y  git-core libcurl4-openssl-dev libgit2-dev libicu-dev libssl-dev make pandoc pandoc-citeproc && rm -rf /var/lib/apt/lists/*
 #> RUN echo "options(repos = c(CRAN = 'https://cran.rstudio.com/'), download.file.method = 'libcurl', Ncpus = 4)" >> /usr/local/lib/R/etc/Rprofile.site
 #> RUN R -e 'install.packages("remotes")'
-#> RUN Rscript -e 'remotes::install_version("glue",upgrade="never", version = "1.5.0")'
-#> RUN Rscript -e 'remotes::install_version("cli",upgrade="never", version = "3.1.0")'
+#> RUN Rscript -e 'remotes::install_version("glue",upgrade="never", version = "1.6.1")'
+#> RUN Rscript -e 'remotes::install_version("cli",upgrade="never", version = "3.1.1")'
 #> RUN Rscript -e 'remotes::install_version("R6",upgrade="never", version = "2.5.1")'
 #> RUN Rscript -e 'remotes::install_version("desc",upgrade="never", version = "1.4.0")'
-#> RUN Rscript -e 'remotes::install_version("jsonlite",upgrade="never", version = "1.7.2")'
+#> RUN Rscript -e 'remotes::install_version("jsonlite",upgrade="never", version = "1.7.3")'
 #> RUN Rscript -e 'remotes::install_version("knitr",upgrade="never", version = "1.37")'
-#> RUN Rscript -e 'remotes::install_version("fs",upgrade="never", version = "1.5.0")'
-#> RUN Rscript -e 'remotes::install_version("testthat",upgrade="never", version = "3.0.0")'
+#> RUN Rscript -e 'remotes::install_version("fs",upgrade="never", version = "1.5.2")'
+#> RUN Rscript -e 'remotes::install_version("testthat",upgrade="never", version = "3.1.2")'
 #> RUN Rscript -e 'remotes::install_version("rmarkdown",upgrade="never", version = "2.11")'
-#> RUN Rscript -e 'remotes::install_version("usethis",upgrade="never", version = "2.1.3")'
-#> RUN Rscript -e 'remotes::install_version("renv",upgrade="never", version = "0.13.2")'
-#> RUN Rscript -e 'remotes::install_version("pkgbuild",upgrade="never", version = "1.2.0")'
-#> RUN Rscript -e 'remotes::install_version("pak",upgrade="never", version = "0.2.1")'
+#> RUN Rscript -e 'remotes::install_version("usethis",upgrade="never", version = "2.1.5")'
+#> RUN Rscript -e 'remotes::install_version("renv",upgrade="never", version = "0.15.2")'
+#> RUN Rscript -e 'remotes::install_version("remotes",upgrade="never", version = "2.4.2")'
+#> RUN Rscript -e 'remotes::install_version("pkgbuild",upgrade="never", version = "1.3.1")'
+#> RUN Rscript -e 'remotes::install_version("pak",upgrade="never", version = "0.2.0")'
 #> RUN Rscript -e 'remotes::install_version("attempt",upgrade="never", version = "0.3.1")'
-#> RUN Rscript -e 'remotes::install_github("dgkf/remotes@aa6f2a24b235c3e06cc603855fd250f44457abbf")'
 #> RUN mkdir /build_zone
 #> ADD . /build_zone
 #> WORKDIR /build_zone
@@ -181,21 +181,21 @@ my_dock
 #> RUN echo "options(repos = c(CRAN = 'https://cran.rstudio.com/'), download.file.method = 'libcurl', Ncpus = 4)" >> /usr/local/lib/R/etc/Rprofile.site
 #> RUN R -e 'remotes::install_cran("rlang")'
 #> RUN R -e 'install.packages("remotes")'
-#> RUN Rscript -e 'remotes::install_version("glue",upgrade="never", version = "1.5.0")'
-#> RUN Rscript -e 'remotes::install_version("cli",upgrade="never", version = "3.1.0")'
+#> RUN Rscript -e 'remotes::install_version("glue",upgrade="never", version = "1.6.1")'
+#> RUN Rscript -e 'remotes::install_version("cli",upgrade="never", version = "3.1.1")'
 #> RUN Rscript -e 'remotes::install_version("R6",upgrade="never", version = "2.5.1")'
 #> RUN Rscript -e 'remotes::install_version("desc",upgrade="never", version = "1.4.0")'
-#> RUN Rscript -e 'remotes::install_version("jsonlite",upgrade="never", version = "1.7.2")'
+#> RUN Rscript -e 'remotes::install_version("jsonlite",upgrade="never", version = "1.7.3")'
 #> RUN Rscript -e 'remotes::install_version("knitr",upgrade="never", version = "1.37")'
-#> RUN Rscript -e 'remotes::install_version("fs",upgrade="never", version = "1.5.0")'
-#> RUN Rscript -e 'remotes::install_version("testthat",upgrade="never", version = "3.0.0")'
+#> RUN Rscript -e 'remotes::install_version("fs",upgrade="never", version = "1.5.2")'
+#> RUN Rscript -e 'remotes::install_version("testthat",upgrade="never", version = "3.1.2")'
 #> RUN Rscript -e 'remotes::install_version("rmarkdown",upgrade="never", version = "2.11")'
-#> RUN Rscript -e 'remotes::install_version("usethis",upgrade="never", version = "2.1.3")'
-#> RUN Rscript -e 'remotes::install_version("renv",upgrade="never", version = "0.13.2")'
-#> RUN Rscript -e 'remotes::install_version("pkgbuild",upgrade="never", version = "1.2.0")'
-#> RUN Rscript -e 'remotes::install_version("pak",upgrade="never", version = "0.2.1")'
+#> RUN Rscript -e 'remotes::install_version("usethis",upgrade="never", version = "2.1.5")'
+#> RUN Rscript -e 'remotes::install_version("renv",upgrade="never", version = "0.15.2")'
+#> RUN Rscript -e 'remotes::install_version("remotes",upgrade="never", version = "2.4.2")'
+#> RUN Rscript -e 'remotes::install_version("pkgbuild",upgrade="never", version = "1.3.1")'
+#> RUN Rscript -e 'remotes::install_version("pak",upgrade="never", version = "0.2.0")'
 #> RUN Rscript -e 'remotes::install_version("attempt",upgrade="never", version = "0.3.1")'
-#> RUN Rscript -e 'remotes::install_github("dgkf/remotes@aa6f2a24b235c3e06cc603855fd250f44457abbf")'
 #> RUN mkdir /build_zone
 #> ADD . /build_zone
 #> WORKDIR /build_zone
@@ -245,7 +245,7 @@ my_dock
 #> RUN apt-get install -y libicu-dev
 #> RUN apt-get install -y pandoc
 #> RUN echo "options(renv.config.pak.enabled = TRUE, repos = c(RSPM = 'https://packagemanager.rstudio.com/all/__linux__/focal}/latest', CRAN = 'https://cran.rstudio.com/'), download.file.method = 'libcurl', Ncpus = 4)" >> /usr/local/lib/R/etc/Rprofile.site
-#> COPY /tmp/RtmpegfGvg/renvcf2107bee05df/renv.lock.dock renv.lock
+#> COPY /tmp/Rtmpt2027C/renv157ef360a56354/renv.lock.dock renv.lock
 #> RUN R -e "install.packages('renv')"
 #> RUN R -e 'renv::restore()'
 ```
@@ -255,9 +255,9 @@ my_dock
 Questions and feedbacks [welcome](mailto:contact@colinfay.me)!
 
 You want to contribute ? Open a
-[PR](https://github.com/ColinFay/dockerfiler/pulls) :) If you encounter
-a bug or want to suggest an enhancement, please [open an
-issue](https://github.com/ColinFay/dockerfiler/issues).
+[PR](https://github.com/ThinkR-open/dockerfiler/pulls) :) If you
+encounter a bug or want to suggest an enhancement, please [open an
+issue](https://github.com/ThinkR-open/dockerfiler/issues).
 
 Please note that this project is released with a [Contributor Code of
 Conduct](CODE_OF_CONDUCT.md). By participating in this project you agree

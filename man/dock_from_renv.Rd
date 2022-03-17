@@ -7,22 +7,32 @@
 dock_from_renv(
   lockfile = "renv.lock",
   distro = "focal",
-  out_dir = NULL,
   FROM = "rocker/r-base",
-  repos = c(RSPM = paste0("https://packagemanager.rstudio.com/all/__linux__/", distro,
-    "}/latest"), CRAN = "https://cran.rstudio.com/")
+  AS = NULL,
+  sysreqs = TRUE,
+  repos = c(CRAN = "https://cran.rstudio.com/"),
+  expand = FALSE,
+  extra_sysreqs = NULL
 )
 }
 \arguments{
-\item{lockfile}{Path to an `renv.lock` file.}
+\item{lockfile}{Path to an `renv.lock` file to use as an input..}
 
 \item{distro}{One of "focal", "bionic", "xenial", "centos7", or "centos8". See available distributions at https://hub.docker.com/r/rstudio/r-base/.}
 
-\item{out_dir}{The directory where to write the `Dockerfile`. When `NULL` no file is written. `NULL` by default.}
+\item{FROM}{Docker image to start FROM Default is
+FROM rocker/r-base}
 
-\item{FROM}{Docker image to start FROM}
+\item{AS}{The AS of the Dockerfile. Default it NULL.}
 
-\item{repos}{CRAN repository to use inside the Dockerfile}
+\item{sysreqs}{boolean. If `TRUE`, the Dockerfile will contain sysreq installation.}
+
+\item{repos}{character. The URL(s) of the repositories to use for `options("repos")`.}
+
+\item{expand}{boolean. If `TRUE` each system requirement will have its own `RUN` line.}
+
+\item{extra_sysreqs}{character vector. Extra debian system requirements.
+Will be installed with apt-get install.}
 }
 \value{
 A R6 object of class `Dockerfile`.
@@ -34,12 +44,10 @@ Create a Dockerfile from an `renv.lock` file
 System requirements for packages are provided through RStudio Package Manager via the {pak} package. The install commands provided from pak are added as `RUN` directives within the `Dockerfile`.
 
 The R version is taken from the `renv.lock` file. Packages are installed using `renv::restore()` which ensures that the proper package version and source is used when installed.
-
-By default, `dock_from_renv()` will utilize the [public RStudio Package Manager](https://packagemanager.rstudio.com/) (PPM) to provide linux binaries. This dramatically improves install time. This is done when `use_rspm = TRUE`.  To do so, a new file `renv.lock.dock` will be created so as to not overwrite your existing `renv.lock` file. This new `renv.lock.dock` file is used to build the Docker image with PPM binaries.
 }
 \examples{
 \dontrun{
-dock <- dock_from_renv("renv.lock", distro = "xenial", out_dir = getwd())
-dock
+dock <- dock_from_renv("renv.lock", distro = "xenial")
+dock$write("Dockerfile")
 }
 }

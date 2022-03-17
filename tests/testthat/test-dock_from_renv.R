@@ -37,7 +37,7 @@ test_that("dock_from_renv works", {
   expect_equal(dock_created[1], "FROM rocker/verse:4.1")
   expect_length(
     grep("RUN R -e \"install.packages\\('renv'\\)\"", dock_created), 1
-    )
+  )
   expect_length(
     grep("RUN R -e 'renv::restore\\(\\)'", dock_created), 1
   )

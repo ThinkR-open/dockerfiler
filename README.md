@@ -142,7 +142,6 @@ dependencies and the package.
 my_dock <- dock_from_desc("DESCRIPTION")
 #> ℹ Please wait while we compute system requirements...
 #> ✓ Done
-#> • .dockerignore already present, skipping its creation.
 my_dock
 #> FROM rocker/r-ver:4.1.2
 #> RUN apt-get update && apt-get install -y  git-core libcurl4-openssl-dev libgit2-dev libicu-dev libssl-dev make pandoc pandoc-citeproc && rm -rf /var/lib/apt/lists/*
@@ -152,9 +151,9 @@ my_dock
 #> RUN Rscript -e 'remotes::install_version("cli",upgrade="never", version = "3.1.1")'
 #> RUN Rscript -e 'remotes::install_version("R6",upgrade="never", version = "2.5.1")'
 #> RUN Rscript -e 'remotes::install_version("desc",upgrade="never", version = "1.4.0")'
+#> RUN Rscript -e 'remotes::install_version("fs",upgrade="never", version = "1.5.2")'
 #> RUN Rscript -e 'remotes::install_version("jsonlite",upgrade="never", version = "1.7.3")'
 #> RUN Rscript -e 'remotes::install_version("knitr",upgrade="never", version = "1.37")'
-#> RUN Rscript -e 'remotes::install_version("fs",upgrade="never", version = "1.5.2")'
 #> RUN Rscript -e 'remotes::install_version("testthat",upgrade="never", version = "3.1.2")'
 #> RUN Rscript -e 'remotes::install_version("rmarkdown",upgrade="never", version = "2.11")'
 #> RUN Rscript -e 'remotes::install_version("usethis",upgrade="never", version = "2.1.5")'
@@ -185,9 +184,9 @@ my_dock
 #> RUN Rscript -e 'remotes::install_version("cli",upgrade="never", version = "3.1.1")'
 #> RUN Rscript -e 'remotes::install_version("R6",upgrade="never", version = "2.5.1")'
 #> RUN Rscript -e 'remotes::install_version("desc",upgrade="never", version = "1.4.0")'
+#> RUN Rscript -e 'remotes::install_version("fs",upgrade="never", version = "1.5.2")'
 #> RUN Rscript -e 'remotes::install_version("jsonlite",upgrade="never", version = "1.7.3")'
 #> RUN Rscript -e 'remotes::install_version("knitr",upgrade="never", version = "1.37")'
-#> RUN Rscript -e 'remotes::install_version("fs",upgrade="never", version = "1.5.2")'
 #> RUN Rscript -e 'remotes::install_version("testthat",upgrade="never", version = "3.1.2")'
 #> RUN Rscript -e 'remotes::install_version("rmarkdown",upgrade="never", version = "2.11")'
 #> RUN Rscript -e 'remotes::install_version("usethis",upgrade="never", version = "2.1.5")'
@@ -217,7 +216,7 @@ the_lockfile <- file.path(dir_build, "renv.lock")
 custom_packages <- c(
   # attachment::att_from_description(),
   "renv",
-  "cli", "glue", #"golem",
+  "cli", "glue", "golem",
   "shiny", "stats", "utils",
   "testthat",
   "knitr"
@@ -233,20 +232,20 @@ renv::snapshot(
 ``` r
 my_dock <- dock_from_renv(lockfile = the_lockfile,
                    distro = "focal",
-                   FROM = "rocker/verse",
-                   out_dir = dir_build
+                   FROM = "rocker/verse"
     )
-#> Fetching system dependencies for 57 package records.
+#> ℹ Please wait while we compute system requirements...
+#> Fetching system dependencies for 81 package records.
+#> Warning: `lang()` is deprecated as of rlang 0.2.0.
+#> Please use `call2()` instead.
+#> This warning is displayed once per session.
+#> ✓ Done
 my_dock
 #> FROM rocker/verse:4.1
-#> RUN apt-get update -y
-#> RUN apt-get install -y make
-#> RUN apt-get install -y zlib1g-dev
-#> RUN apt-get install -y libicu-dev
-#> RUN apt-get install -y pandoc
-#> RUN echo "options(renv.config.pak.enabled = TRUE, repos = c(RSPM = 'https://packagemanager.rstudio.com/all/__linux__/focal}/latest', CRAN = 'https://cran.rstudio.com/'), download.file.method = 'libcurl', Ncpus = 4)" >> /usr/local/lib/R/etc/Rprofile.site
-#> COPY /tmp/Rtmpt2027C/renv157ef360a56354/renv.lock.dock renv.lock
-#> RUN R -e "install.packages('renv')"
+#> RUN apt-get update -y && apt-get install -y  make  libcurl4-openssl-dev  libssl-dev  git  libgit2-dev  libicu-dev  libxml2-dev  zlib1g-dev  pandoc && rm -rf /var/lib/apt/lists/*
+#> RUN echo "options(renv.config.pak.enabled = TRUE, repos = c(CRAN = 'https://cran.rstudio.com/'), download.file.method = 'libcurl', Ncpus = 4)" >> /usr/local/lib/R/etc/Rprofile.site
+#> RUN R -e 'install.packages(c("renv","remotes"))'
+#> COPY renv.lock renv.lock
 #> RUN R -e 'renv::restore()'
 ```
 

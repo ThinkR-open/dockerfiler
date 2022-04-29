@@ -112,12 +112,12 @@ dock_from_desc <- function(
   } else if (!is.na(sr)) {
     message(
       paste(
-        "the DESCRIPTION file contains the SystemRequirements bellow: ",
+        "The DESCRIPTION file contains the following SystemRequirements: ",
         sr
       )
     )
     message(
-      "please check the Dockerfile created and if needed pass extra sysreqs using the extra_sysreqs param"
+      "Please check the created Dockerfile. \n You might needed to add extra sysreqs."
     )
   }
 
@@ -180,7 +180,7 @@ dock_from_desc <- function(
 
   dock$RUN("R -e 'install.packages(\"remotes\")'")
 
-  if ( length(packages_on_cran > 0) ) {
+  if (length(packages_on_cran > 0)) {
     ping <- mapply(
       function(dock, ver, nm) {
         res <- dock$RUN(
@@ -198,7 +198,7 @@ dock_from_desc <- function(
   }
 
   if (length(packages_not_on_cran > 0)) {
-    nn <-as.data.frame(
+    nn <- as.data.frame(
       do.call(
         rbind,
         lapply(
@@ -323,4 +323,3 @@ repos_as_character <- function(repos) {
 
   repos_as_character
 }
-

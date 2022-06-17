@@ -1,19 +1,13 @@
 # Workflow derived from https://github.com/r-lib/actions/tree/master/examples
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
-on:
-  push:
-    branches: [main, master]
-  pull_request:
-    branches: [main, master]
-
-
-name: Docker Image CI
 
 on:
   push:
-    branches: [ "main", "explo-dockerfile" ]
+    branches: [ "main", "explo-dockerfile","renv_en_folie" ]
   pull_request:
     branches: [ "main" ]
+
+name: Docker Image CI
 
 jobs:
 

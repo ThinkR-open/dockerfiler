@@ -1,0 +1,25 @@
+# Workflow derived from https://github.com/r-lib/actions/tree/master/examples
+# Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "main", "explo-dockerfile" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+
+  build:
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)

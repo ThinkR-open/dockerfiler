@@ -18,5 +18,5 @@ jobs:
     - name: Build the Docker image
     
       run: |
-        Rscript -e 'install.packages("pkgload");pkgload::load_all();descdir <- tempfile(pattern = "desc");dir.create(descdir);file.copy("DESCRIPTION", descdir);my_dock <- dock_from_desc(file.path(descdir, "DESCRIPTION"));my_dock$write("Dockerfile")'
+        Rscript -e 'try(install.packages("pkgload"));pkgload::load_all();descdir <- tempfile(pattern = "desc");dir.create(descdir);file.copy("DESCRIPTION", descdir);my_dock <- dock_from_desc(file.path(descdir, "DESCRIPTION"));my_dock$write("Dockerfile")'
         docker build . --file Dockerfile --tag my-image-name:$(date +%s)

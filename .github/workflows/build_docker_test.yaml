@@ -16,4 +16,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
+    
+      run: |
+        Rscript -e 'descdir <- tempfile(pattern = "desc");dir.create(descdir);file.copy("DESCRIPTION", descdir);my_dock <- dock_from_desc(file.path(descdir, "DESCRIPTION"));my_dock$write("Dockerfile")'
+        docker build . --file Dockerfile --tag my-image-name:$(date +%s)

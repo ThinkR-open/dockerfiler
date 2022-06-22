@@ -18,14 +18,17 @@ dock_from_renv(
 \arguments{
 \item{lockfile}{Path to an `renv.lock` file to use as an input..}
 
-\item{distro}{One of "focal", "bionic", "xenial", "centos7", or "centos8". See available distributions at https://hub.docker.com/r/rstudio/r-base/.}
+\item{distro}{One of "focal", "bionic", "xenial", "centos7",
+or "centos8". See available distributions
+at https://hub.docker.com/r/rstudio/r-base/.}
 
 \item{FROM}{Docker image to start FROM Default is
 FROM rocker/r-base}
 
 \item{AS}{The AS of the Dockerfile. Default it NULL.}
 
-\item{sysreqs}{boolean. If `TRUE`, the Dockerfile will contain sysreq installation.}
+\item{sysreqs}{boolean. If `TRUE`, the Dockerfile
+will contain sysreq installation.}
 
 \item{repos}{character. The URL(s) of the repositories to use for `options("repos")`.}
 
@@ -41,9 +44,14 @@ A R6 object of class `Dockerfile`.
 Create a Dockerfile from an `renv.lock` file
 }
 \details{
-System requirements for packages are provided through RStudio Package Manager via the {pak} package. The install commands provided from pak are added as `RUN` directives within the `Dockerfile`.
+System requirements for packages are provided
+through RStudio Package Manager via the {pak}
+package. The install commands provided from pak
+are added as `RUN` directives within the `Dockerfile`.
 
-The R version is taken from the `renv.lock` file. Packages are installed using `renv::restore()` which ensures that the proper package version and source is used when installed.
+The R version is taken from the `renv.lock` file.
+Packages are installed using `renv::restore()` which ensures
+that the proper package version and source is used when installed.
 }
 \examples{
 \dontrun{

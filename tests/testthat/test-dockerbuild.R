@@ -1,17 +1,9 @@
-
-
 test_that("dockerfile is buildable", {
 
-  descdir <- tempfile(pattern = "desc")
-  dir.create(descdir)
-  file.copy("DESCRIPTION", descdir)
-  my_dock <- dockerfiler:::dock_from_desc(file.path(descdir, "DESCRIPTION"),
-                                          FROM = "rocker/r-ver:4.1.2"
-
-
-                                          )
-  tpf <- "Dockerfile"
-  dirname(tpf)
+  # descdir <- tempfile(pattern = "desc")
+  # dir.create(descdir)
+  # file.copy("DESCRIPTION", descdir)
+  my_dock <- dock_from_renv(lockfile = "renv.lock")
   cat(".RData
 .Rhistory
 .git
@@ -20,11 +12,13 @@ manifest.json
 rsconnect/
 .Rproj.user",file = ".dockerignore")
   # file.edit(".dockerignore")
-  my_dock$write(tpf)
+  my_dock$write("Dockerfile")
 skip_on_cran()
   out1 <-system("docker run hello-world ")
 expect_equal(out1,0)
- out <- system(sprintf("docker build . --file %s ",tpf),wait = TRUE)
+ out <- system("docker build . --file Dockerfile ",wait = TRUE)
 # file.edit(tpf)
 expect_equal(out,0)
+
+unlink(".dockerignore")
 })

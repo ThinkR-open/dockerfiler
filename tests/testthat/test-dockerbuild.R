@@ -13,9 +13,18 @@ rsconnect/
 .Rproj.user",file = ".dockerignore")
   # file.edit(".dockerignore")
   my_dock$write("Dockerfile")
-skip_on_cran()
+
+
+
+
+
+
+  skip_on_cran()
+  out_v <-system("docker -v")
+skip_if_not(out_v == 0)
   out1 <-system("docker run hello-world ")
 expect_equal(out1,0)
+
  out <- system("docker build . --file Dockerfile ",wait = TRUE)
 # file.edit(tpf)
 expect_equal(out,0)

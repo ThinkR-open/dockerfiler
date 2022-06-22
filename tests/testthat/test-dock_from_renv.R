@@ -35,7 +35,7 @@ test_that("dock_from_renv works", {
   # read Dockerfile
   out$write(file.path(dir_build, "Dockerfile"))
   dock_created <- readLines(file.path(dir_build, "Dockerfile"))
-  expect_equal(dock_created[1], "FROM rocker/verse:4.1")
+  expect_equal(dock_created[1], "FROM rocker/verse:4.1.2")
 
   expect_length(
         grep("install.packages\\(c\\(\"renv\",\"remotes\"", dock_created) , 1

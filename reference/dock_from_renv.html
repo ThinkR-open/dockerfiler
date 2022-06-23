@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">dockerfiler</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.5.0001</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.5.0002</span>
       </span>
     </div>
 
@@ -69,42 +69,76 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">dock_from_renv</span><span class="op">(</span>
   lockfile <span class="op">=</span> <span class="st">"renv.lock"</span>,
   distro <span class="op">=</span> <span class="st">"focal"</span>,
-  out_dir <span class="op">=</span> <span class="cn">NULL</span>,
   FROM <span class="op">=</span> <span class="st">"rocker/r-base"</span>,
-  repos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>RSPM <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"https://packagemanager.rstudio.com/all/__linux__/"</span>, <span class="va">distro</span>,
-    <span class="st">"}/latest"</span><span class="op">)</span>, CRAN <span class="op">=</span> <span class="st">"https://cran.rstudio.com/"</span><span class="op">)</span>
+  AS <span class="op">=</span> <span class="cn">NULL</span>,
+  sysreqs <span class="op">=</span> <span class="cn">TRUE</span>,
+  repos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>CRAN <span class="op">=</span> <span class="st">"https://cran.rstudio.com/"</span><span class="op">)</span>,
+  expand <span class="op">=</span> <span class="cn">FALSE</span>,
+  extra_sysreqs <span class="op">=</span> <span class="cn">NULL</span>
 <span class="op">)</span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>lockfile</dt>
-<dd><p>Path to an `renv.lock` file.</p></dd>
+<dd><p>Path to an `renv.lock` file to use as an input..</p></dd>
+
+
 <dt>distro</dt>
-<dd><p>One of "focal", "bionic", "xenial", "centos7", or "centos8". See available distributions at https://hub.docker.com/r/rstudio/r-base/.</p></dd>
-<dt>out_dir</dt>
-<dd><p>The directory where to write the `Dockerfile`. When `NULL` no file is written. `NULL` by default.</p></dd>
+<dd><p>One of "focal", "bionic", "xenial", "centos7",
+or "centos8". See available distributions
+at https://hub.docker.com/r/rstudio/r-base/.</p></dd>
+
+
 <dt>FROM</dt>
-<dd><p>Docker image to start FROM</p></dd>
+<dd><p>Docker image to start FROM Default is
+FROM rocker/r-base</p></dd>
+
+
+<dt>AS</dt>
+<dd><p>The AS of the Dockerfile. Default it NULL.</p></dd>
+
+
+<dt>sysreqs</dt>
+<dd><p>boolean. If `TRUE`, the Dockerfile
+will contain sysreq installation.</p></dd>
+
+
 <dt>repos</dt>
-<dd><p>CRAN repository to use inside the Dockerfile</p></dd>
+<dd><p>character. The URL(s) of the repositories to use for `options("repos")`.</p></dd>
+
+
+<dt>expand</dt>
+<dd><p>boolean. If `TRUE` each system requirement will have its own `RUN` line.</p></dd>
+
+
+<dt>extra_sysreqs</dt>
+<dd><p>character vector. Extra debian system requirements.
+Will be installed with apt-get install.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A R6 object of class `Dockerfile`.</p>
+    
+
+<p>A R6 object of class `Dockerfile`.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
-    <p>System requirements for packages are provided through RStudio Package Manager via the pak package. The install commands provided from pak are added as `RUN` directives within the `Dockerfile`.</p>
-<p>The R version is taken from the `renv.lock` file. Packages are installed using `renv::restore()` which ensures that the proper package version and source is used when installed.</p>
-<p>By default, `dock_from_renv()` will utilize the [public RStudio Package Manager](https://packagemanager.rstudio.com/) (PPM) to provide linux binaries. This dramatically improves install time. This is done when `use_rspm = TRUE`.  To do so, a new file `renv.lock.dock` will be created so as to not overwrite your existing `renv.lock` file. This new `renv.lock.dock` file is used to build the Docker image with PPM binaries.</p>
+    <p>System requirements for packages are provided
+through RStudio Package Manager via the pak
+package. The install commands provided from pak
+are added as `RUN` directives within the `Dockerfile`.</p>
+<p>The R version is taken from the `renv.lock` file.
+Packages are installed using `renv::restore()` which ensures
+that the proper package version and source is used when installed.</p>
     </div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="va">dock</span> <span class="op">&lt;-</span> <span class="fu">dock_from_renv</span><span class="op">(</span><span class="st">"renv.lock"</span>, distro <span class="op">=</span> <span class="st">"xenial"</span>, out_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/getwd.html" class="external-link">getwd</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">dock</span></span>
+<span class="r-in"><span class="va">dock</span> <span class="op">&lt;-</span> <span class="fu">dock_from_renv</span><span class="op">(</span><span class="st">"renv.lock"</span>, distro <span class="op">=</span> <span class="st">"xenial"</span><span class="op">)</span></span>
+<span class="r-in"><span class="va">dock</span><span class="op">$</span><span class="fu">write</span><span class="op">(</span><span class="st">"Dockerfile"</span><span class="op">)</span></span>
 <span class="r-in"><span class="op">}</span></span>
 </code></pre></div>
     </div>
@@ -120,7 +154,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
       </footer></div>

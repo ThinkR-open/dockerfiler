@@ -1,8 +1,8 @@
 pandoc: 2.7.3
-pkgdown: 2.0.2
+pkgdown: 2.0.4
 pkgdown_sha: ~
 articles:
   dockerfile-from-renv-lock: dockerfile-from-renv-lock.html
   dockerfiler: dockerfiler.html
-last_built: 2022-03-13T09:15Z
+last_built: 2022-06-23T07:23Z
 

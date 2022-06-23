@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">dockerfiler</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.5.0001</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.5.0002</span>
       </span>
     </div>
 
@@ -83,26 +83,43 @@
     <h2>Arguments</h2>
     <dl><dt>path</dt>
 <dd><p>path to the DESCRIPTION file to use as an input.</p></dd>
+
+
 <dt>FROM</dt>
 <dd><p>The FROM of the Dockerfile. Default is
 FROM rocker/r-ver:`R.Version()$major`.`R.Version()$minor`.</p></dd>
+
+
 <dt>AS</dt>
 <dd><p>The AS of the Dockerfile. Default it NULL.</p></dd>
+
+
 <dt>sysreqs</dt>
 <dd><p>boolean. If TRUE, the Dockerfile will contain sysreq installation.</p></dd>
+
+
 <dt>repos</dt>
 <dd><p>character. The URL(s) of the repositories to use for `options("repos")`.</p></dd>
+
+
 <dt>expand</dt>
 <dd><p>boolean. If `TRUE` each system requirement will have its own `RUN` line.</p></dd>
+
+
 <dt>update_tar_gz</dt>
 <dd><p>boolean. If `TRUE` and `build_from_source` is also `TRUE`,
 an updated tar.gz is created.</p></dd>
+
+
 <dt>build_from_source</dt>
 <dd><p>boolean. If `TRUE` no tar.gz is created and
 the Dockerfile directly mount the source folder.</p></dd>
+
+
 <dt>extra_sysreqs</dt>
 <dd><p>character vector. Extra debian system requirements.
 Will be installed with apt-get install.</p></dd>
+
 </dl></div>
 
   </div>
@@ -117,7 +134,7 @@ Will be installed with apt-get install.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
       </footer></div>

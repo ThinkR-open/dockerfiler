@@ -35,7 +35,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">dockerfiler</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.5.0001</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.5.0002</span>
       </span>
     </div>
 
@@ -186,7 +186,6 @@
 <code class="sourceCode R"><span class="va">my_dock</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/dockerfiles.html">dock_from_desc</a></span><span class="op">(</span><span class="st">"DESCRIPTION"</span><span class="op">)</span>
 <span class="co">#&gt; ℹ Please wait while we compute system requirements...</span>
 <span class="co">#&gt; ✓ Done</span>
-<span class="co">#&gt; • .dockerignore already present, skipping its creation.</span>
 <span class="va">my_dock</span>
 <span class="co">#&gt; FROM rocker/r-ver:4.1.2</span>
 <span class="co">#&gt; RUN apt-get update &amp;&amp; apt-get install -y  git-core libcurl4-openssl-dev libgit2-dev libicu-dev libssl-dev make pandoc pandoc-citeproc &amp;&amp; rm -rf /var/lib/apt/lists/*</span>
@@ -196,9 +195,9 @@
 <span class="co">#&gt; RUN Rscript -e 'remotes::install_version("cli",upgrade="never", version = "3.1.1")'</span>
 <span class="co">#&gt; RUN Rscript -e 'remotes::install_version("R6",upgrade="never", version = "2.5.1")'</span>
 <span class="co">#&gt; RUN Rscript -e 'remotes::install_version("desc",upgrade="never", version = "1.4.0")'</span>
+<span class="co">#&gt; RUN Rscript -e 'remotes::install_version("fs",upgrade="never", version = "1.5.2")'</span>
 <span class="co">#&gt; RUN Rscript -e 'remotes::install_version("jsonlite",upgrade="never", version = "1.7.3")'</span>
 <span class="co">#&gt; RUN Rscript -e 'remotes::install_version("knitr",upgrade="never", version = "1.37")'</span>
-<span class="co">#&gt; RUN Rscript -e 'remotes::install_version("fs",upgrade="never", version = "1.5.2")'</span>
 <span class="co">#&gt; RUN Rscript -e 'remotes::install_version("testthat",upgrade="never", version = "3.1.2")'</span>
 <span class="co">#&gt; RUN Rscript -e 'remotes::install_version("rmarkdown",upgrade="never", version = "2.11")'</span>
 <span class="co">#&gt; RUN Rscript -e 'remotes::install_version("usethis",upgrade="never", version = "2.1.5")'</span>
@@ -229,9 +228,9 @@
 <span class="co">#&gt; RUN Rscript -e 'remotes::install_version("cli",upgrade="never", version = "3.1.1")'</span>
 <span class="co">#&gt; RUN Rscript -e 'remotes::install_version("R6",upgrade="never", version = "2.5.1")'</span>
 <span class="co">#&gt; RUN Rscript -e 'remotes::install_version("desc",upgrade="never", version = "1.4.0")'</span>
+<span class="co">#&gt; RUN Rscript -e 'remotes::install_version("fs",upgrade="never", version = "1.5.2")'</span>
 <span class="co">#&gt; RUN Rscript -e 'remotes::install_version("jsonlite",upgrade="never", version = "1.7.3")'</span>
 <span class="co">#&gt; RUN Rscript -e 'remotes::install_version("knitr",upgrade="never", version = "1.37")'</span>
-<span class="co">#&gt; RUN Rscript -e 'remotes::install_version("fs",upgrade="never", version = "1.5.2")'</span>
 <span class="co">#&gt; RUN Rscript -e 'remotes::install_version("testthat",upgrade="never", version = "3.1.2")'</span>
 <span class="co">#&gt; RUN Rscript -e 'remotes::install_version("rmarkdown",upgrade="never", version = "2.11")'</span>
 <span class="co">#&gt; RUN Rscript -e 'remotes::install_version("usethis",upgrade="never", version = "2.1.5")'</span>
@@ -250,9 +249,7 @@
 <div class="section level2">
 <h2 id="create-a-dockerfile-from-renvlock">Create a Dockerfile from renv.lock<a class="anchor" aria-label="anchor" href="#create-a-dockerfile-from-renvlock"></a>
 </h2>
-<ul>
-<li>Create renv.lock</li>
-</ul>
+<ul><li>Create renv.lock</li></ul>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">dir_build</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>pattern <span class="op">=</span> <span class="st">"renv"</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="va">dir_build</span><span class="op">)</span>
@@ -262,7 +259,7 @@
 <span class="va">custom_packages</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>
   <span class="co"># attachment::att_from_description(),</span>
   <span class="st">"renv"</span>,
-  <span class="st">"cli"</span>, <span class="st">"glue"</span>, <span class="co">#"golem",</span>
+  <span class="st">"cli"</span>, <span class="st">"glue"</span>, <span class="st">"golem"</span>,
   <span class="st">"shiny"</span>, <span class="st">"stats"</span>, <span class="st">"utils"</span>,
   <span class="st">"testthat"</span>,
   <span class="st">"knitr"</span>
@@ -271,26 +268,24 @@
   packages <span class="op">=</span> <span class="va">custom_packages</span>,
   lockfile <span class="op">=</span> <span class="va">the_lockfile</span>,
   prompt <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
-<ul>
-<li>Build Dockerfile</li>
-</ul>
+<ul><li>Build Dockerfile</li></ul>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">my_dock</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/dock_from_renv.html">dock_from_renv</a></span><span class="op">(</span>lockfile <span class="op">=</span> <span class="va">the_lockfile</span>,
                    distro <span class="op">=</span> <span class="st">"focal"</span>,
-                   FROM <span class="op">=</span> <span class="st">"rocker/verse"</span>,
-                   out_dir <span class="op">=</span> <span class="va">dir_build</span>
+                   FROM <span class="op">=</span> <span class="st">"rocker/verse"</span>
     <span class="op">)</span>
-<span class="co">#&gt; Fetching system dependencies for 57 package records.</span>
+<span class="co">#&gt; ℹ Please wait while we compute system requirements...</span>
+<span class="co">#&gt; Fetching system dependencies for 81 package records.</span>
+<span class="co">#&gt; Warning: `lang()` is deprecated as of rlang 0.2.0.</span>
+<span class="co">#&gt; Please use `call2()` instead.</span>
+<span class="co">#&gt; This warning is displayed once per session.</span>
+<span class="co">#&gt; ✓ Done</span>
 <span class="va">my_dock</span>
 <span class="co">#&gt; FROM rocker/verse:4.1</span>
-<span class="co">#&gt; RUN apt-get update -y</span>
-<span class="co">#&gt; RUN apt-get install -y make</span>
-<span class="co">#&gt; RUN apt-get install -y zlib1g-dev</span>
-<span class="co">#&gt; RUN apt-get install -y libicu-dev</span>
-<span class="co">#&gt; RUN apt-get install -y pandoc</span>
-<span class="co">#&gt; RUN echo "options(renv.config.pak.enabled = TRUE, repos = c(RSPM = 'https://packagemanager.rstudio.com/all/__linux__/focal}/latest', CRAN = 'https://cran.rstudio.com/'), download.file.method = 'libcurl', Ncpus = 4)" &gt;&gt; /usr/local/lib/R/etc/Rprofile.site</span>
-<span class="co">#&gt; COPY /tmp/Rtmpt2027C/renv157ef360a56354/renv.lock.dock renv.lock</span>
-<span class="co">#&gt; RUN R -e "install.packages('renv')"</span>
+<span class="co">#&gt; RUN apt-get update -y &amp;&amp; apt-get install -y  make  libcurl4-openssl-dev  libssl-dev  git  libgit2-dev  libicu-dev  libxml2-dev  zlib1g-dev  pandoc &amp;&amp; rm -rf /var/lib/apt/lists/*</span>
+<span class="co">#&gt; RUN echo "options(renv.config.pak.enabled = TRUE, repos = c(CRAN = 'https://cran.rstudio.com/'), download.file.method = 'libcurl', Ncpus = 4)" &gt;&gt; /usr/local/lib/R/etc/Rprofile.site</span>
+<span class="co">#&gt; RUN R -e 'install.packages(c("renv","remotes"))'</span>
+<span class="co">#&gt; COPY renv.lock renv.lock</span>
 <span class="co">#&gt; RUN R -e 'renv::restore()'</span></code></pre></div>
 </div>
 <div class="section level2">
@@ -365,7 +360,7 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
       </footer>

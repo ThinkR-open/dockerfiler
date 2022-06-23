@@ -16,12 +16,14 @@ rsconnect/
 
 
 
-
-
-
   skip_on_cran()
   out_v <-system("docker -v")
-skip_if_not(out_v == 0)
+skip_if_not(out_v == 0) #docker not available
+
+  out_linux <-system("docker run rocker/r-base")
+
+skip_if_not(out_linux == 2) # image operating system "linux" cannot be used on this platform
+
   out1 <-system("docker run hello-world ")
 expect_equal(out1,0)
 

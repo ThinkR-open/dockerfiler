@@ -112,12 +112,12 @@ dock_from_desc <- function(
   } else if (!is.na(sr)) {
     message(
       paste(
-        "the DESCRIPTION file contains the SystemRequirements bellow: ",
+        "The DESCRIPTION file contains the following SystemRequirements: ",
         sr
       )
     )
     message(
-      "please check the Dockerfile created and if needed pass extra sysreqs using the extra_sysreqs param"
+      "Please check the created Dockerfile. \n You might needed to add extra sysreqs."
     )
   }
 
@@ -171,16 +171,24 @@ dock_from_desc <- function(
 
   repos_as_character <- repos_as_character(repos)
 
+  dock$RUN("mkdir -p /usr/local/lib/R/etc/ /usr/lib/R/etc/")
+
+
+
+
   dock$RUN(
     sprintf(
-      "echo \"options(repos = %s, download.file.method = 'libcurl', Ncpus = 4)\" >> /usr/local/lib/R/etc/Rprofile.site",
+      "echo \"options(repos = %s, download.file.method = 'libcurl', Ncpus = 4)\" | tee /usr/local/lib/R/etc/Rprofile.site | tee /usr/lib/R/etc/Rprofile.site",
       repos_as_character
     )
   )
 
+
+
+
   dock$RUN("R -e 'install.packages(\"remotes\")'")
 
-  if ( length(packages_on_cran > 0) ) {
+  if (length(packages_on_cran > 0)) {
     ping <- mapply(
       function(dock, ver, nm) {
         res <- dock$RUN(
@@ -198,7 +206,7 @@ dock_from_desc <- function(
   }
 
   if (length(packages_not_on_cran > 0)) {
-    nn <-as.data.frame(
+    nn <- as.data.frame(
       do.call(
         rbind,
         lapply(
@@ -323,4 +331,3 @@ repos_as_character <- function(repos) {
 
   repos_as_character
 }
-

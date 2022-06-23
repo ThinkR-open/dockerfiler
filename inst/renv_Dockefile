@@ -1,10 +1,6 @@
 FROM rocker/verse:4.1
-RUN apt-get update -y
-RUN apt-get install -y make
-RUN apt-get install -y zlib1g-dev
-RUN apt-get install -y libicu-dev
-RUN apt-get install -y pandoc
-RUN echo "options(renv.config.pak.enabled = TRUE, repos = c(RSPM = 'https://packagemanager.rstudio.com/all/__linux__/focal}/latest', CRAN = 'https://cran.rstudio.com/'), download.file.method = 'libcurl', Ncpus = 4)" >> /usr/local/lib/R/etc/Rprofile.site
-COPY /tmp/Rtmp5wFefe/renv5f7364109a54f/renv.lock.dock renv.lock
-RUN R -e "install.packages('renv')"
+RUN apt-get update -y && apt-get install -y  make  zlib1g-dev  libicu-dev  pandoc && rm -rf /var/lib/apt/lists/*
+RUN echo "options(renv.config.pak.enabled = TRUE, repos = c(CRAN = 'https://cran.rstudio.com/'), download.file.method = 'libcurl', Ncpus = 4)" >> /usr/local/lib/R/etc/Rprofile.site
+RUN R -e 'install.packages(c("renv","remotes"))'
+COPY renv.lock renv.lock
 RUN R -e 'renv::restore()'

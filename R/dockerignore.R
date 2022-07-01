@@ -35,7 +35,7 @@ docker_ignore_add <- function(path) {
       ".gitignore",
       "manifest.json",
       "rsconnect/",
-      "Rproj.user"
+      ".Rproj.user"
     )) {
       write_ignore(i)
     }

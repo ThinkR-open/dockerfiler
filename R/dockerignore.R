@@ -49,7 +49,7 @@ docker_ignore_add <- function(path) {
     )) {
       write(
         "^\\.dockerignore$", 
-        path, 
+        path_ri, 
         append = TRUE)
       cat_bullet(
         ".dockerignore added to the .Rbuildignore file.",

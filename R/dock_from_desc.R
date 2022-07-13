@@ -206,7 +206,7 @@ dock_from_desc <- function(
   }
 
   if (length(packages_not_on_cran > 0)) {
-    nn <- as.data.frame(
+    nn_df <- as.data.frame(
       do.call(
         rbind,
         lapply(
@@ -219,25 +219,45 @@ dock_from_desc <- function(
     )
 
     nn <- sprintf(
+      "%s/%s",
+      nn_df$username,
+      nn_df$repo
+    )
+
+    repo_status <- lapply(nn, repo_get)
+    ind_private <- sapply(repo_status, function(x) x$visibility == "private") %|0|% FALSE
+    if (any(ind_private)) {
+      dock$ARG("GITHUB_PAT")
+      dock$RUN("GITHUB_PAT=$GITHUB_PAT")
+    }
+
+
+    nn <- sprintf(
       "%s/%s@%s",
-      nn$username,
-      nn$repo,
-      nn$sha
+      nn_df$username,
+      nn_df$repo,
+      nn_df$sha
     )
 
 
     pong <- mapply(
-      function(dock, ver, nm) {
+      function(dock, ver, nm, i) {
+        fmt <- "Rscript -e 'remotes::install_github(\"%s\")'"
+        if (i)
+          fmt <- paste("GITHUB_PAT=$GITHUB_PAT", fmt)
         res <- dock$RUN(
           sprintf(
-            "Rscript -e 'remotes::install_github(\"%s\")'",
+            fmt,
             ver
           )
         )
       },
       ver = nn,
+      i = ind_private,
       MoreArgs = list(dock = dock)
     )
+    cat_info(glue::glue("Must add --build-arg GITHUB_PAT={remotes:::github_pat()} to docker build call. Note that the GITHUB_PAT will be visible in this image metadata. If uploaded to Docker Hub, the visibility must be set to private to avoid exposing the GITHUB_PAT."))
+    dock$custom("#", "Must add --build-arg GITHUB_PAT=[YOUR GITHUB PAT] to docker build call")
   }
 
   if (!build_from_source) {

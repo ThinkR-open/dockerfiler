@@ -336,3 +336,20 @@ repos_as_character <- function(repos) {
 repo_get <- function(repo) {
   jsonlite::fromJSON(suppressMessages(system(glue::glue("curl -H \"Accept: application/vnd.github+json\" -H \"Authorization: token {remotes:::github_pat()}\" https://api.github.com/repos/{repo}"), intern = TRUE)))
 }
+
+#' Replace zero-length values in a vector
+#' @rdname op-zero-default
+#' @param x \code{vctr}
+#' @param y \code{object} to replace zero-length values. Must be of same class as x
+#'
+#' @return \code{vctr}
+#' @export
+#'
+#' @examples
+#' c(TRUE, FALSE, logical(0)) %|0|% FALSE
+`%|0|%` <- Vectorize(function(x, y) {
+  if (rlang::is_empty(x))
+    y
+  else
+    x
+})

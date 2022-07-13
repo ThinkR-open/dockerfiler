@@ -323,7 +323,10 @@ dock_from_desc <- function(
     dock$RUN("mkdir /build_zone")
     dock$ADD(from = ".", to = "/build_zone")
     dock$WORKDIR("/build_zone")
-    dock$RUN("R -e 'remotes::install_local(upgrade=\"never\")'")
+    run <- "R -e 'remotes::install_local(upgrade=\"never\")'"
+    if (any(get0("ind_private", inherits = FALSE)))
+      paste("GITHUB_PAT=$GITHUB_PAT", run)
+    dock$RUN(run)
     dock$RUN("rm -rf /build_zone")
   }
   # Add a dockerignore

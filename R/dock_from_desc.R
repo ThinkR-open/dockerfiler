@@ -256,8 +256,8 @@ dock_from_desc <- function(
       i = ind_private,
       MoreArgs = list(dock = dock)
     )
-    cat_info(glue::glue("Must add --build-arg GITHUB_PAT={remotes:::github_pat()} to docker build call. Note that the GITHUB_PAT will be visible in this image metadata. If uploaded to Docker Hub, the visibility must be set to private to avoid exposing the GITHUB_PAT."))
-    dock$custom("#", "Must add --build-arg GITHUB_PAT=[YOUR GITHUB PAT] to docker build call")
+    cat_red_bullet(glue::glue("Must add `--build-arg GITHUB_PAT={remotes:::github_pat()}` to `docker build` call. Note that the GITHUB_PAT will be visible in this image metadata. If uploaded to Docker Hub, the visibility must be set to private to avoid exposing the GITHUB_PAT."))
+    dock$custom("#", "Must add `--build-arg GITHUB_PAT=[YOUR GITHUB PAT]` to `docker build` call")
   }
 
   if (!build_from_source) {
@@ -325,7 +325,7 @@ dock_from_desc <- function(
     dock$WORKDIR("/build_zone")
     run <- "R -e 'remotes::install_local(upgrade=\"never\")'"
     if (any(get0("ind_private", inherits = FALSE)))
-      paste("GITHUB_PAT=$GITHUB_PAT", run)
+      run <- paste("GITHUB_PAT=$GITHUB_PAT", run)
     dock$RUN(run)
     dock$RUN("rm -rf /build_zone")
   }

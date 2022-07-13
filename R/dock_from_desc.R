@@ -331,3 +331,8 @@ repos_as_character <- function(repos) {
 
   repos_as_character
 }
+
+#' @noRd
+repo_get <- function(repo) {
+  jsonlite::fromJSON(suppressMessages(system(glue::glue("curl -H \"Accept: application/vnd.github+json\" -H \"Authorization: token {remotes:::github_pat()}\" https://api.github.com/repos/{repo}"), intern = TRUE)))
+}

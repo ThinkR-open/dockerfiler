@@ -67,6 +67,7 @@ dock_from_desc <- function(
   ),
   sha256 = NULL,
   AS = NULL,
+  use_suggests = TRUE,
   sysreqs = TRUE,
   repos = c(CRAN = "https://cran.rstudio.com/"),
   expand = FALSE,
@@ -76,7 +77,10 @@ dock_from_desc <- function(
 ) {
   path <- fs::path_abs(path)
 
-  packages <- desc_get_deps(path)$package
+  packages <- desc_get_deps(path)
+  if (!use_suggests)
+    packages <- packages[packages$type != "Suggests",]
+  packages <- packages$package
   packages <- packages[packages != "R"] # remove R
   packages <- packages[!packages %in% base_pkg_] # remove base and recommended
 

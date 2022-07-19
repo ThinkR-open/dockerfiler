@@ -83,7 +83,7 @@ dock_from_desc <- function(
     packages <- packages[packages$type != "Suggests",]
   packages <- packages$package
   packages <- packages[packages != "R"] # remove R
-  packages <- packages[!packages %in% base_pkg_] # remove base and recommended
+  packages <- sort(packages[!packages %in% base_pkg_]) # remove base and recommended
 
   if (sysreqs) {
 

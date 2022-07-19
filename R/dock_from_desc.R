@@ -36,6 +36,7 @@ base_pkg_ <- c(
 #' @param FROM The FROM of the Dockerfile. Default is
 #'     FROM rocker/r-ver:`R.Version()$major`.`R.Version()$minor`.
 #' @param AS The AS of the Dockerfile. Default it NULL.
+#' @param sha256 The Digest SHA256 hash corresponding to the chip architecture of the deployment host machine if different than the machine on which the image will be built.
 #' @param sysreqs boolean. If TRUE, the Dockerfile will contain sysreq installation.
 #' @param repos character. The URL(s) of the repositories to use for `options("repos")`.
 #' @param expand boolean. If `TRUE` each system requirement will have its own `RUN` line.
@@ -64,6 +65,7 @@ dock_from_desc <- function(
     ".",
     R.Version()$minor
   ),
+  sha256 = NULL,
   AS = NULL,
   sysreqs = TRUE,
   repos = c(CRAN = "https://cran.rstudio.com/"),
@@ -145,6 +147,10 @@ dock_from_desc <- function(
     packages_with_version$installed,
     packages_with_version$package
   )
+
+  # Add SHA for Architecture
+  if (!is.null(sha256))
+    FROM <- paste0(FROM, "@sha256:", sha256)
 
   dock <- Dockerfile$new(
     FROM = FROM,

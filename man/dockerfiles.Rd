@@ -7,6 +7,7 @@
 dock_from_desc(
   path = "DESCRIPTION",
   FROM = paste0("rocker/r-ver:", R.Version()$major, ".", R.Version()$minor),
+  sha256 = NULL,
   AS = NULL,
   sysreqs = TRUE,
   repos = c(CRAN = "https://cran.rstudio.com/"),
@@ -21,6 +22,8 @@ dock_from_desc(
 
 \item{FROM}{The FROM of the Dockerfile. Default is
 FROM rocker/r-ver:`R.Version()$major`.`R.Version()$minor`.}
+
+\item{sha256}{The Digest SHA256 hash corresponding to the chip architecture of the deployment host machine if different than the machine on which the image will be built.}
 
 \item{AS}{The AS of the Dockerfile. Default it NULL.}
 

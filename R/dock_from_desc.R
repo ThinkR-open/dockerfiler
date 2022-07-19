@@ -36,8 +36,9 @@ base_pkg_ <- c(
 #' @param FROM The FROM of the Dockerfile. Default is
 #'     FROM rocker/r-ver:`R.Version()$major`.`R.Version()$minor`.
 #' @param AS The AS of the Dockerfile. Default it NULL.
-#' @param sha256 The Digest SHA256 hash corresponding to the chip architecture of the deployment host machine if different than the machine on which the image will be built.
+#' @param sha256 character. The Digest SHA256 hash corresponding to the chip architecture of the deployment host machine if different than the machine on which the image will be built.
 #' @param sysreqs boolean. If TRUE, the Dockerfile will contain sysreq installation.
+#' @param use_suggests boolean. If TRUE (the default), include dependencies listed in Suggests field in DESCRIPTION.
 #' @param repos character. The URL(s) of the repositories to use for `options("repos")`.
 #' @param expand boolean. If `TRUE` each system requirement will have its own `RUN` line.
 #' @param build_from_source boolean. If `TRUE` no tar.gz is created and

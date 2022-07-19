@@ -83,7 +83,7 @@ dock_from_desc <- function(
     packages <- packages[packages$type != "Suggests",]
   packages <- packages$package
   packages <- packages[packages != "R"] # remove R
-  packages <- sort(packages[!packages %in% base_pkg_]) # remove base and recommended
+  packages <- packages[!packages %in% base_pkg_] # remove base and recommended
 
   if (sysreqs) {
 
@@ -134,10 +134,10 @@ dock_from_desc <- function(
     packages
   )
 
-  packages_not_on_cran <- setdiff(
+  packages_not_on_cran <- sort(setdiff(
     packages,
     packages_on_cran
-  )
+  ))
 
   packages_with_version <- data.frame(
     package = remotes_deps$package,
@@ -153,6 +153,7 @@ dock_from_desc <- function(
     packages_with_version$package
   )
 
+  packages_on_cran <- packages_on_cran[order(names(packages_on_cran))]
   # Add SHA for Architecture
   if (!is.null(sha256))
     FROM <- paste0(FROM, "@sha256:", sha256)

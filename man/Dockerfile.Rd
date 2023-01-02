@@ -46,36 +46,36 @@ my_dock <- Dockerfile$new()
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-new}{\code{Dockerfile$new()}}
-\item \href{#method-RUN}{\code{Dockerfile$RUN()}}
-\item \href{#method-ADD}{\code{Dockerfile$ADD()}}
-\item \href{#method-COPY}{\code{Dockerfile$COPY()}}
-\item \href{#method-WORKDIR}{\code{Dockerfile$WORKDIR()}}
-\item \href{#method-EXPOSE}{\code{Dockerfile$EXPOSE()}}
-\item \href{#method-VOLUME}{\code{Dockerfile$VOLUME()}}
-\item \href{#method-CMD}{\code{Dockerfile$CMD()}}
-\item \href{#method-LABEL}{\code{Dockerfile$LABEL()}}
-\item \href{#method-ENV}{\code{Dockerfile$ENV()}}
-\item \href{#method-ENTRYPOINT}{\code{Dockerfile$ENTRYPOINT()}}
-\item \href{#method-USER}{\code{Dockerfile$USER()}}
-\item \href{#method-ARG}{\code{Dockerfile$ARG()}}
-\item \href{#method-ONBUILD}{\code{Dockerfile$ONBUILD()}}
-\item \href{#method-STOPSIGNAL}{\code{Dockerfile$STOPSIGNAL()}}
-\item \href{#method-HEALTHCHECK}{\code{Dockerfile$HEALTHCHECK()}}
-\item \href{#method-SHELL}{\code{Dockerfile$SHELL()}}
-\item \href{#method-MAINTAINER}{\code{Dockerfile$MAINTAINER()}}
-\item \href{#method-custom}{\code{Dockerfile$custom()}}
-\item \href{#method-print}{\code{Dockerfile$print()}}
-\item \href{#method-write}{\code{Dockerfile$write()}}
-\item \href{#method-switch_cmd}{\code{Dockerfile$switch_cmd()}}
-\item \href{#method-remove_cmd}{\code{Dockerfile$remove_cmd()}}
-\item \href{#method-add_after}{\code{Dockerfile$add_after()}}
-\item \href{#method-clone}{\code{Dockerfile$clone()}}
+\item \href{#method-Dockerfile-new}{\code{Dockerfile$new()}}
+\item \href{#method-Dockerfile-RUN}{\code{Dockerfile$RUN()}}
+\item \href{#method-Dockerfile-ADD}{\code{Dockerfile$ADD()}}
+\item \href{#method-Dockerfile-COPY}{\code{Dockerfile$COPY()}}
+\item \href{#method-Dockerfile-WORKDIR}{\code{Dockerfile$WORKDIR()}}
+\item \href{#method-Dockerfile-EXPOSE}{\code{Dockerfile$EXPOSE()}}
+\item \href{#method-Dockerfile-VOLUME}{\code{Dockerfile$VOLUME()}}
+\item \href{#method-Dockerfile-CMD}{\code{Dockerfile$CMD()}}
+\item \href{#method-Dockerfile-LABEL}{\code{Dockerfile$LABEL()}}
+\item \href{#method-Dockerfile-ENV}{\code{Dockerfile$ENV()}}
+\item \href{#method-Dockerfile-ENTRYPOINT}{\code{Dockerfile$ENTRYPOINT()}}
+\item \href{#method-Dockerfile-USER}{\code{Dockerfile$USER()}}
+\item \href{#method-Dockerfile-ARG}{\code{Dockerfile$ARG()}}
+\item \href{#method-Dockerfile-ONBUILD}{\code{Dockerfile$ONBUILD()}}
+\item \href{#method-Dockerfile-STOPSIGNAL}{\code{Dockerfile$STOPSIGNAL()}}
+\item \href{#method-Dockerfile-HEALTHCHECK}{\code{Dockerfile$HEALTHCHECK()}}
+\item \href{#method-Dockerfile-SHELL}{\code{Dockerfile$SHELL()}}
+\item \href{#method-Dockerfile-MAINTAINER}{\code{Dockerfile$MAINTAINER()}}
+\item \href{#method-Dockerfile-custom}{\code{Dockerfile$custom()}}
+\item \href{#method-Dockerfile-print}{\code{Dockerfile$print()}}
+\item \href{#method-Dockerfile-write}{\code{Dockerfile$write()}}
+\item \href{#method-Dockerfile-switch_cmd}{\code{Dockerfile$switch_cmd()}}
+\item \href{#method-Dockerfile-remove_cmd}{\code{Dockerfile$remove_cmd()}}
+\item \href{#method-Dockerfile-add_after}{\code{Dockerfile$add_after()}}
+\item \href{#method-Dockerfile-clone}{\code{Dockerfile$clone()}}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-new"></a>}}
-\if{latex}{\out{\hypertarget{method-new}{}}}
+\if{html}{\out{<a id="method-Dockerfile-new"></a>}}
+\if{latex}{\out{\hypertarget{method-Dockerfile-new}{}}}
 \subsection{Method \code{new()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Dockerfile$new(FROM = "rocker/r-base", AS = NULL)}\if{html}{\out{</div>}}
@@ -83,8 +83,8 @@ my_dock <- Dockerfile$new()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-RUN"></a>}}
-\if{latex}{\out{\hypertarget{method-RUN}{}}}
+\if{html}{\out{<a id="method-Dockerfile-RUN"></a>}}
+\if{latex}{\out{\hypertarget{method-Dockerfile-RUN}{}}}
 \subsection{Method \code{RUN()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Dockerfile$RUN(cmd)}\if{html}{\out{</div>}}
@@ -92,8 +92,8 @@ my_dock <- Dockerfile$new()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-ADD"></a>}}
-\if{latex}{\out{\hypertarget{method-ADD}{}}}
+\if{html}{\out{<a id="method-Dockerfile-ADD"></a>}}
+\if{latex}{\out{\hypertarget{method-Dockerfile-ADD}{}}}
 \subsection{Method \code{ADD()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Dockerfile$ADD(from, to, force = TRUE)}\if{html}{\out{</div>}}
@@ -101,8 +101,8 @@ my_dock <- Dockerfile$new()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-COPY"></a>}}
-\if{latex}{\out{\hypertarget{method-COPY}{}}}
+\if{html}{\out{<a id="method-Dockerfile-COPY"></a>}}
+\if{latex}{\out{\hypertarget{method-Dockerfile-COPY}{}}}
 \subsection{Method \code{COPY()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Dockerfile$COPY(from, to, force = TRUE)}\if{html}{\out{</div>}}
@@ -110,8 +110,8 @@ my_dock <- Dockerfile$new()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-WORKDIR"></a>}}
-\if{latex}{\out{\hypertarget{method-WORKDIR}{}}}
+\if{html}{\out{<a id="method-Dockerfile-WORKDIR"></a>}}
+\if{latex}{\out{\hypertarget{method-Dockerfile-WORKDIR}{}}}
 \subsection{Method \code{WORKDIR()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Dockerfile$WORKDIR(where)}\if{html}{\out{</div>}}
@@ -119,8 +119,8 @@ my_dock <- Dockerfile$new()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-EXPOSE"></a>}}
-\if{latex}{\out{\hypertarget{method-EXPOSE}{}}}
+\if{html}{\out{<a id="method-Dockerfile-EXPOSE"></a>}}
+\if{latex}{\out{\hypertarget{method-Dockerfile-EXPOSE}{}}}
 \subsection{Method \code{EXPOSE()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Dockerfile$EXPOSE(port)}\if{html}{\out{</div>}}
@@ -128,8 +128,8 @@ my_dock <- Dockerfile$new()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-VOLUME"></a>}}
-\if{latex}{\out{\hypertarget{method-VOLUME}{}}}
+\if{html}{\out{<a id="method-Dockerfile-VOLUME"></a>}}
+\if{latex}{\out{\hypertarget{method-Dockerfile-VOLUME}{}}}
 \subsection{Method \code{VOLUME()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Dockerfile$VOLUME(volume)}\if{html}{\out{</div>}}
@@ -137,8 +137,8 @@ my_dock <- Dockerfile$new()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-CMD"></a>}}
-\if{latex}{\out{\hypertarget{method-CMD}{}}}
+\if{html}{\out{<a id="method-Dockerfile-CMD"></a>}}
+\if{latex}{\out{\hypertarget{method-Dockerfile-CMD}{}}}
 \subsection{Method \code{CMD()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Dockerfile$CMD(cmd)}\if{html}{\out{</div>}}
@@ -146,8 +146,8 @@ my_dock <- Dockerfile$new()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-LABEL"></a>}}
-\if{latex}{\out{\hypertarget{method-LABEL}{}}}
+\if{html}{\out{<a id="method-Dockerfile-LABEL"></a>}}
+\if{latex}{\out{\hypertarget{method-Dockerfile-LABEL}{}}}
 \subsection{Method \code{LABEL()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Dockerfile$LABEL(key, value)}\if{html}{\out{</div>}}
@@ -155,8 +155,8 @@ my_dock <- Dockerfile$new()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-ENV"></a>}}
-\if{latex}{\out{\hypertarget{method-ENV}{}}}
+\if{html}{\out{<a id="method-Dockerfile-ENV"></a>}}
+\if{latex}{\out{\hypertarget{method-Dockerfile-ENV}{}}}
 \subsection{Method \code{ENV()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Dockerfile$ENV(key, value)}\if{html}{\out{</div>}}
@@ -164,8 +164,8 @@ my_dock <- Dockerfile$new()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-ENTRYPOINT"></a>}}
-\if{latex}{\out{\hypertarget{method-ENTRYPOINT}{}}}
+\if{html}{\out{<a id="method-Dockerfile-ENTRYPOINT"></a>}}
+\if{latex}{\out{\hypertarget{method-Dockerfile-ENTRYPOINT}{}}}
 \subsection{Method \code{ENTRYPOINT()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Dockerfile$ENTRYPOINT(cmd)}\if{html}{\out{</div>}}
@@ -173,8 +173,8 @@ my_dock <- Dockerfile$new()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-USER"></a>}}
-\if{latex}{\out{\hypertarget{method-USER}{}}}
+\if{html}{\out{<a id="method-Dockerfile-USER"></a>}}
+\if{latex}{\out{\hypertarget{method-Dockerfile-USER}{}}}
 \subsection{Method \code{USER()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Dockerfile$USER(user)}\if{html}{\out{</div>}}
@@ -182,8 +182,8 @@ my_dock <- Dockerfile$new()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-ARG"></a>}}
-\if{latex}{\out{\hypertarget{method-ARG}{}}}
+\if{html}{\out{<a id="method-Dockerfile-ARG"></a>}}
+\if{latex}{\out{\hypertarget{method-Dockerfile-ARG}{}}}
 \subsection{Method \code{ARG()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Dockerfile$ARG(arg, ahead = FALSE)}\if{html}{\out{</div>}}
@@ -191,8 +191,8 @@ my_dock <- Dockerfile$new()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-ONBUILD"></a>}}
-\if{latex}{\out{\hypertarget{method-ONBUILD}{}}}
+\if{html}{\out{<a id="method-Dockerfile-ONBUILD"></a>}}
+\if{latex}{\out{\hypertarget{method-Dockerfile-ONBUILD}{}}}
 \subsection{Method \code{ONBUILD()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Dockerfile$ONBUILD(cmd)}\if{html}{\out{</div>}}
@@ -200,8 +200,8 @@ my_dock <- Dockerfile$new()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-STOPSIGNAL"></a>}}
-\if{latex}{\out{\hypertarget{method-STOPSIGNAL}{}}}
+\if{html}{\out{<a id="method-Dockerfile-STOPSIGNAL"></a>}}
+\if{latex}{\out{\hypertarget{method-Dockerfile-STOPSIGNAL}{}}}
 \subsection{Method \code{STOPSIGNAL()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Dockerfile$STOPSIGNAL(signal)}\if{html}{\out{</div>}}
@@ -209,8 +209,8 @@ my_dock <- Dockerfile$new()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-HEALTHCHECK"></a>}}
-\if{latex}{\out{\hypertarget{method-HEALTHCHECK}{}}}
+\if{html}{\out{<a id="method-Dockerfile-HEALTHCHECK"></a>}}
+\if{latex}{\out{\hypertarget{method-Dockerfile-HEALTHCHECK}{}}}
 \subsection{Method \code{HEALTHCHECK()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Dockerfile$HEALTHCHECK(check)}\if{html}{\out{</div>}}
@@ -218,8 +218,8 @@ my_dock <- Dockerfile$new()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-SHELL"></a>}}
-\if{latex}{\out{\hypertarget{method-SHELL}{}}}
+\if{html}{\out{<a id="method-Dockerfile-SHELL"></a>}}
+\if{latex}{\out{\hypertarget{method-Dockerfile-SHELL}{}}}
 \subsection{Method \code{SHELL()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Dockerfile$SHELL(shell)}\if{html}{\out{</div>}}
@@ -227,8 +227,8 @@ my_dock <- Dockerfile$new()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-MAINTAINER"></a>}}
-\if{latex}{\out{\hypertarget{method-MAINTAINER}{}}}
+\if{html}{\out{<a id="method-Dockerfile-MAINTAINER"></a>}}
+\if{latex}{\out{\hypertarget{method-Dockerfile-MAINTAINER}{}}}
 \subsection{Method \code{MAINTAINER()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Dockerfile$MAINTAINER(name, email)}\if{html}{\out{</div>}}
@@ -236,8 +236,8 @@ my_dock <- Dockerfile$new()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-custom"></a>}}
-\if{latex}{\out{\hypertarget{method-custom}{}}}
+\if{html}{\out{<a id="method-Dockerfile-custom"></a>}}
+\if{latex}{\out{\hypertarget{method-Dockerfile-custom}{}}}
 \subsection{Method \code{custom()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Dockerfile$custom(base, cmd)}\if{html}{\out{</div>}}
@@ -245,8 +245,8 @@ my_dock <- Dockerfile$new()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-print"></a>}}
-\if{latex}{\out{\hypertarget{method-print}{}}}
+\if{html}{\out{<a id="method-Dockerfile-print"></a>}}
+\if{latex}{\out{\hypertarget{method-Dockerfile-print}{}}}
 \subsection{Method \code{print()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Dockerfile$print()}\if{html}{\out{</div>}}
@@ -254,8 +254,8 @@ my_dock <- Dockerfile$new()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-write"></a>}}
-\if{latex}{\out{\hypertarget{method-write}{}}}
+\if{html}{\out{<a id="method-Dockerfile-write"></a>}}
+\if{latex}{\out{\hypertarget{method-Dockerfile-write}{}}}
 \subsection{Method \code{write()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Dockerfile$write(as = "Dockerfile")}\if{html}{\out{</div>}}
@@ -263,8 +263,8 @@ my_dock <- Dockerfile$new()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-switch_cmd"></a>}}
-\if{latex}{\out{\hypertarget{method-switch_cmd}{}}}
+\if{html}{\out{<a id="method-Dockerfile-switch_cmd"></a>}}
+\if{latex}{\out{\hypertarget{method-Dockerfile-switch_cmd}{}}}
 \subsection{Method \code{switch_cmd()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Dockerfile$switch_cmd(a, b)}\if{html}{\out{</div>}}
@@ -272,8 +272,8 @@ my_dock <- Dockerfile$new()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-remove_cmd"></a>}}
-\if{latex}{\out{\hypertarget{method-remove_cmd}{}}}
+\if{html}{\out{<a id="method-Dockerfile-remove_cmd"></a>}}
+\if{latex}{\out{\hypertarget{method-Dockerfile-remove_cmd}{}}}
 \subsection{Method \code{remove_cmd()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Dockerfile$remove_cmd(where)}\if{html}{\out{</div>}}
@@ -281,8 +281,8 @@ my_dock <- Dockerfile$new()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-add_after"></a>}}
-\if{latex}{\out{\hypertarget{method-add_after}{}}}
+\if{html}{\out{<a id="method-Dockerfile-add_after"></a>}}
+\if{latex}{\out{\hypertarget{method-Dockerfile-add_after}{}}}
 \subsection{Method \code{add_after()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Dockerfile$add_after(cmd, after)}\if{html}{\out{</div>}}
@@ -290,8 +290,8 @@ my_dock <- Dockerfile$new()
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-clone"></a>}}
-\if{latex}{\out{\hypertarget{method-clone}{}}}
+\if{html}{\out{<a id="method-Dockerfile-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-Dockerfile-clone}{}}}
 \subsection{Method \code{clone()}}{
 The objects of this class are cloneable with this method.
 \subsection{Usage}{

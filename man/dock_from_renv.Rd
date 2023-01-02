@@ -8,6 +8,7 @@ dock_from_renv(
   lockfile = "renv.lock",
   distro = "focal",
   FROM = "rocker/r-base",
+  sha256 = NULL,
   AS = NULL,
   sysreqs = TRUE,
   repos = c(CRAN = "https://cran.rstudio.com/"),
@@ -24,6 +25,8 @@ at https://hub.docker.com/r/rstudio/r-base/.}
 
 \item{FROM}{Docker image to start FROM Default is
 FROM rocker/r-base}
+
+\item{sha256}{character. The Digest SHA256 hash corresponding to the chip architecture of the deployment host machine. This will need to be set in instances where the machine on which the image is built is different than the machine on which the image will be hosted/deployed. This is a convenience for setting `FROM = rocker/rver@sha256:xxxx`}
 
 \item{AS}{The AS of the Dockerfile. Default it NULL.}
 

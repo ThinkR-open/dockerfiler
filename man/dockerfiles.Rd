@@ -24,7 +24,7 @@ dock_from_desc(
 \item{FROM}{The FROM of the Dockerfile. Default is
 FROM rocker/r-ver:`R.Version()$major`.`R.Version()$minor`.}
 
-\item{sha256}{character. The Digest SHA256 hash corresponding to the chip architecture of the deployment host machine if different than the machine on which the image will be built.}
+\item{sha256}{character. The Digest SHA256 hash corresponding to the chip architecture of the deployment host machine. This will need to be set in instances where the machine on which the image is built is different than the machine on which the image will be hosted/deployed. This is a convenience for setting `FROM = rocker/rver@sha256:xxxx`}
 
 \item{AS}{The AS of the Dockerfile. Default it NULL.}
 

@@ -94,7 +94,12 @@ get_batch_sysreqs <- function(
     out <- jsonlite::fromJSON(path)
   }
 
-  file_delete(path)
+  try(
+    {
+      fs::file_delete(path)
+    },
+    silent = TRUE
+  )
 
   unique(out[!is.na(out)])
 }

@@ -9,7 +9,28 @@ status](https://codecov.io/gh/ThinkR-open/dockerfiler/branch/master/graph/badge.
 
 # `{dockerfiler}`
 
-Easy Dockerfile Creation from R.
+The goal of `{dockerfiler}` is to provide an easy way to create
+Dockerfiles from R.
+
+## About
+
+You’re reading the doc about version :
+
+``` r
+desc::desc_get_version()
+#> [1] '0.2.1'
+```
+
+The check results are:
+
+``` r
+devtools::check(quiet = TRUE)
+#> ℹ Loading dockerfiler
+#> ── R CMD check results ────────────────────────────────── dockerfiler 0.2.1 ────
+#> Duration: 48.4s
+#> 
+#> 0 errors ✔ | 0 warnings ✔ | 0 notes ✔
+```
 
 ## Installation
 
@@ -61,15 +82,6 @@ See your Dockerfile :
 
 ``` r
 my_dock
-#> FROM rocker/r-base
-#> MAINTAINER Colin FAY <contact@colinfay.me>
-#> RUN R -e 'install.packages("attempt", repo = "http://cran.irsn.fr/")'
-#> RUN mkdir /usr/scripts
-#> RUN cd /usr/scripts
-#> COPY plumberfile.R /usr/scripts/plumber.R
-#> COPY torun.R /usr/scripts/torun.R
-#> EXPOSE 8000
-#> CMD Rscript /usr/scripts/torun.R
 ```
 
 If you’ve made a mistake in your script, you can switch lines with the
@@ -80,15 +92,6 @@ the two cmd you want to switch :
 # Switch line 8 and 7
 my_dock$switch_cmd(8, 7)
 my_dock
-#> FROM rocker/r-base
-#> MAINTAINER Colin FAY <contact@colinfay.me>
-#> RUN R -e 'install.packages("attempt", repo = "http://cran.irsn.fr/")'
-#> RUN mkdir /usr/scripts
-#> RUN cd /usr/scripts
-#> COPY plumberfile.R /usr/scripts/plumber.R
-#> EXPOSE 8000
-#> COPY torun.R /usr/scripts/torun.R
-#> CMD Rscript /usr/scripts/torun.R
 ```
 
 You can also remove a cmd with `remove_cmd`:
@@ -96,14 +99,6 @@ You can also remove a cmd with `remove_cmd`:
 ``` r
 my_dock$remove_cmd(8)
 my_dock
-#> FROM rocker/r-base
-#> MAINTAINER Colin FAY <contact@colinfay.me>
-#> RUN R -e 'install.packages("attempt", repo = "http://cran.irsn.fr/")'
-#> RUN mkdir /usr/scripts
-#> RUN cd /usr/scripts
-#> COPY plumberfile.R /usr/scripts/plumber.R
-#> EXPOSE 8000
-#> CMD Rscript /usr/scripts/torun.R
 ```
 
 This also works with a vector:
@@ -111,18 +106,13 @@ This also works with a vector:
 ``` r
 my_dock$remove_cmd(5:7)
 my_dock
-#> FROM rocker/r-base
-#> MAINTAINER Colin FAY <contact@colinfay.me>
-#> RUN R -e 'install.packages("attempt", repo = "http://cran.irsn.fr/")'
-#> RUN mkdir /usr/scripts
-#> CMD Rscript /usr/scripts/torun.R
 ```
 
 `add_after` add a command after a given line.
 
 ``` r
 my_dock$add_after(
-  cmd = "RUN R -e 'remotes::install_cran(\"rlang\")'", 
+  cmd = "RUN R -e 'remotes::install_cran(\"rlang\")'",
   after = 3
 )
 ```
@@ -140,72 +130,20 @@ dependencies and the package.
 
 ``` r
 my_dock <- dock_from_desc("DESCRIPTION")
-#> ℹ Please wait while we compute system requirements...
-#> ✓ Done
 my_dock
-#> FROM rocker/r-ver:4.1.2
-#> RUN apt-get update && apt-get install -y  git-core libcurl4-openssl-dev libgit2-dev libicu-dev libssl-dev make pandoc pandoc-citeproc && rm -rf /var/lib/apt/lists/*
-#> RUN echo "options(repos = c(CRAN = 'https://cran.rstudio.com/'), download.file.method = 'libcurl', Ncpus = 4)" >> /usr/local/lib/R/etc/Rprofile.site
-#> RUN R -e 'install.packages("remotes")'
-#> RUN Rscript -e 'remotes::install_version("glue",upgrade="never", version = "1.6.1")'
-#> RUN Rscript -e 'remotes::install_version("cli",upgrade="never", version = "3.1.1")'
-#> RUN Rscript -e 'remotes::install_version("R6",upgrade="never", version = "2.5.1")'
-#> RUN Rscript -e 'remotes::install_version("desc",upgrade="never", version = "1.4.0")'
-#> RUN Rscript -e 'remotes::install_version("fs",upgrade="never", version = "1.5.2")'
-#> RUN Rscript -e 'remotes::install_version("jsonlite",upgrade="never", version = "1.7.3")'
-#> RUN Rscript -e 'remotes::install_version("knitr",upgrade="never", version = "1.37")'
-#> RUN Rscript -e 'remotes::install_version("testthat",upgrade="never", version = "3.1.2")'
-#> RUN Rscript -e 'remotes::install_version("rmarkdown",upgrade="never", version = "2.11")'
-#> RUN Rscript -e 'remotes::install_version("usethis",upgrade="never", version = "2.1.5")'
-#> RUN Rscript -e 'remotes::install_version("renv",upgrade="never", version = "0.15.2")'
-#> RUN Rscript -e 'remotes::install_version("remotes",upgrade="never", version = "2.4.2")'
-#> RUN Rscript -e 'remotes::install_version("pkgbuild",upgrade="never", version = "1.3.1")'
-#> RUN Rscript -e 'remotes::install_version("pak",upgrade="never", version = "0.2.0")'
-#> RUN Rscript -e 'remotes::install_version("attempt",upgrade="never", version = "0.3.1")'
-#> RUN mkdir /build_zone
-#> ADD . /build_zone
-#> WORKDIR /build_zone
-#> RUN R -e 'remotes::install_local(upgrade="never")'
-#> RUN rm -rf /build_zone
 
 my_dock$CMD(r(library(dockerfiler)))
 
 my_dock$add_after(
-  cmd = "RUN R -e 'remotes::install_cran(\"rlang\")'", 
+  cmd = "RUN R -e 'remotes::install_cran(\"rlang\")'",
   after = 3
 )
 my_dock
-#> FROM rocker/r-ver:4.1.2
-#> RUN apt-get update && apt-get install -y  git-core libcurl4-openssl-dev libgit2-dev libicu-dev libssl-dev make pandoc pandoc-citeproc && rm -rf /var/lib/apt/lists/*
-#> RUN echo "options(repos = c(CRAN = 'https://cran.rstudio.com/'), download.file.method = 'libcurl', Ncpus = 4)" >> /usr/local/lib/R/etc/Rprofile.site
-#> RUN R -e 'remotes::install_cran("rlang")'
-#> RUN R -e 'install.packages("remotes")'
-#> RUN Rscript -e 'remotes::install_version("glue",upgrade="never", version = "1.6.1")'
-#> RUN Rscript -e 'remotes::install_version("cli",upgrade="never", version = "3.1.1")'
-#> RUN Rscript -e 'remotes::install_version("R6",upgrade="never", version = "2.5.1")'
-#> RUN Rscript -e 'remotes::install_version("desc",upgrade="never", version = "1.4.0")'
-#> RUN Rscript -e 'remotes::install_version("fs",upgrade="never", version = "1.5.2")'
-#> RUN Rscript -e 'remotes::install_version("jsonlite",upgrade="never", version = "1.7.3")'
-#> RUN Rscript -e 'remotes::install_version("knitr",upgrade="never", version = "1.37")'
-#> RUN Rscript -e 'remotes::install_version("testthat",upgrade="never", version = "3.1.2")'
-#> RUN Rscript -e 'remotes::install_version("rmarkdown",upgrade="never", version = "2.11")'
-#> RUN Rscript -e 'remotes::install_version("usethis",upgrade="never", version = "2.1.5")'
-#> RUN Rscript -e 'remotes::install_version("renv",upgrade="never", version = "0.15.2")'
-#> RUN Rscript -e 'remotes::install_version("remotes",upgrade="never", version = "2.4.2")'
-#> RUN Rscript -e 'remotes::install_version("pkgbuild",upgrade="never", version = "1.3.1")'
-#> RUN Rscript -e 'remotes::install_version("pak",upgrade="never", version = "0.2.0")'
-#> RUN Rscript -e 'remotes::install_version("attempt",upgrade="never", version = "0.3.1")'
-#> RUN mkdir /build_zone
-#> ADD . /build_zone
-#> WORKDIR /build_zone
-#> RUN R -e 'remotes::install_local(upgrade="never")'
-#> RUN rm -rf /build_zone
-#> CMD R -e 'library(dockerfiler)'
 ```
 
 ## Create a Dockerfile from renv.lock
 
--   Create renv.lock
+- Create renv.lock
 
 ``` r
 dir_build <- tempfile(pattern = "renv")
@@ -216,37 +154,31 @@ the_lockfile <- file.path(dir_build, "renv.lock")
 custom_packages <- c(
   # attachment::att_from_description(),
   "renv",
-  "cli", "glue", "golem",
-  "shiny", "stats", "utils",
+  "cli",
+  "glue",
+  "golem",
+  "shiny",
+  "stats",
+  "utils",
   "testthat",
   "knitr"
 )
 renv::snapshot(
   packages = custom_packages,
   lockfile = the_lockfile,
-  prompt = FALSE)
+  prompt = FALSE
+)
 ```
 
--   Build Dockerfile
+- Build Dockerfile
 
 ``` r
-my_dock <- dock_from_renv(lockfile = the_lockfile,
-                   distro = "focal",
-                   FROM = "rocker/verse"
-    )
-#> ℹ Please wait while we compute system requirements...
-#> Fetching system dependencies for 81 package records.
-#> Warning: `lang()` is deprecated as of rlang 0.2.0.
-#> Please use `call2()` instead.
-#> This warning is displayed once per session.
-#> ✓ Done
+my_dock <- dock_from_renv(
+  lockfile = the_lockfile,
+  distro = "focal",
+  FROM = "rocker/verse"
+)
 my_dock
-#> FROM rocker/verse:4.1
-#> RUN apt-get update -y && apt-get install -y  make  libcurl4-openssl-dev  libssl-dev  git  libgit2-dev  libicu-dev  libxml2-dev  zlib1g-dev  pandoc && rm -rf /var/lib/apt/lists/*
-#> RUN echo "options(renv.config.pak.enabled = TRUE, repos = c(CRAN = 'https://cran.rstudio.com/'), download.file.method = 'libcurl', Ncpus = 4)" >> /usr/local/lib/R/etc/Rprofile.site
-#> RUN R -e 'install.packages(c("renv","remotes"))'
-#> COPY renv.lock renv.lock
-#> RUN R -e 'renv::restore()'
 ```
 
 ## Contact

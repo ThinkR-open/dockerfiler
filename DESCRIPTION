@@ -1,6 +1,6 @@
 Package: dockerfiler
 Title: Easy Dockerfile Creation from R
-Version: 0.1.6
+Version: 0.2.1
 Authors@R: c(
     person("Colin", "Fay", , "contact@colinfay.me", role = c("cre", "aut"),
            comment = c(ORCID = "0000-0001-7343-1846")),
@@ -17,7 +17,7 @@ Description: Build a Dockerfile straight from your R session.
 License: MIT + file LICENSE
 URL: https://github.com/ThinkR-open/dockerfiler
 BugReports: https://github.com/ThinkR-open/dockerfiler/issues
-Imports: 
+Imports:
     attempt (>= 0.3.1),
     cli (>= 2.3.0),
     desc (>= 1.2.0),
@@ -31,12 +31,12 @@ Imports:
     renv (>= 0.12.0),
     usethis (>= 2.0.1),
     utils
-Suggests: 
+Suggests:
     knitr (>= 1.31),
     rmarkdown (>= 2.6),
     testthat (>= 3.0.0),
     withr
-VignetteBuilder: 
+VignetteBuilder:
     knitr
 Config/testthat/edition: 3
 Encoding: UTF-8

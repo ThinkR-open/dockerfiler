@@ -1,3 +1,6 @@
+# dockerfile 0.1.6
+
+fix: graceful failing in case no internet
 # dockerfile 0.1.5
 
 * Added `dock_from_renv()`, to create a Dockerfile from a renv.lock file (@JosiahParry, @statnmap)

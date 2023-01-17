@@ -3,295 +3,541 @@
 \name{Dockerfile}
 \alias{Dockerfile}
 \title{A Dockerfile template}
-\value{
-A dockerfile template
-}
 \description{
 A Dockerfile template
 
 A Dockerfile template
 }
-\section{Methods}{
-
-\describe{
-  \item{\code{RUN}}{add a RUN command}
-  \item{\code{ADD}}{add a ADD command}
-  \item{\code{COPY}}{add a COPY command}
-  \item{\code{WORKDIR}}{add a WORKDIR command}
-  \item{\code{EXPOSE}}{add an EXPOSE command}
-  \item{\code{VOLUME}}{add a VOLUME command}
-  \item{\code{CMD}}{add a CMD command}
-  \item{\code{LABEL}}{add a LABEL command}
-  \item{\code{ENV}}{add a ENV command}
-  \item{\code{ENTRYPOINT}}{add a ENTRYPOINT command}
-  \item{\code{VOLUME}}{add a VOLUME command}
-  \item{\code{USER}}{add a USER command}
-  \item{\code{ARG}}{add an ARG command}
-  \item{\code{ONBUILD}}{add a ONBUILD command}
-  \item{\code{STOPSIGNAL}}{add a STOPSIGNAL command}
-  \item{\code{HEALTHCHECK}}{add a HEALTHCHECK command}
-  \item{\code{STOPSIGNAL}}{add a STOPSIGNAL command}
-  \item{\code{SHELL}}{add a SHELL command}
-  \item{\code{MAINTAINER}}{add a MAINTAINER command}
-  \item{\code{custom}}{add a custom command}
-  \item{\code{write}}{save the Dockerfile}
-  \item{\code{switch_cmd}}{switch two command}
-  \item{\code{remove_cmd}}{remove_cmd one or more command(s)}
-}
-}
-
 \examples{
 my_dock <- Dockerfile$new()
+}
+\section{Public fields}{
+\if{html}{\out{<div class="r6-fields">}}
+\describe{
+\item{\code{Dockerfile}}{The dockerfile content.}
+}
+\if{html}{\out{</div>}}
 }
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-new}{\code{Dockerfile$new()}}
-\item \href{#method-RUN}{\code{Dockerfile$RUN()}}
-\item \href{#method-ADD}{\code{Dockerfile$ADD()}}
-\item \href{#method-COPY}{\code{Dockerfile$COPY()}}
-\item \href{#method-WORKDIR}{\code{Dockerfile$WORKDIR()}}
-\item \href{#method-EXPOSE}{\code{Dockerfile$EXPOSE()}}
-\item \href{#method-VOLUME}{\code{Dockerfile$VOLUME()}}
-\item \href{#method-CMD}{\code{Dockerfile$CMD()}}
-\item \href{#method-LABEL}{\code{Dockerfile$LABEL()}}
-\item \href{#method-ENV}{\code{Dockerfile$ENV()}}
-\item \href{#method-ENTRYPOINT}{\code{Dockerfile$ENTRYPOINT()}}
-\item \href{#method-USER}{\code{Dockerfile$USER()}}
-\item \href{#method-ARG}{\code{Dockerfile$ARG()}}
-\item \href{#method-ONBUILD}{\code{Dockerfile$ONBUILD()}}
-\item \href{#method-STOPSIGNAL}{\code{Dockerfile$STOPSIGNAL()}}
-\item \href{#method-HEALTHCHECK}{\code{Dockerfile$HEALTHCHECK()}}
-\item \href{#method-SHELL}{\code{Dockerfile$SHELL()}}
-\item \href{#method-MAINTAINER}{\code{Dockerfile$MAINTAINER()}}
-\item \href{#method-custom}{\code{Dockerfile$custom()}}
-\item \href{#method-print}{\code{Dockerfile$print()}}
-\item \href{#method-write}{\code{Dockerfile$write()}}
-\item \href{#method-switch_cmd}{\code{Dockerfile$switch_cmd()}}
-\item \href{#method-remove_cmd}{\code{Dockerfile$remove_cmd()}}
-\item \href{#method-add_after}{\code{Dockerfile$add_after()}}
-\item \href{#method-clone}{\code{Dockerfile$clone()}}
+\item \href{#method-Dockerfile-new}{\code{Dockerfile$new()}}
+\item \href{#method-Dockerfile-RUN}{\code{Dockerfile$RUN()}}
+\item \href{#method-Dockerfile-ADD}{\code{Dockerfile$ADD()}}
+\item \href{#method-Dockerfile-COPY}{\code{Dockerfile$COPY()}}
+\item \href{#method-Dockerfile-WORKDIR}{\code{Dockerfile$WORKDIR()}}
+\item \href{#method-Dockerfile-EXPOSE}{\code{Dockerfile$EXPOSE()}}
+\item \href{#method-Dockerfile-VOLUME}{\code{Dockerfile$VOLUME()}}
+\item \href{#method-Dockerfile-CMD}{\code{Dockerfile$CMD()}}
+\item \href{#method-Dockerfile-LABEL}{\code{Dockerfile$LABEL()}}
+\item \href{#method-Dockerfile-ENV}{\code{Dockerfile$ENV()}}
+\item \href{#method-Dockerfile-ENTRYPOINT}{\code{Dockerfile$ENTRYPOINT()}}
+\item \href{#method-Dockerfile-USER}{\code{Dockerfile$USER()}}
+\item \href{#method-Dockerfile-ARG}{\code{Dockerfile$ARG()}}
+\item \href{#method-Dockerfile-ONBUILD}{\code{Dockerfile$ONBUILD()}}
+\item \href{#method-Dockerfile-STOPSIGNAL}{\code{Dockerfile$STOPSIGNAL()}}
+\item \href{#method-Dockerfile-HEALTHCHECK}{\code{Dockerfile$HEALTHCHECK()}}
+\item \href{#method-Dockerfile-SHELL}{\code{Dockerfile$SHELL()}}
+\item \href{#method-Dockerfile-MAINTAINER}{\code{Dockerfile$MAINTAINER()}}
+\item \href{#method-Dockerfile-custom}{\code{Dockerfile$custom()}}
+\item \href{#method-Dockerfile-print}{\code{Dockerfile$print()}}
+\item \href{#method-Dockerfile-write}{\code{Dockerfile$write()}}
+\item \href{#method-Dockerfile-switch_cmd}{\code{Dockerfile$switch_cmd()}}
+\item \href{#method-Dockerfile-remove_cmd}{\code{Dockerfile$remove_cmd()}}
+\item \href{#method-Dockerfile-add_after}{\code{Dockerfile$add_after()}}
+\item \href{#method-Dockerfile-clone}{\code{Dockerfile$clone()}}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-new"></a>}}
-\if{latex}{\out{\hypertarget{method-new}{}}}
+\if{html}{\out{<a id="method-Dockerfile-new"></a>}}
+\if{latex}{\out{\hypertarget{method-Dockerfile-new}{}}}
 \subsection{Method \code{new()}}{
+Create a new Dockerfile object.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Dockerfile$new(FROM = "rocker/r-base", AS = NULL)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{FROM}}{The base image.}
+
+\item{\code{AS}}{The name of the image.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+A Dockerfile object.
+}
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-RUN"></a>}}
-\if{latex}{\out{\hypertarget{method-RUN}{}}}
+\if{html}{\out{<a id="method-Dockerfile-RUN"></a>}}
+\if{latex}{\out{\hypertarget{method-Dockerfile-RUN}{}}}
 \subsection{Method \code{RUN()}}{
+Add a RUN command.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Dockerfile$RUN(cmd)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{cmd}}{The command to add.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+the Dockerfile object, invisibly.
+}
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-ADD"></a>}}
-\if{latex}{\out{\hypertarget{method-ADD}{}}}
+\if{html}{\out{<a id="method-Dockerfile-ADD"></a>}}
+\if{latex}{\out{\hypertarget{method-Dockerfile-ADD}{}}}
 \subsection{Method \code{ADD()}}{
+Add a ADD command.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Dockerfile$ADD(from, to, force = TRUE)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{from}}{The source file.}
+
+\item{\code{to}}{The destination file.}
+
+\item{\code{force}}{If TRUE, overwrite the destination file.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+the Dockerfile object, invisibly.
+}
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-COPY"></a>}}
-\if{latex}{\out{\hypertarget{method-COPY}{}}}
+\if{html}{\out{<a id="method-Dockerfile-COPY"></a>}}
+\if{latex}{\out{\hypertarget{method-Dockerfile-COPY}{}}}
 \subsection{Method \code{COPY()}}{
+Add a COPY command.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Dockerfile$COPY(from, to, force = TRUE)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{from}}{The source file.}
+
+\item{\code{to}}{The destination file.}
+
+\item{\code{force}}{If TRUE, overwrite the destination file.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+the Dockerfile object, invisibly.
+}
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-WORKDIR"></a>}}
-\if{latex}{\out{\hypertarget{method-WORKDIR}{}}}
+\if{html}{\out{<a id="method-Dockerfile-WORKDIR"></a>}}
+\if{latex}{\out{\hypertarget{method-Dockerfile-WORKDIR}{}}}
 \subsection{Method \code{WORKDIR()}}{
+Add a WORKDIR command.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Dockerfile$WORKDIR(where)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{where}}{The working directory.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+the Dockerfile object, invisibly.
+}
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-EXPOSE"></a>}}
-\if{latex}{\out{\hypertarget{method-EXPOSE}{}}}
+\if{html}{\out{<a id="method-Dockerfile-EXPOSE"></a>}}
+\if{latex}{\out{\hypertarget{method-Dockerfile-EXPOSE}{}}}
 \subsection{Method \code{EXPOSE()}}{
+Add a EXPOSE command.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Dockerfile$EXPOSE(port)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{port}}{The port to expose.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+the Dockerfile object, invisibly.
+}
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-VOLUME"></a>}}
-\if{latex}{\out{\hypertarget{method-VOLUME}{}}}
+\if{html}{\out{<a id="method-Dockerfile-VOLUME"></a>}}
+\if{latex}{\out{\hypertarget{method-Dockerfile-VOLUME}{}}}
 \subsection{Method \code{VOLUME()}}{
+Add a VOLUME command.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Dockerfile$VOLUME(volume)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{volume}}{The volume to add.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+the Dockerfile object, invisibly.
+}
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-CMD"></a>}}
-\if{latex}{\out{\hypertarget{method-CMD}{}}}
+\if{html}{\out{<a id="method-Dockerfile-CMD"></a>}}
+\if{latex}{\out{\hypertarget{method-Dockerfile-CMD}{}}}
 \subsection{Method \code{CMD()}}{
+Add a CMD command.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Dockerfile$CMD(cmd)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{cmd}}{The command to add.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+the Dockerfile object, invisibly.
+}
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-LABEL"></a>}}
-\if{latex}{\out{\hypertarget{method-LABEL}{}}}
+\if{html}{\out{<a id="method-Dockerfile-LABEL"></a>}}
+\if{latex}{\out{\hypertarget{method-Dockerfile-LABEL}{}}}
 \subsection{Method \code{LABEL()}}{
+Add a LABEL command.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Dockerfile$LABEL(key, value)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{key, value}}{The key and value of the label.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+the Dockerfile object, invisibly.
+}
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-ENV"></a>}}
-\if{latex}{\out{\hypertarget{method-ENV}{}}}
+\if{html}{\out{<a id="method-Dockerfile-ENV"></a>}}
+\if{latex}{\out{\hypertarget{method-Dockerfile-ENV}{}}}
 \subsection{Method \code{ENV()}}{
+Add a ENV command.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Dockerfile$ENV(key, value)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{key, value}}{The key and value of the label.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+the Dockerfile object, invisibly.
+}
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-ENTRYPOINT"></a>}}
-\if{latex}{\out{\hypertarget{method-ENTRYPOINT}{}}}
+\if{html}{\out{<a id="method-Dockerfile-ENTRYPOINT"></a>}}
+\if{latex}{\out{\hypertarget{method-Dockerfile-ENTRYPOINT}{}}}
 \subsection{Method \code{ENTRYPOINT()}}{
+Add a ENTRYPOINT command.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Dockerfile$ENTRYPOINT(cmd)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{cmd}}{The command to add.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+the Dockerfile object, invisibly.
+}
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-USER"></a>}}
-\if{latex}{\out{\hypertarget{method-USER}{}}}
+\if{html}{\out{<a id="method-Dockerfile-USER"></a>}}
+\if{latex}{\out{\hypertarget{method-Dockerfile-USER}{}}}
 \subsection{Method \code{USER()}}{
+Add a USER command.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Dockerfile$USER(user)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{user}}{The user to add.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+the Dockerfile object, invisibly.
+}
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-ARG"></a>}}
-\if{latex}{\out{\hypertarget{method-ARG}{}}}
+\if{html}{\out{<a id="method-Dockerfile-ARG"></a>}}
+\if{latex}{\out{\hypertarget{method-Dockerfile-ARG}{}}}
 \subsection{Method \code{ARG()}}{
+Add a ARG command.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Dockerfile$ARG(arg, ahead = FALSE)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{arg}}{The argument to add.}
+
+\item{\code{ahead}}{If TRUE, add the argument at the beginning of the Dockerfile.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+the Dockerfile object, invisibly.
+}
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-ONBUILD"></a>}}
-\if{latex}{\out{\hypertarget{method-ONBUILD}{}}}
+\if{html}{\out{<a id="method-Dockerfile-ONBUILD"></a>}}
+\if{latex}{\out{\hypertarget{method-Dockerfile-ONBUILD}{}}}
 \subsection{Method \code{ONBUILD()}}{
+Add a ONBUILD command.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Dockerfile$ONBUILD(cmd)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{cmd}}{The command to add.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+the Dockerfile object, invisibly.
+}
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-STOPSIGNAL"></a>}}
-\if{latex}{\out{\hypertarget{method-STOPSIGNAL}{}}}
+\if{html}{\out{<a id="method-Dockerfile-STOPSIGNAL"></a>}}
+\if{latex}{\out{\hypertarget{method-Dockerfile-STOPSIGNAL}{}}}
 \subsection{Method \code{STOPSIGNAL()}}{
+Add a STOPSIGNAL command.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Dockerfile$STOPSIGNAL(signal)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{signal}}{The signal to add.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+the Dockerfile object, invisibly.
+}
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-HEALTHCHECK"></a>}}
-\if{latex}{\out{\hypertarget{method-HEALTHCHECK}{}}}
+\if{html}{\out{<a id="method-Dockerfile-HEALTHCHECK"></a>}}
+\if{latex}{\out{\hypertarget{method-Dockerfile-HEALTHCHECK}{}}}
 \subsection{Method \code{HEALTHCHECK()}}{
+Add a HEALTHCHECK command.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Dockerfile$HEALTHCHECK(check)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{check}}{The check to add.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+the Dockerfile object, invisibly.
+}
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-SHELL"></a>}}
-\if{latex}{\out{\hypertarget{method-SHELL}{}}}
+\if{html}{\out{<a id="method-Dockerfile-SHELL"></a>}}
+\if{latex}{\out{\hypertarget{method-Dockerfile-SHELL}{}}}
 \subsection{Method \code{SHELL()}}{
+Add a SHELL command.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Dockerfile$SHELL(shell)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{shell}}{The shell to add.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+the Dockerfile object, invisibly.
+}
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-MAINTAINER"></a>}}
-\if{latex}{\out{\hypertarget{method-MAINTAINER}{}}}
+\if{html}{\out{<a id="method-Dockerfile-MAINTAINER"></a>}}
+\if{latex}{\out{\hypertarget{method-Dockerfile-MAINTAINER}{}}}
 \subsection{Method \code{MAINTAINER()}}{
+Add a MAINTAINER command.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Dockerfile$MAINTAINER(name, email)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{name, email}}{The name and email of the maintainer.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+the Dockerfile object, invisibly.
+}
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-custom"></a>}}
-\if{latex}{\out{\hypertarget{method-custom}{}}}
+\if{html}{\out{<a id="method-Dockerfile-custom"></a>}}
+\if{latex}{\out{\hypertarget{method-Dockerfile-custom}{}}}
 \subsection{Method \code{custom()}}{
+Add a custom command.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Dockerfile$custom(base, cmd)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{base, cmd}}{The base and command to add.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+the Dockerfile object, invisibly.
+}
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-print"></a>}}
-\if{latex}{\out{\hypertarget{method-print}{}}}
+\if{html}{\out{<a id="method-Dockerfile-print"></a>}}
+\if{latex}{\out{\hypertarget{method-Dockerfile-print}{}}}
 \subsection{Method \code{print()}}{
+Print the Dockerfile.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Dockerfile$print()}\if{html}{\out{</div>}}
 }
 
+\subsection{Returns}{
+used for side effect
+}
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-write"></a>}}
-\if{latex}{\out{\hypertarget{method-write}{}}}
+\if{html}{\out{<a id="method-Dockerfile-write"></a>}}
+\if{latex}{\out{\hypertarget{method-Dockerfile-write}{}}}
 \subsection{Method \code{write()}}{
+Write the Dockerfile to a file.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Dockerfile$write(as = "Dockerfile")}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{as}}{The file to write to.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+used for side effect
+}
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-switch_cmd"></a>}}
-\if{latex}{\out{\hypertarget{method-switch_cmd}{}}}
+\if{html}{\out{<a id="method-Dockerfile-switch_cmd"></a>}}
+\if{latex}{\out{\hypertarget{method-Dockerfile-switch_cmd}{}}}
 \subsection{Method \code{switch_cmd()}}{
+Switch commands.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Dockerfile$switch_cmd(a, b)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{a, b}}{The commands to switch.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+the Dockerfile object, invisibly.
+}
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-remove_cmd"></a>}}
-\if{latex}{\out{\hypertarget{method-remove_cmd}{}}}
+\if{html}{\out{<a id="method-Dockerfile-remove_cmd"></a>}}
+\if{latex}{\out{\hypertarget{method-Dockerfile-remove_cmd}{}}}
 \subsection{Method \code{remove_cmd()}}{
+Remove a command.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Dockerfile$remove_cmd(where)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{where}}{The commands to remove.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+the Dockerfile object, invisibly.
+}
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-add_after"></a>}}
-\if{latex}{\out{\hypertarget{method-add_after}{}}}
+\if{html}{\out{<a id="method-Dockerfile-add_after"></a>}}
+\if{latex}{\out{\hypertarget{method-Dockerfile-add_after}{}}}
 \subsection{Method \code{add_after()}}{
+Add a command after another.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Dockerfile$add_after(cmd, after)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{cmd}}{The command to add.}
+
+\item{\code{after}}{Where to add the cmd}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+the Dockerfile object, invisibly.
+}
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-clone"></a>}}
-\if{latex}{\out{\hypertarget{method-clone}{}}}
+\if{html}{\out{<a id="method-Dockerfile-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-Dockerfile-clone}{}}}
 \subsection{Method \code{clone()}}{
 The objects of this class are cloneable with this method.
 \subsection{Usage}{

@@ -1,7 +1,7 @@
 Package: dockerfiler
 Title: Easy Dockerfile Creation from R
 Version: 0.1.3.9000
-Authors@R: 
+Authors@R:
     c(person(given = "Colin",
              family = "Fay",
              role = c("cre", "aut"),
@@ -18,7 +18,7 @@ Description: Build a Dockerfile straight from your R session.
 License: MIT + file LICENSE
 URL: https://github.com/ColinFay/dockerfiler
 BugReports: https://github.com/ColinFay/dockerfiler/issues
-Imports: 
+Imports:
     attempt (>= 0.3.1),
     glue,
     R6,
@@ -30,12 +30,9 @@ Imports:
     usethis,
     jsonlite,
     pkgbuild
-Suggests: 
+Suggests:
     covr,
-    knitr,
-    rmarkdown,
-    testthat (>= 3.0.0)
-VignetteBuilder: 
+VignetteBuilder:
     knitr
 Encoding: UTF-8
 LazyData: true

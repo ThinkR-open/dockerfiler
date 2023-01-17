@@ -3,18 +3,23 @@ dir.create(dir_build)
 
 # Create a lockfile
 the_lockfile <- file.path(dir_build, "renv.lock")
+
 custom_packages <- c(
   # attachment::att_from_description(),
   "renv",
-  "cli", "glue", #"golem",
-  "shiny", "stats", "utils",
+  "cli",
+  "glue", # "golem",
+  "shiny",
+  "stats",
+  "utils",
   "testthat",
   "knitr"
 )
 renv::snapshot(
   packages = custom_packages,
   lockfile = the_lockfile,
-  prompt = FALSE)
+  prompt = FALSE
+)
 
 # Modify R version for tests
 renv_file <- readLines(file.path(dir_build, "renv.lock"))
@@ -26,28 +31,72 @@ test_that("dock_from_renv works", {
   # skip_if_not(interactive())
   # Create Dockerfile
 
-  out <-   dock_from_renv(lockfile = the_lockfile,
-                   distro = "focal",
-                   FROM = "rocker/verse",
-    )
-  expect_s3_class(out,"Dockerfile")
-  expect_s3_class(out,"R6")
+  out <- dock_from_renv(
+    lockfile = the_lockfile,
+    distro = "focal",
+    FROM = "rocker/verse",
+  )
+  expect_s3_class(
+    out,
+    "Dockerfile"
+  )
+  expect_s3_class(
+    out,
+    "R6"
+  )
   # read Dockerfile
-  out$write(file.path(dir_build, "Dockerfile"))
-  dock_created <- readLines(file.path(dir_build, "Dockerfile"))
-  expect_equal(dock_created[1], "FROM rocker/verse:4.1.2")
+  out$write(
+    file.path(
+      dir_build,
+      "Dockerfile"
+    )
+  )
+
+  dock_created <- readLines(
+    file.path(
+      dir_build,
+      "Dockerfile"
+    )
+  )
+  expect_equal(
+    dock_created[1],
+    "FROM rocker/verse:4.1.2"
+  )
 
   expect_length(
-        grep("install.packages\\(c\\(\"renv\",\"remotes\"", dock_created) , 1
+    grep("install.packages\\(c\\(\"renv\",\"remotes\"", dock_created),
+    1
   )
   expect_length(
-    grep("RUN R -e 'renv::restore\\(\\)'", dock_created), 1
+    grep("RUN R -e 'renv::restore\\(\\)'", dock_created),
+    1
   )
 
   # System dependencies are different when build in interactive environment?
   skip_if_not(interactive())
-  file.copy(file.path(dir_build, "Dockerfile"), "inst/renv_Dockefile", overwrite = TRUE)
-  dock_expected <- readLines(system.file("renv_Dockefile", package = "dockerfiler"))
+  dir.create(
+    file.path(
+      dir_build,
+      "inst"
+    )
+  )
+  file.copy(
+    file.path(
+      dir_build,
+      "Dockerfile"
+    ),
+    file.path(
+      dir_build,
+      "inst"
+    ),
+    overwrite = TRUE
+  )
+  dock_expected <- readLines(
+    system.file(
+      "renv_Dockefile",
+      package = "dockerfiler"
+    )
+  )
 
   expect_equal(dock_created, dock_expected)
 })
@@ -59,11 +108,13 @@ test_that("repos_as_character works", {
   out <- dockerfiler:::repos_as_character(
     repos = c(
       RSPM = paste0("https://packagemanager.rstudio.com/all/__linux__/focal/latest"),
-      CRAN = "https://cran.rstudio.com/")
+      CRAN = "https://cran.rstudio.com/"
+    )
   )
   expect_equal(
     out,
-    "c(RSPM = 'https://packagemanager.rstudio.com/all/__linux__/focal/latest', CRAN = 'https://cran.rstudio.com/')")
+    "c(RSPM = 'https://packagemanager.rstudio.com/all/__linux__/focal/latest', CRAN = 'https://cran.rstudio.com/')"
+  )
 })
 
 # gen_base_image ----

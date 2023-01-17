@@ -68,13 +68,38 @@ get_batch_sysreqs <- function(
     paste(all_deps, collapse = ",")
   )
   path <- file_temp()
-  utils::download.file(
-    url,
-    path,
-    mode = "wb",
-    quiet = quiet
+
+  # Try to download, may fail if
+  # no internet or sysreq unavailable.
+  # In that case, we return ""
+  is_downloaded <- try(
+    {
+      suppressWarnings({
+        utils::download.file(
+          url,
+          path,
+          mode = "wb",
+          quiet = quiet
+        )
+      })
+    },
+    silent = TRUE
   )
-  out <- jsonlite::fromJSON(path)
-  file_delete(path)
+
+  if (attempt::is_try_error(is_downloaded)) {
+    cat_red_bullet("Unable to query the sysreqs.")
+    cat_red_bullet("Possible explanation: no internet connection or sysreqs.r-hub.io is unavailable.")
+    out <- ""
+  } else {
+    out <- jsonlite::fromJSON(path)
+  }
+
+  try(
+    {
+      fs::file_delete(path)
+    },
+    silent = TRUE
+  )
+
   unique(out[!is.na(out)])
 }

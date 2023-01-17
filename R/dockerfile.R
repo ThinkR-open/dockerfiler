@@ -1,122 +1,192 @@
 #' A Dockerfile template
 #'
-#' @return A dockerfile template
-#'
-#' @section Methods:
-#' \describe{
-#'   \item{\code{RUN}}{add a RUN command}
-#'   \item{\code{ADD}}{add a ADD command}
-#'   \item{\code{COPY}}{add a COPY command}
-#'   \item{\code{WORKDIR}}{add a WORKDIR command}
-#'   \item{\code{EXPOSE}}{add an EXPOSE command}
-#'   \item{\code{VOLUME}}{add a VOLUME command}
-#'   \item{\code{CMD}}{add a CMD command}
-#'   \item{\code{LABEL}}{add a LABEL command}
-#'   \item{\code{ENV}}{add a ENV command}
-#'   \item{\code{ENTRYPOINT}}{add a ENTRYPOINT command}
-#'   \item{\code{VOLUME}}{add a VOLUME command}
-#'   \item{\code{USER}}{add a USER command}
-#'   \item{\code{ARG}}{add an ARG command}
-#'   \item{\code{ONBUILD}}{add a ONBUILD command}
-#'   \item{\code{STOPSIGNAL}}{add a STOPSIGNAL command}
-#'   \item{\code{HEALTHCHECK}}{add a HEALTHCHECK command}
-#'   \item{\code{STOPSIGNAL}}{add a STOPSIGNAL command}
-#'   \item{\code{SHELL}}{add a SHELL command}
-#'   \item{\code{MAINTAINER}}{add a MAINTAINER command}
-#'   \item{\code{custom}}{add a custom command}
-#'   \item{\code{write}}{save the Dockerfile}
-#'   \item{\code{switch_cmd}}{switch two command}
-#'   \item{\code{remove_cmd}}{remove_cmd one or more command(s)}
-#' }
-#'
-#' @importFrom R6 R6Class
 #' @export
-#'
+#' @importFrom R6 R6Class
 #' @examples
 #' my_dock <- Dockerfile$new()
 Dockerfile <- R6::R6Class(
-  "Dockerfile",
-  public = list(
-    Dockerfile = character(),
-    ## Either from a file, or from a character vector
-    initialize = function(
-  FROM = "rocker/r-base",
-  AS = NULL
-    ) {
-      self$Dockerfile <- create_dockerfile(FROM, AS)
-    },
-    RUN = function(cmd) {
-      self$Dockerfile <- c(self$Dockerfile, add_run(cmd))
-    },
-    ADD = function(from, to, force = TRUE) {
-      self$Dockerfile <- c(self$Dockerfile, add_add(from, to, force))
-    },
-    COPY = function(from, to, force = TRUE) {
-      self$Dockerfile <- c(self$Dockerfile, add_copy(from, to, force))
-    },
-    WORKDIR = function(where) {
-      self$Dockerfile <- c(self$Dockerfile, add_workdir(where))
-    },
-    EXPOSE = function(port) {
-      self$Dockerfile <- c(self$Dockerfile, add_expose(port))
-    },
-    VOLUME = function(volume) {
-      self$Dockerfile <- c(self$Dockerfile, add_volume(volume))
-    },
-    CMD = function(cmd) {
-      self$Dockerfile <- c(self$Dockerfile, add_cmd(cmd))
-    },
-    LABEL = function(key, value) {
-      self$Dockerfile <- c(self$Dockerfile, add_label(key, value))
-    },
-    ENV = function(key, value) {
-      self$Dockerfile <- c(self$Dockerfile, add_env(key, value))
-    },
-    ENTRYPOINT = function(cmd) {
-      self$Dockerfile <- c(self$Dockerfile, add_entrypoint(cmd))
-    },
-    USER = function(user) {
-      self$Dockerfile <- c(self$Dockerfile, add_user(user))
-    },
-    ARG = function(arg, ahead = FALSE) {
-      if (ahead) {
-        self$Dockerfile <- c(add_arg(arg), self$Dockerfile)
-      } else {
-        self$Dockerfile <- c(self$Dockerfile, add_arg(arg))
-      }
-    },
-    ONBUILD = function(cmd) {
-      self$Dockerfile <- c(self$Dockerfile, add_onbuild(cmd))
-    },
-    STOPSIGNAL = function(signal) {
-      self$Dockerfile <- c(self$Dockerfile, add_stopsignal(signal))
-    },
-    HEALTHCHECK = function(check) {
-      self$Dockerfile <- c(self$Dockerfile, add_healthcheck(check))
-    },
-    SHELL = function(shell) {
-      self$Dockerfile <- c(self$Dockerfile, add_shell(shell))
-    },
-    MAINTAINER = function(name, email) {
-      self$Dockerfile <- c(self$Dockerfile, add_maintainer(name, email))
-    },
-    custom = function(base, cmd) {
-      self$Dockerfile <- c(self$Dockerfile, add_custom(base, cmd))
-    },
-    print = function() {
-      cat(self$Dockerfile, sep = "\n")
-    },
-    write = function(as = "Dockerfile") {
-      base::write(self$Dockerfile, file = as)
-    },
-    switch_cmd = function(a, b) {
-      self$Dockerfile <- switch_them(self$Dockerfile, a, b)
-    },
-    remove_cmd = function(where) {
-      self$Dockerfile <- remove_from(self$Dockerfile, where)
-    },
-    add_after = function(cmd, after) {
-      self$Dockerfile <- add_to(self$Dockerfile, cmd, after)
-    }
-  )
+"Dockerfile",
+public = list(
+#' @field Dockerfile The dockerfile content.
+Dockerfile = character(),
+#' @description
+#' Create a new Dockerfile object.
+#' @param FROM The base image.
+#' @param AS The name of the image.
+#' @return A Dockerfile object.
+initialize = function(FROM = "rocker/r-base",
+AS = NULL) {
+self$Dockerfile <- create_dockerfile(FROM, AS)
+},
+#' @description
+#' Add a RUN command.
+#' @param cmd The command to add.
+#' @return the Dockerfile object, invisibly.
+RUN = function(cmd) {
+self$Dockerfile <- c(self$Dockerfile, add_run(cmd))
+},
+#' @description
+#' Add a ADD command.
+#' @param from The source file.
+#' @param to The destination file.
+#' @param force If TRUE, overwrite the destination file.
+#' @return the Dockerfile object, invisibly.
+ADD = function(from, to, force = TRUE) {
+self$Dockerfile <- c(self$Dockerfile, add_add(from, to, force))
+},
+#' @description
+#' Add a COPY command.
+#' @param from The source file.
+#' @param to The destination file.
+#' @param force If TRUE, overwrite the destination file.
+#' @return the Dockerfile object, invisibly.
+COPY = function(from, to, force = TRUE) {
+self$Dockerfile <- c(self$Dockerfile, add_copy(from, to, force))
+},
+#' @description
+#' Add a WORKDIR command.
+#' @param where The working directory.
+#' @return the Dockerfile object, invisibly.
+WORKDIR = function(where) {
+self$Dockerfile <- c(self$Dockerfile, add_workdir(where))
+},
+#' @description
+#' Add a EXPOSE command.
+#' @param port The port to expose.
+#' @return the Dockerfile object, invisibly.
+EXPOSE = function(port) {
+self$Dockerfile <- c(self$Dockerfile, add_expose(port))
+},
+#' @description
+#' Add a VOLUME command.
+#' @param volume The volume to add.
+#' @return the Dockerfile object, invisibly.
+VOLUME = function(volume) {
+self$Dockerfile <- c(self$Dockerfile, add_volume(volume))
+},
+#' @description
+#' Add a CMD command.
+#' @param cmd The command to add.
+#' @return the Dockerfile object, invisibly.
+CMD = function(cmd) {
+self$Dockerfile <- c(self$Dockerfile, add_cmd(cmd))
+},
+#' @description
+#' Add a LABEL command.
+#' @param key,value The key and value of the label.
+#' @return the Dockerfile object, invisibly.
+LABEL = function(key, value) {
+self$Dockerfile <- c(self$Dockerfile, add_label(key, value))
+},
+#' @description
+#' Add a ENV command.
+#' @param key,value The key and value of the label.
+#' @return the Dockerfile object, invisibly.
+ENV = function(key, value) {
+self$Dockerfile <- c(self$Dockerfile, add_env(key, value))
+},
+#' @description
+#' Add a ENTRYPOINT command.
+#' @param cmd The command to add.
+#' @return the Dockerfile object, invisibly.
+ENTRYPOINT = function(cmd) {
+self$Dockerfile <- c(self$Dockerfile, add_entrypoint(cmd))
+},
+#' @description
+#' Add a USER command.
+#' @param user The user to add.
+#' @return the Dockerfile object, invisibly.
+USER = function(user) {
+self$Dockerfile <- c(self$Dockerfile, add_user(user))
+},
+#' @description
+#' Add a ARG command.
+#' @param arg The argument to add.
+#' @param ahead If TRUE, add the argument at the beginning of the Dockerfile.
+#' @return the Dockerfile object, invisibly.
+ARG = function(arg, ahead = FALSE) {
+if (ahead) {
+self$Dockerfile <- c(add_arg(arg), self$Dockerfile)
+} else {
+self$Dockerfile <- c(self$Dockerfile, add_arg(arg))
+}
+},
+#' @description
+#' Add a ONBUILD command.
+#' @param cmd The command to add.
+#' @return the Dockerfile object, invisibly.
+ONBUILD = function(cmd) {
+self$Dockerfile <- c(self$Dockerfile, add_onbuild(cmd))
+},
+#' @description
+#' Add a STOPSIGNAL command.
+#' @param signal The signal to add.
+#' @return the Dockerfile object, invisibly.
+STOPSIGNAL = function(signal) {
+self$Dockerfile <- c(self$Dockerfile, add_stopsignal(signal))
+},
+#' @description
+#' Add a HEALTHCHECK command.
+#' @param check The check to add.
+#' @return the Dockerfile object, invisibly.
+HEALTHCHECK = function(check) {
+self$Dockerfile <- c(self$Dockerfile, add_healthcheck(check))
+},
+#' @description
+#' Add a SHELL command.
+#' @param shell The shell to add.
+#' @return the Dockerfile object, invisibly.
+SHELL = function(shell) {
+self$Dockerfile <- c(self$Dockerfile, add_shell(shell))
+},
+#' @description
+#' Add a MAINTAINER command.
+#' @param name,email The name and email of the maintainer.
+#' @return the Dockerfile object, invisibly.
+MAINTAINER = function(name, email) {
+self$Dockerfile <- c(self$Dockerfile, add_maintainer(name, email))
+},
+#' @description
+#' Add a custom command.
+#' @param base,cmd The base and command to add.
+#' @return the Dockerfile object, invisibly.
+custom = function(base, cmd) {
+self$Dockerfile <- c(self$Dockerfile, add_custom(base, cmd))
+},
+#' @description
+#' Print the Dockerfile.
+#' @return used for side effect
+print = function() {
+cat(self$Dockerfile, sep = "\n")
+},
+#' @description
+#' Write the Dockerfile to a file.
+#' @param as The file to write to.
+#' @return used for side effect
+write = function(as = "Dockerfile") {
+base::write(self$Dockerfile, file = as)
+},
+#' @description
+#' Switch commands.
+#' @param a,b The commands to switch.
+#' @return the Dockerfile object, invisibly.
+switch_cmd = function(a, b) {
+self$Dockerfile <- switch_them(self$Dockerfile, a, b)
+},
+#' @description
+#' Remove a command.
+#' @param where The commands to remove.
+#' @return the Dockerfile object, invisibly.
+remove_cmd = function(where) {
+self$Dockerfile <- remove_from(self$Dockerfile, where)
+},
+#' @description
+#' Add a command after another.
+#' @param cmd The command to add.
+#' @param after Where to add the cmd
+#' @return the Dockerfile object, invisibly.
+add_after = function(cmd, after) {
+self$Dockerfile <- add_to(self$Dockerfile, cmd, after)
+}
+)
 )

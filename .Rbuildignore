@@ -15,3 +15,4 @@
 ^dev$
 ^dockerfiler\.Rproj$
 ^\.dockerignore$
+tests/testthat/.dockerignore

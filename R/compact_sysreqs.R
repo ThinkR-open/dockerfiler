@@ -26,20 +26,12 @@ compact_sysreqs <- function(pkg_installs,
   # we choose to not compact unusals sysreqs
   without_apt_out <- unlist(without_apt)
 
-  unlist(without_apt)
+if ( length(without_apt_out) > 0 && isTRUE( all(without_apt_out != "")) ){
   without_apt_out[1] <- paste(update_cmd,     "&&", without_apt_out[1] )
   without_apt_out[length(without_apt_out)] <- paste( without_apt_out[length(without_apt_out)],"&&",clean_cmd)
-
-
-  paste(
-    update_cmd,
-    "&&",
-    install_cmd,
-    without_apt,
-    "&&",
-    clean_cmd
-  )
-
+} else {
+  without_apt_out <- NULL
+}
 
 
   compact <- paste(

@@ -143,7 +143,7 @@ dock_from_renv <- function(
 
     message(
       sprintf(
-        "Fetching system dependencies for %s package records.",
+        "Fetching system dependencies for %s package(s) records.",
         length(pkgs)
       )
     )

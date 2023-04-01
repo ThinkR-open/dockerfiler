@@ -106,7 +106,8 @@ dock_from_renv <- function(
     centos8 = "yum install -y",
     xenial = "apt-get install -y",
     bionic = "apt-get install -y",
-    focal = "apt-get install -y"
+    focal = "apt-get install -y",
+    jammy = "apt-get install -y"
   )
 
   update_cmd <- switch(
@@ -115,7 +116,8 @@ dock_from_renv <- function(
     centos8 = "yum update -y",
     xenial = "apt-get update -y",
     bionic = "apt-get update -y",
-    focal = "apt-get update -y"
+    focal = "apt-get update -y",
+    jammy = "apt-get update -y"
   )
 
   clean_cmd <- switch(
@@ -124,7 +126,8 @@ dock_from_renv <- function(
     centos8 = "yum clean all && rm -rf /var/cache/yum",
     xenial = "rm -rf /var/lib/apt/lists/*",
     bionic = "rm -rf /var/lib/apt/lists/*",
-    focal = "rm -rf /var/lib/apt/lists/*"
+    focal = "rm -rf /var/lib/apt/lists/*",
+    jammy = "rm -rf /var/lib/apt/lists/*"
   )
 
   pkgs <- names(lock$data()$Packages)
@@ -205,7 +208,12 @@ dock_from_renv <- function(
   # compact
   if (!expand) {
     # we compact sysreqs
-    pkg_installs <- compact_sysreqs(pkg_installs)
+    pkg_installs <- compact_sysreqs(
+      pkg_installs,
+      update_cmd = update_cmd,
+      install_cmd = install_cmd,
+      clean_cmd = clean_cmd
+    )
 
   } else {
     dock$RUN(update_cmd)

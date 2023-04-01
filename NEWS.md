@@ -4,6 +4,8 @@
 
 - feat: Added `dock_from_renv()`, to create a Dockerfile from a renv.lock file (@JosiahParry, @statnmap)
 
+- fix: the dedicated `compact_sysreqs` function allow to deal with 'complex' sysreqs, such as chroimum installation
+
 # dockerfiler 0.1.4
 
 * new version of `dock_from_desc()`

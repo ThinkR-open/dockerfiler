@@ -4,7 +4,9 @@
 
 - feat: Added `dock_from_renv()`, to create a Dockerfile from a renv.lock file (@JosiahParry, @statnmap)
 
-- fix: the dedicated `compact_sysreqs` function allow to deal with 'complex' sysreqs, such as chroimum installation
+- fix: the dedicated `compact_sysreqs` function allow to deal with 'complex' sysreqs, such as chromimum installation
+
+- feat: add jammy ubuntu distro in available distro
 
 # dockerfiler 0.1.4
 

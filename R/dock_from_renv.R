@@ -93,6 +93,10 @@ dock_from_renv <- function(
     focal = list(
       os = "ubuntu",
       os_release = "20.04"
+    ),
+    jammy = list(
+      os = "ubuntu",
+      os_release = "22.04"
     )
   )
 
@@ -162,9 +166,13 @@ dock_from_renv <- function(
       .e = ~ character(0)
     )
 
-    pkg_installs <- unique(unlist(pkg_sysreqs))
 
-    if (length(pkg_installs) == 0) {
+
+
+
+    pkg_installs <- unique(pkg_sysreqs)
+
+    if (length(unlist(pkg_installs)) == 0) {
       cat_bullet(
         "No sysreqs required",
         bullet = "info",
@@ -179,36 +187,26 @@ dock_from_renv <- function(
 
   # extra_sysreqs
 
+
+
+
   if (length(extra_sysreqs) > 0) {
     extra <- paste(
       install_cmd,
       extra_sysreqs
     )
-    pkg_installs <- c(pkg_installs, extra)
+    pkg_installs <- unique(c(pkg_installs, extra))
   }
+
+
+
+
 
   # compact
   if (!expand) {
     # we compact sysreqs
+    pkg_installs <- compact_sysreqs(pkg_installs)
 
-    compact <- paste(
-      gsub(
-        pkg_installs,
-        pattern = install_cmd,
-        replacement = ""
-      ),
-      collapse = " "
-    )
-    if (compact != "") {
-      pkg_installs <- paste(
-        update_cmd,
-        "&&",
-        install_cmd,
-        compact,
-        "&&",
-        clean_cmd
-      )
-    }
   } else {
     dock$RUN(update_cmd)
   }

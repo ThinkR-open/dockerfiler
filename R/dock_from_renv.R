@@ -93,6 +93,10 @@ dock_from_renv <- function(
     focal = list(
       os = "ubuntu",
       os_release = "20.04"
+    ),
+    jammy = list(
+      os = "ubuntu",
+      os_release = "22.04"
     )
   )
 
@@ -102,7 +106,8 @@ dock_from_renv <- function(
     centos8 = "yum install -y",
     xenial = "apt-get install -y",
     bionic = "apt-get install -y",
-    focal = "apt-get install -y"
+    focal = "apt-get install -y",
+    jammy = "apt-get install -y"
   )
 
   update_cmd <- switch(
@@ -111,7 +116,8 @@ dock_from_renv <- function(
     centos8 = "yum update -y",
     xenial = "apt-get update -y",
     bionic = "apt-get update -y",
-    focal = "apt-get update -y"
+    focal = "apt-get update -y",
+    jammy = "apt-get update -y"
   )
 
   clean_cmd <- switch(
@@ -120,7 +126,8 @@ dock_from_renv <- function(
     centos8 = "yum clean all && rm -rf /var/cache/yum",
     xenial = "rm -rf /var/lib/apt/lists/*",
     bionic = "rm -rf /var/lib/apt/lists/*",
-    focal = "rm -rf /var/lib/apt/lists/*"
+    focal = "rm -rf /var/lib/apt/lists/*",
+    jammy = "rm -rf /var/lib/apt/lists/*"
   )
 
   pkgs <- names(lock$data()$Packages)
@@ -136,7 +143,7 @@ dock_from_renv <- function(
 
     message(
       sprintf(
-        "Fetching system dependencies for %s package records.",
+        "Fetching system dependencies for %s package(s) records.",
         length(pkgs)
       )
     )
@@ -162,9 +169,13 @@ dock_from_renv <- function(
       .e = ~ character(0)
     )
 
-    pkg_installs <- unique(unlist(pkg_sysreqs))
 
-    if (length(pkg_installs) == 0) {
+
+
+
+    pkg_installs <- unique(pkg_sysreqs)
+
+    if (length(unlist(pkg_installs)) == 0) {
       cat_bullet(
         "No sysreqs required",
         bullet = "info",
@@ -179,36 +190,31 @@ dock_from_renv <- function(
 
   # extra_sysreqs
 
+
+
+
   if (length(extra_sysreqs) > 0) {
     extra <- paste(
       install_cmd,
       extra_sysreqs
     )
-    pkg_installs <- c(pkg_installs, extra)
+    pkg_installs <- unique(c(pkg_installs, extra))
   }
+
+
+
+
 
   # compact
   if (!expand) {
     # we compact sysreqs
-
-    compact <- paste(
-      gsub(
-        pkg_installs,
-        pattern = install_cmd,
-        replacement = ""
-      ),
-      collapse = " "
+    pkg_installs <- compact_sysreqs(
+      pkg_installs,
+      update_cmd = update_cmd,
+      install_cmd = install_cmd,
+      clean_cmd = clean_cmd
     )
-    if (compact != "") {
-      pkg_installs <- paste(
-        update_cmd,
-        "&&",
-        install_cmd,
-        compact,
-        "&&",
-        clean_cmd
-      )
-    }
+
   } else {
     dock$RUN(update_cmd)
   }

@@ -26,8 +26,38 @@ renv_file <- readLines(file.path(dir_build, "renv.lock"))
 renv_file[grep("Version", renv_file)[1]] <- '    "Version": "4.1.2",'
 writeLines(renv_file, file.path(dir_build, "renv.lock"))
 
+test_that("dock_from_renv works with old renv", {
+  out <- dock_from_renv(
+    lockfile = the_lockfile,
+    distro = "focal",
+    FROM = "rocker/verse",
+    keep_renv_version = TRUE
+  )
+
+  out$write(
+    file.path(
+      dir_build,
+      "Dockerfile"
+    )
+  )
+
+  dock_created <- readLines(
+    file.path(
+      dir_build,
+      "Dockerfile"
+    )
+  )
+
+  test_string <- "remotes::install.version\\(\"renv\", version = 1.0.2\\)"
+  message(test_string)
+  expect_length(
+    grep(test_string , dock_created), 1
+  )
+
+})
+
 # dock_from_renv ----
-test_that("dock_from_renv works", {
+test_that("dock_from_renv works with keep_renv_version", {
   # skip_if_not(interactive())
   # Create Dockerfile
 

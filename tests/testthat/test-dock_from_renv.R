@@ -57,7 +57,7 @@ test_that("dock_from_renv works with old renv", {
 })
 
 # dock_from_renv ----
-test_that("dock_from_renv works with keep_renv_version", {
+test_that("dock_from_renv works", {
   # skip_if_not(interactive())
   # Create Dockerfile
 

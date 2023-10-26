@@ -245,7 +245,7 @@ dock_from_renv <- function(
   if (keep_renv_version){
     dock$RUN("R -e 'install.packages(\"remotes\")'")
       install_renv_string <- paste0(
-        "R -e 'remotes::install.version(\"renv\", version = ",
+        "R -e 'remotes::install_version(\"renv\", version = ",
         renv_version,
         ")'"
       )

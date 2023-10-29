@@ -12,7 +12,8 @@ dock_from_renv(
   sysreqs = TRUE,
   repos = c(CRAN = "https://cran.rstudio.com/"),
   expand = FALSE,
-  extra_sysreqs = NULL
+  extra_sysreqs = NULL,
+  fix_renv_version = FALSE
 )
 }
 \arguments{
@@ -36,6 +37,9 @@ will contain sysreq installation.}
 
 \item{extra_sysreqs}{character vector. Extra debian system requirements.
 Will be installed with apt-get install.}
+
+\item{fix_renv_version}{boolean. If `TRUE` the version of renv in the lockfile
+will be used for the `renv::restore()` command}
 }
 \value{
 A R6 object of class `Dockerfile`.

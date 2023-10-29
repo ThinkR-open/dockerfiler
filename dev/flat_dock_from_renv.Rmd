@@ -13,7 +13,304 @@ library(testthat)
  You need to run the 'description' chunk in the '0-dev_history.Rmd' file before continuing your code there.
 -->
 
+# gen_base_image
+    
+```{r function-gen_base_image}
+#' Generate base image name
+#'
+#' Creates the base image name from the provided distro name and the R version found in the `renv.lock` file.
+#'
+#' @keywords internal
+gen_base_image <- function(
+  distro = "bionic",
+  r_version = "4.0",
+  FROM = "rstudio/r-base"
+) {
+  distro <- match.arg(distro, available_distros)
+
+  if (FROM == "rstudio/r-base") {
+    glue::glue("{FROM}:{r_version}-{distro}")
+  } else {
+    glue::glue("{FROM}:{r_version}")
+  }
+}
+```
+  
+
+
+
 # Create a Dockerfile from a renv.lock file
+
+    
+```{r function-dock_from_renv}
+# ignoring opensuse for the time being
+available_distros <- c(
+  "xenial",
+  "bionic",
+  "focal",
+  "centos7",
+  "centos8"
+)
+
+#' Create a Dockerfile from an `renv.lock` file
+#'
+#' @param lockfile Path to an `renv.lock` file to use as an input..
+#' @param FROM Docker image to start FROM Default is
+#'     FROM rocker/r-base
+#' @param AS The AS of the Dockerfile. Default it NULL.
+#' @param distro One of "focal", "bionic", "xenial", "centos7",
+#'     or "centos8". See available distributions
+#'     at https://hub.docker.com/r/rstudio/r-base/.
+#' @param sysreqs boolean. If `TRUE`, the Dockerfile
+#'     will contain sysreq installation.
+#' @param expand boolean. If `TRUE` each system requirement will have its own `RUN` line.
+#' @param repos character. The URL(s) of the repositories to use for `options("repos")`.
+#' @param extra_sysreqs character vector. Extra debian system requirements.
+#'    Will be installed with apt-get install.
+#' @param fix_renv_version boolean. If `TRUE` the version of renv in the lockfile
+#'    will be used for the `renv::restore()` command
+#' @importFrom utils getFromNamespace
+#' @return A R6 object of class `Dockerfile`.
+#' @details
+#'
+#' System requirements for packages are provided
+#' through RStudio Package Manager via the {pak}
+#' package. The install commands provided from pak
+#' are added as `RUN` directives within the `Dockerfile`.
+#'
+#' The R version is taken from the `renv.lock` file.
+#' Packages are installed using `renv::restore()` which ensures
+#' that the proper package version and source is used when installed.
+#'
+#' @importFrom attempt map_try_catch
+#' @importFrom glue glue
+#' @importFrom pak pkg_system_requirements
+
+#' @export
+dock_from_renv <- function(
+  lockfile = "renv.lock",
+  distro = "focal",
+  FROM = "rocker/r-base",
+  AS = NULL,
+  sysreqs = TRUE,
+  repos = c(CRAN = "https://cran.rstudio.com/"),
+  expand = FALSE,
+  extra_sysreqs = NULL,
+  fix_renv_version = FALSE
+) {
+  distro <- match.arg(distro, available_distros)
+
+  lock <- getFromNamespace("lockfile", "renv")(lockfile)
+
+  # lock$repos(CRAN = repos)
+  lockfile <- basename(lockfile)
+
+  # start the dockerfile
+  R_major_minor <- lock$data()$R$Version
+  dock <- Dockerfile$new(
+    FROM = gen_base_image(
+      distro = distro,
+      r_version = R_major_minor,
+      FROM = FROM
+    ),
+    AS = AS
+  )
+
+  # get renv version
+  renv_version <- lock$data()$Packages$renv$Version
+
+  distro_args <- switch(
+    distro,
+    centos7 = list(
+      os = "centos",
+      os_release = "7"
+    ),
+    centos8 = list(
+      os = "centos",
+      os_release = "8"
+    ),
+    xenial = list(
+      os = "ubuntu",
+      os_release = "16.04"
+    ),
+    bionic = list(
+      os = "ubuntu",
+      os_release = "18.04"
+    ),
+    focal = list(
+      os = "ubuntu",
+      os_release = "20.04"
+    ),
+    jammy = list(
+      os = "ubuntu",
+      os_release = "22.04"
+    )
+  )
+
+  install_cmd <- switch(
+    distro,
+    centos7 = "yum install -y",
+    centos8 = "yum install -y",
+    xenial = "apt-get install -y",
+    bionic = "apt-get install -y",
+    focal = "apt-get install -y",
+    jammy = "apt-get install -y"
+  )
+
+  update_cmd <- switch(
+    distro,
+    centos7 = "yum update -y",
+    centos8 = "yum update -y",
+    xenial = "apt-get update -y",
+    bionic = "apt-get update -y",
+    focal = "apt-get update -y",
+    jammy = "apt-get update -y"
+  )
+
+  clean_cmd <- switch(
+    distro,
+    centos7 = "yum clean all && rm -rf /var/cache/yum",
+    centos8 = "yum clean all && rm -rf /var/cache/yum",
+    xenial = "rm -rf /var/lib/apt/lists/*",
+    bionic = "rm -rf /var/lib/apt/lists/*",
+    focal = "rm -rf /var/lib/apt/lists/*",
+    jammy = "rm -rf /var/lib/apt/lists/*"
+  )
+
+  pkgs <- names(lock$data()$Packages)
+
+  if (sysreqs) {
+
+    # please wait during system requirement calculation
+    cat_bullet(
+      "Please wait while we compute system requirements...",
+      bullet = "info",
+      bullet_col = "green"
+    )
+
+    message(
+      sprintf(
+        "Fetching system dependencies for %s package(s) records.",
+        length(pkgs)
+      )
+    )
+
+    pkg_os <- lapply(
+      pkgs,
+      FUN = function(x) {
+        c(
+          list(package = x),
+          distro_args
+        )
+      }
+    )
+
+    pkg_sysreqs <- attempt::map_try_catch(
+      pkg_os,
+      function(x) {
+        do.call(
+          pak::pkg_system_requirements,
+          x
+        )
+      },
+      .e = ~ character(0)
+    )
+
+
+
+
+
+    pkg_installs <- unique(pkg_sysreqs)
+
+    if (length(unlist(pkg_installs)) == 0) {
+      cat_bullet(
+        "No sysreqs required",
+        bullet = "info",
+        bullet_col = "green"
+      )
+    }
+
+    cat_green_tick("Done") # TODO animated version ?
+  } else {
+    pkg_installs <- NULL
+  }
+
+  # extra_sysreqs
+
+
+
+
+  if (length(extra_sysreqs) > 0) {
+    extra <- paste(
+      install_cmd,
+      extra_sysreqs
+    )
+    pkg_installs <- unique(c(pkg_installs, extra))
+  }
+
+
+
+
+
+  # compact
+  if (!expand) {
+    # we compact sysreqs
+    pkg_installs <- compact_sysreqs(
+      pkg_installs,
+      update_cmd = update_cmd,
+      install_cmd = install_cmd,
+      clean_cmd = clean_cmd
+    )
+
+  } else {
+    dock$RUN(update_cmd)
+  }
+
+  do.call(dock$RUN, list(pkg_installs))
+
+  if (expand) {
+    dock$RUN(clean_cmd)
+  }
+
+  repos_as_character <- repos_as_character(repos)
+  dock$RUN("mkdir -p /usr/local/lib/R/etc/ /usr/lib/R/etc/")
+
+  dock$RUN(
+    sprintf(
+      "echo \"options(renv.config.pak.enabled = TRUE, repos = %s, download.file.method = 'libcurl', Ncpus = 4)\" | tee /usr/local/lib/R/etc/Rprofile.site | tee /usr/lib/R/etc/Rprofile.site",
+      repos_as_character
+    )
+  )
+
+  # check if fix_renv_version is true
+  if (fix_renv_version){
+    dock$RUN("R -e 'install.packages(\"remotes\")'")
+      install_renv_string <- paste0(
+        "R -e 'remotes::install_version(\"renv\", version = ",
+        renv_version,
+        ")'"
+      )
+      dock$RUN(install_renv_string)
+
+  } else {
+    dock$RUN("R -e 'install.packages(c(\"renv\",\"remotes\"))'")
+  }
+
+  dock$COPY(basename(lockfile), "renv.lock")
+  dock$RUN(r(renv::restore()))
+
+  dock
+}
+
+```
+  
+```{r example-dock_from_renv}
+#' \dontrun{
+#' dock <- dock_from_renv("renv.lock", distro = "xenial")
+#' dock$write("Dockerfile")
+#' }
+```
+  
 
 ```{r dock_from_renv, eval=FALSE}
 # A temporary directory
@@ -51,48 +348,102 @@ dir.create(dir_build)
 
 # Create a lockfile
 the_lockfile <- file.path(dir_build, "renv.lock")
+
 custom_packages <- c(
   # attachment::att_from_description(),
   "renv",
-  "cli", "glue", #"golem",
-  "shiny", "stats", "utils",
+  "cli",
+  "glue", # "golem",
+  "shiny",
+  "stats",
+  "utils",
   "testthat",
   "knitr"
 )
 renv::snapshot(
   packages = custom_packages,
   lockfile = the_lockfile,
-  prompt = FALSE)
+  prompt = FALSE
+)
 
 # Modify R version for tests
 renv_file <- readLines(file.path(dir_build, "renv.lock"))
 renv_file[grep("Version", renv_file)[1]] <- '    "Version": "4.1.2",'
 writeLines(renv_file, file.path(dir_build, "renv.lock"))
 
+
+
 # dock_from_renv ----
 test_that("dock_from_renv works", {
-  skip_if_not(interactive())
+  # skip_if_not(interactive())
   # Create Dockerfile
-  expect_error(
-    dock_from_renv(lockfile = the_lockfile,
-                   distro = "focal",
-                   FROM = "rocker/verse",
-                   out_dir = dir_build
-    ), regexp = NA)
 
-  # read Dockerfile
-  dock_created <- readLines(file.path(dir_build, "Dockerfile"))
-  expect_equal(
-    dock_created[grep("renv.lock.dock renv.lock", dock_created)],
-    paste0("COPY ", dir_build, "/renv.lock.dock renv.lock")
+  out <- dock_from_renv(
+    lockfile = the_lockfile,
+    distro = "focal",
+    FROM = "rocker/verse",
   )
-  dock_created[grep("renv.lock.dock renv.lock", dock_created)] <-
-    "COPY renv.lock.dock renv.lock"
+  expect_s3_class(
+    out,
+    "Dockerfile"
+  )
+  expect_s3_class(
+    out,
+    "R6"
+  )
+  # read Dockerfile
+  out$write(
+    file.path(
+      dir_build,
+      "Dockerfile"
+    )
+  )
 
-  # file.copy(file.path(dir_build, "Dockerfile"), "inst/renv_Dockefile", overwrite = TRUE)
-  dock_expected <- readLines(system.file("renv_Dockefile", package = "dockerfiler"))
-  dock_expected[grep("renv.lock.dock renv.lock", dock_expected)] <-
-    "COPY renv.lock.dock renv.lock"
+  dock_created <- readLines(
+    file.path(
+      dir_build,
+      "Dockerfile"
+    )
+  )
+  expect_equal(
+    dock_created[1],
+    "FROM rocker/verse:4.1.2"
+  )
+
+  expect_length(
+    grep("install.packages\\(c\\(\"renv\",\"remotes\"", dock_created),
+    1
+  )
+  expect_length(
+    grep("RUN R -e 'renv::restore\\(\\)'", dock_created),
+    1
+  )
+
+  # System dependencies are different when build in interactive environment?
+  skip_if_not(interactive())
+  dir.create(
+    file.path(
+      dir_build,
+      "inst"
+    )
+  )
+  file.copy(
+    file.path(
+      dir_build,
+      "Dockerfile"
+    ),
+    file.path(
+      dir_build,
+      "inst"
+    ),
+    overwrite = TRUE
+  )
+  dock_expected <- readLines(
+    system.file(
+      "renv_Dockefile",
+      package = "dockerfiler"
+    )
+  )
 
   expect_equal(dock_created, dock_expected)
 })
@@ -101,26 +452,28 @@ unlink(dir_build)
 
 # repos_as_character ----
 test_that("repos_as_character works", {
-  out <- repos_as_character(
+  out <- dockerfiler:::repos_as_character(
     repos = c(
       RSPM = paste0("https://packagemanager.rstudio.com/all/__linux__/focal/latest"),
-      CRAN = "https://cran.rstudio.com/")
+      CRAN = "https://cran.rstudio.com/"
+    )
   )
   expect_equal(
     out,
-    "c(RSPM = 'https://packagemanager.rstudio.com/all/__linux__/focal/latest', CRAN = 'https://cran.rstudio.com/')")
+    "c(RSPM = 'https://packagemanager.rstudio.com/all/__linux__/focal/latest', CRAN = 'https://cran.rstudio.com/')"
+  )
 })
 
 # gen_base_image ----
 test_that("gen_base_image works", {
-  out <- gen_base_image(
+  out <- dockerfiler:::gen_base_image(
     distro = "focal",
     r_version = "4.0",
     FROM = "rstudio/r-base"
   )
   expect_equal(out, "rstudio/r-base:4.0-focal")
 
-  out <- gen_base_image(
+  out <- dockerfiler:::gen_base_image(
     distro = "focal",
     r_version = "4.0",
     FROM = "rocker/verse"
@@ -128,6 +481,63 @@ test_that("gen_base_image works", {
   expect_equal(out, "rocker/verse:4.0")
 })
 
+
+
+
+
+test_that("dock_from_renv works with old renv", {
+  out_true <- dock_from_renv(
+    lockfile = the_lockfile,
+    distro = "focal",
+    FROM = "rocker/verse",
+    fix_renv_version = TRUE
+  )
+
+  out_true$write(
+    file.path(
+      dir_build,
+      "Dockerfile_keep_true"
+    )
+  )
+
+  dock_created_true <- readLines(
+    file.path(
+      dir_build,
+      "Dockerfile_keep_true"
+    )
+  )
+  out_false <- dock_from_renv(
+    lockfile = the_lockfile,
+    distro = "focal",
+    FROM = "rocker/verse",
+    fix_renv_version = FALSE
+  )
+
+  out_false$write(
+    file.path(
+      dir_build,
+      "Dockerfile_keep_false"
+    )
+  )
+
+  dock_created_false <- readLines(
+    file.path(
+      dir_build,
+      "Dockerfile_keep_false"
+    )
+  )
+  dock_created_false
+  dock_created_true
+
+  packageVersion("renv")
+  test_string <- paste0("remotes::install_version\\(\"renv\", version = ", packageVersion("renv")  ,"\\)")
+  expect_true( any(   grepl(test_string , dock_created_true)    ))
+
+  dock_created_false
+  test_string <- 'install.packages\\(c\\(\"renv\",\"remotes\"))'
+  expect_true( any(   grepl(test_string , dock_created_false)    ))
+
+})
 ```
 
 

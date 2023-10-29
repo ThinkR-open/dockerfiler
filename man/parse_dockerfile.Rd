@@ -16,6 +16,6 @@ A Dockerfile object
 Create a Dockerfile object from a Dockerfile.
 }
 \examples{
-parse_dockerfile(system.file("Dockerfile", package = "dockerfiler")
+parse_dockerfile(system.file("Dockerfile", package = "dockerfiler"))
 
 }

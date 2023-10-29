@@ -7,7 +7,7 @@
 #' @returns A Dockerfile object
 #' @export
 #' @examples
-#' parse_dockerfile(system.file("Dockerfile", package = "dockerfiler")
+#' parse_dockerfile(system.file("Dockerfile", package = "dockerfiler"))
 #'
 parse_dockerfile <- function(path) {
 

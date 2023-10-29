@@ -4,6 +4,10 @@
 
 - feat: Added `dock_from_renv()`, to create a Dockerfile from a renv.lock file (@JosiahParry, @statnmap)
 
+- feat: Added `parse_dockerfile()`, to Create a Dockerfile object from a Dockerfile (@JosiahParry)
+
+- feat: Added `fix_renv_version` boolean parameter to `dock_from_renv` to be able to fix the renv version to use during `renv::restore()`
+
 - fix: the dedicated `compact_sysreqs` function allow to deal with 'complex' sysreqs, such as chromimum installation
 
 - feat: add jammy ubuntu distro in available distro

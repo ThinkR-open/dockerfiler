@@ -134,5 +134,5 @@ test_that("gen_base_image works", {
 ```{r development-inflate, eval=FALSE}
 # Run but keep eval=FALSE to avoid infinite loop
 # Execute in the console directly
-fusen::inflate(flat_file = "dev/flat_dock_from_renv.Rmd", vignette_name = "Dockerfile from renv.lock")
+fusen::inflate(flat_file = "dev/flat_dock_from_renv.Rmd", vignette_name = "Dockerfile from renv.lock",check=FALSE,open_vignette = FALSE,overwrite = TRUE)
 ```

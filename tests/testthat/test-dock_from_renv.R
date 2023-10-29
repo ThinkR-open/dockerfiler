@@ -26,35 +26,7 @@ renv_file <- readLines(file.path(dir_build, "renv.lock"))
 renv_file[grep("Version", renv_file)[1]] <- '    "Version": "4.1.2",'
 writeLines(renv_file, file.path(dir_build, "renv.lock"))
 
-test_that("dock_from_renv works with old renv", {
-  out <- dock_from_renv(
-    lockfile = the_lockfile,
-    distro = "focal",
-    FROM = "rocker/verse",
-    keep_renv_version = TRUE
-  )
 
-  out$write(
-    file.path(
-      dir_build,
-      "Dockerfile"
-    )
-  )
-
-  dock_created <- readLines(
-    file.path(
-      dir_build,
-      "Dockerfile"
-    )
-  )
-
-  test_string <- "remotes::install.version\\(\"renv\", version = 1.0.2\\)"
-  message(test_string)
-  expect_length(
-    grep(test_string , dock_created), 1
-  )
-
-})
 
 # dock_from_renv ----
 test_that("dock_from_renv works", {
@@ -163,3 +135,63 @@ test_that("gen_base_image works", {
   )
   expect_equal(out, "rocker/verse:4.0")
 })
+
+
+
+
+
+test_that("dock_from_renv works with old renv", {
+  out_true <- dock_from_renv(
+    lockfile = the_lockfile,
+    distro = "focal",
+    FROM = "rocker/verse",
+    fix_renv_version = TRUE
+  )
+
+  out_true$write(
+    file.path(
+      dir_build,
+      "Dockerfile_keep_true"
+    )
+  )
+
+  dock_created_true <- readLines(
+    file.path(
+      dir_build,
+      "Dockerfile_keep_true"
+    )
+  )
+  out_false <- dock_from_renv(
+    lockfile = the_lockfile,
+    distro = "focal",
+    FROM = "rocker/verse",
+    fix_renv_version = FALSE
+  )
+
+  out_false$write(
+    file.path(
+      dir_build,
+      "Dockerfile_keep_false"
+    )
+  )
+
+  dock_created_false <- readLines(
+    file.path(
+      dir_build,
+      "Dockerfile_keep_false"
+    )
+  )
+  dock_created_false
+  dock_created_true
+
+  packageVersion("renv")
+  test_string <- paste0("remotes::install_version\\(\"renv\", version = ", packageVersion("renv")  ,"\\)")
+  expect_true( any(   grepl(test_string , dock_created_true)    ))
+
+  dock_created_false
+  test_string <- 'install.packages\\(c\\(\"renv\",\"remotes\"))'
+  expect_true( any(   grepl(test_string , dock_created_false)    ))
+
+})
+
+

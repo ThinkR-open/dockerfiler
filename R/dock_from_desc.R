@@ -30,6 +30,14 @@ base_pkg_ <- c(
   "utils"
 )
 
+quote_not_na <- function(x){
+  x[!is.na(x)] <- paste0('\"',x[!is.na(x)],'\"')
+  x
+}
+
+
+
+
 #' Create a Dockerfile from a DESCRIPTION
 #
 #' @param path path to the DESCRIPTION file to use as an input.
@@ -191,15 +199,10 @@ dock_from_desc <- function(
   if (length(packages_on_cran > 0)) {
     ping <- mapply(
       function(dock, ver, nm) {
-        res <- dock$RUN(
-          sprintf(
-            "Rscript -e 'remotes::install_version(\"%s\",upgrade=\"never\", version = \"%s\")'",
-            nm,
-            ver
-          )
-        )
+        res <- dock$RUN(sprintf("Rscript -e 'remotes::install_version(\"%s\",upgrade=\"never\", version = %s)'",
+                                nm, ver))
       },
-      ver = packages_on_cran,
+      ver = quote_not_na(packages_on_cran),
       nm = names(packages_on_cran),
       MoreArgs = list(dock = dock)
     )

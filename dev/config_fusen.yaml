@@ -1,0 +1,15 @@
+flat_dock_from_renv.Rmd:
+  path: dev/flat_dock_from_renv.Rmd
+  state: active
+  R:
+  - R/dock_from_renv.R
+  - R/gen_base_image.R
+  tests: tests/testthat/test-dock_from_renv.R
+  vignettes: vignettes/dockerfile-from-renv-lock.Rmd
+  inflate:
+    flat_file: dev/flat_dock_from_renv.Rmd
+    vignette_name: Dockerfile from renv.lock
+    open_vignette: false
+    check: false
+    document: true
+    overwrite: 'yes'

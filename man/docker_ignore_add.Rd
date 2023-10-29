@@ -16,7 +16,7 @@ The path to the `.dockerignore` file, invisibly.
 Create a dockerignore file
 }
 \examples{
-if (interactive()) {
+\dontrun{
   docker_ignore_add()
 }
 }

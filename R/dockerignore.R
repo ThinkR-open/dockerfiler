@@ -10,7 +10,7 @@
 #' @export
 #'
 #' @examples
-#' if (interactive()) {
+#' \dontrun{
 #'   docker_ignore_add()
 #' }
 docker_ignore_add <- function(path) {
@@ -48,8 +48,8 @@ docker_ignore_add <- function(path) {
       path_ri
     )) {
       write(
-        "^\\.dockerignore$", 
-        path_ri, 
+        "^\\.dockerignore$",
+        path_ri,
         append = TRUE)
       cat_bullet(
         ".dockerignore added to the .Rbuildignore file.",

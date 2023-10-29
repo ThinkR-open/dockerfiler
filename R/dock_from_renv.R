@@ -22,6 +22,8 @@ available_distros <- c(
 #' @param repos character. The URL(s) of the repositories to use for `options("repos")`.
 #' @param extra_sysreqs character vector. Extra debian system requirements.
 #'    Will be installed with apt-get install.
+#' @param keep_renv_version boolean. If `TRUE` the version of renv in the lockfile
+#'    will be used for the `renv::restore()` command
 #' @importFrom utils getFromNamespace
 #' @return A R6 object of class `Dockerfile`.
 #' @details
@@ -52,7 +54,8 @@ dock_from_renv <- function(
   sysreqs = TRUE,
   repos = c(CRAN = "https://cran.rstudio.com/"),
   expand = FALSE,
-  extra_sysreqs = NULL
+  extra_sysreqs = NULL,
+  keep_renv_version = FALSE
 ) {
   distro <- match.arg(distro, available_distros)
 
@@ -71,6 +74,9 @@ dock_from_renv <- function(
     ),
     AS = AS
   )
+
+  # get renv version
+  renv_version <- lock$data()$Packages$renv$Version
 
   distro_args <- switch(
     distro,
@@ -235,7 +241,19 @@ dock_from_renv <- function(
     )
   )
 
-  dock$RUN("R -e 'install.packages(c(\"renv\",\"remotes\"))'")
+  # check if keep_renv_version is true
+  if (keep_renv_version){
+    dock$RUN("R -e 'install.packages(\"remotes\")'")
+      install_renv_string <- paste0(
+        "R -e 'remotes::install_version(\"renv\", version = ",
+        renv_version,
+        ")'"
+      )
+      dock$RUN(install_renv_string)
+
+  } else {
+    dock$RUN("R -e 'install.packages(c(\"renv\",\"remotes\"))'")
+  }
 
   dock$COPY(basename(lockfile), "renv.lock")
   dock$RUN(r(renv::restore()))

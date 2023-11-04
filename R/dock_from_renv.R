@@ -15,6 +15,7 @@ available_distros <- c(
 #' @param FROM Docker image to start FROM Default is
 #'     FROM rocker/r-base
 #' @param AS The AS of the Dockerfile. Default it NULL.
+#' @param sha256 character. The Digest SHA256 hash corresponding to the chip architecture of the deployment host machine. This will need to be set in instances where the machine on which the image is built is different than the machine on which the image will be hosted/deployed. This is a convenience for setting `FROM = rocker/rver@sha256:xxxx`
 #' @param distro One of "focal", "bionic", "xenial", "centos7",
 #'     or "centos8". See available distributions
 #'     at https://hub.docker.com/r/rstudio/r-base/.
@@ -53,6 +54,7 @@ dock_from_renv <- function(
   lockfile = "renv.lock",
   distro = "focal",
   FROM = "rocker/r-base",
+  sha256 = NULL,
   AS = NULL,
   sysreqs = TRUE,
   repos = c(CRAN = "https://cran.rstudio.com/"),
@@ -67,6 +69,9 @@ dock_from_renv <- function(
   # lock$repos(CRAN = repos)
   lockfile <- basename(lockfile)
 
+  # Add SHA for Architecture
+  if (!is.null(sha256))
+    FROM <- paste0(FROM, "@sha256:", sha256)
   # start the dockerfile
   R_major_minor <- lock$data()$R$Version
   dock <- Dockerfile$new(

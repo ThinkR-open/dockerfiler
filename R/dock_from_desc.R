@@ -44,7 +44,9 @@ quote_not_na <- function(x){
 #' @param FROM The FROM of the Dockerfile. Default is
 #'     FROM rocker/r-ver:`R.Version()$major`.`R.Version()$minor`.
 #' @param AS The AS of the Dockerfile. Default it NULL.
+#' @param sha256 character. The Digest SHA256 hash corresponding to the chip architecture of the deployment host machine. This will need to be set in instances where the machine on which the image is built is different than the machine on which the image will be hosted/deployed. This is a convenience for setting `FROM = rocker/rver@sha256:xxxx`
 #' @param sysreqs boolean. If TRUE, the Dockerfile will contain sysreq installation.
+#' @param use_suggests boolean. If TRUE (the default), include dependencies listed in Suggests field in DESCRIPTION.
 #' @param repos character. The URL(s) of the repositories to use for `options("repos")`.
 #' @param expand boolean. If `TRUE` each system requirement will have its own `RUN` line.
 #' @param build_from_source boolean. If `TRUE` no tar.gz is created and
@@ -72,7 +74,9 @@ dock_from_desc <- function(
     ".",
     R.Version()$minor
   ),
+  sha256 = NULL,
   AS = NULL,
+  use_suggests = TRUE,
   sysreqs = TRUE,
   repos = c(CRAN = "https://cran.rstudio.com/"),
   expand = FALSE,
@@ -82,7 +86,10 @@ dock_from_desc <- function(
 ) {
   path <- fs::path_abs(path)
 
-  packages <- desc_get_deps(path)$package
+  packages <- desc_get_deps(path)
+  if (!use_suggests)
+    packages <- packages[packages$type != "Suggests",]
+  packages <- packages$package
   packages <- packages[packages != "R"] # remove R
   packages <- packages[!packages %in% base_pkg_] # remove base and recommended
 
@@ -135,10 +142,10 @@ dock_from_desc <- function(
     packages
   )
 
-  packages_not_on_cran <- setdiff(
+  packages_not_on_cran <- sort(setdiff(
     packages,
     packages_on_cran
-  )
+  ))
 
   packages_with_version <- data.frame(
     package = remotes_deps$package,
@@ -153,6 +160,11 @@ dock_from_desc <- function(
     packages_with_version$installed,
     packages_with_version$package
   )
+
+  packages_on_cran <- packages_on_cran[order(names(packages_on_cran))]
+  # Add SHA for Architecture
+  if (!is.null(sha256))
+    FROM <- paste0(FROM, "@sha256:", sha256)
 
   dock <- Dockerfile$new(
     FROM = FROM,
@@ -209,7 +221,7 @@ dock_from_desc <- function(
   }
 
   if (length(packages_not_on_cran > 0)) {
-    nn <- as.data.frame(
+    nn_df <- as.data.frame(
       do.call(
         rbind,
         lapply(
@@ -222,25 +234,45 @@ dock_from_desc <- function(
     )
 
     nn <- sprintf(
+      "%s/%s",
+      nn_df$username,
+      nn_df$repo
+    )
+
+    repo_status <- lapply(nn, repo_get)
+    ind_private <- sapply(repo_status, function(x) x$visibility == "private") %|0|% FALSE
+    if (any(ind_private)) {
+      dock$ARG("GITHUB_PAT")
+      dock$RUN("GITHUB_PAT=$GITHUB_PAT")
+    }
+
+
+    nn <- sprintf(
       "%s/%s@%s",
-      nn$username,
-      nn$repo,
-      nn$sha
+      nn_df$username,
+      nn_df$repo,
+      nn_df$sha
     )
 
 
     pong <- mapply(
-      function(dock, ver, nm) {
+      function(dock, ver, nm, i) {
+        fmt <- "Rscript -e 'remotes::install_github(\"%s\")'"
+        if (i)
+          fmt <- paste("GITHUB_PAT=$GITHUB_PAT", fmt)
         res <- dock$RUN(
           sprintf(
-            "Rscript -e 'remotes::install_github(\"%s\")'",
+            fmt,
             ver
           )
         )
       },
       ver = nn,
+      i = ind_private,
       MoreArgs = list(dock = dock)
     )
+    cat_red_bullet(glue::glue("Must add `--build-arg GITHUB_PAT={remotes:::github_pat()}` to `docker build` call. Note that the GITHUB_PAT will be visible in this image metadata. If uploaded to Docker Hub, the visibility must be set to private to avoid exposing the GITHUB_PAT."))
+    dock$custom("#", "Must add `--build-arg GITHUB_PAT=[YOUR GITHUB PAT]` to `docker build` call")
   }
 
   if (!build_from_source) {
@@ -306,7 +338,10 @@ dock_from_desc <- function(
     dock$RUN("mkdir /build_zone")
     dock$ADD(from = ".", to = "/build_zone")
     dock$WORKDIR("/build_zone")
-    dock$RUN("R -e 'remotes::install_local(upgrade=\"never\")'")
+    run <- "R -e 'remotes::install_local(upgrade=\"never\")'"
+    if (any(get0("ind_private", inherits = FALSE)))
+      run <- paste("GITHUB_PAT=$GITHUB_PAT", run)
+    dock$RUN(run)
     dock$RUN("rm -rf /build_zone")
   }
   # Add a dockerignore
@@ -334,3 +369,25 @@ repos_as_character <- function(repos) {
 
   repos_as_character
 }
+
+#' @noRd
+repo_get <- function(repo) {
+  jsonlite::fromJSON(suppressMessages(system(glue::glue("curl -H \"Accept: application/vnd.github+json\" -H \"Authorization: token {remotes:::github_pat()}\" https://api.github.com/repos/{repo}"), intern = TRUE)))
+}
+
+#' Replace zero-length values in a vector
+#' @rdname op-zero-default
+#' @param x \code{vctr}
+#' @param y \code{object} to replace zero-length values. Must be of same class as x
+#'
+#' @return \code{vctr}
+#' @export
+#'
+#' @examples
+#' c(TRUE, FALSE, logical(0)) %|0|% FALSE
+`%|0|%` <- Vectorize(function(x, y) {
+  if (rlang::is_empty(x))
+    y
+  else
+    x
+})

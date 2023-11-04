@@ -7,7 +7,9 @@
 dock_from_desc(
   path = "DESCRIPTION",
   FROM = paste0("rocker/r-ver:", R.Version()$major, ".", R.Version()$minor),
+  sha256 = NULL,
   AS = NULL,
+  use_suggests = TRUE,
   sysreqs = TRUE,
   repos = c(CRAN = "https://cran.rstudio.com/"),
   expand = FALSE,
@@ -22,7 +24,11 @@ dock_from_desc(
 \item{FROM}{The FROM of the Dockerfile. Default is
 FROM rocker/r-ver:`R.Version()$major`.`R.Version()$minor`.}
 
+\item{sha256}{character. The Digest SHA256 hash corresponding to the chip architecture of the deployment host machine. This will need to be set in instances where the machine on which the image is built is different than the machine on which the image will be hosted/deployed. This is a convenience for setting `FROM = rocker/rver@sha256:xxxx`}
+
 \item{AS}{The AS of the Dockerfile. Default it NULL.}
+
+\item{use_suggests}{boolean. If TRUE (the default), include dependencies listed in Suggests field in DESCRIPTION.}
 
 \item{sysreqs}{boolean. If TRUE, the Dockerfile will contain sysreq installation.}
 

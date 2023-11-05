@@ -61,7 +61,7 @@ dock_from_renv <- function(
   fix_renv_version = FALSE
 ) {
   distro <- match.arg(distro, available_distros)
-
+  try(dockerfiler:::renv$initialize(),silent=TRUE)
   lock <- renv$lockfile_read(file = lockfile) # using vendored renv
   # lock <- lockfile_read(file = lockfile) # using vendored renv
   # https://rstudio.github.io/renv/reference/vendor.html?q=vendor#null

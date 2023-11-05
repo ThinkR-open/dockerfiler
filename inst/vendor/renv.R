@@ -1,6 +1,6 @@
 #
-# renv 1.0.3.9000 [rstudio/renv#bc7c230]: A dependency management toolkit for R.
-# Generated using `renv:::vendor()` at 2023-11-05 10:33:22.
+# renv 1.0.3 [rstudio/renv#e49d9be]: A dependency management toolkit for R.
+# Generated using `renv:::vendor()` at 2023-11-05 11:48:15.
 #
 
 # aaa.R ----------------------------------------------------------------------
@@ -10522,7 +10522,7 @@ renv_file_copy_dir_cp <- function(source, target) {
   target <- path.expand(target)
 
   # build 'cp' arguments
-  args <- c("-PR", renv_shell_path(source), renv_shell_path(target))
+  args <- c("-pPR", renv_shell_path(source), renv_shell_path(target))
 
   # execute command
   renv_system_exec("cp", args, action = "copying directory")
@@ -13264,11 +13264,29 @@ renv_init_repos <- function() {
   if (!enabled)
     return(repos)
 
-  # check for default repositories set
+  # if we're using the global CDN from RStudio, use PPM instead
   rstudio <- attr(repos, "RStudio", exact = TRUE)
-  if (identical(rstudio, TRUE) || identical(repos, list(CRAN = "@CRAN@"))) {
+  if (identical(rstudio, TRUE)) {
     repos[["CRAN"]] <- config$ppm.url()
     return(repos)
+  }
+
+  # otherwise, check for some common 'default' CRAN settings
+  cran <- repos[["CRAN"]]
+  if (is.character(cran) && length(cran) == 1L) {
+    cran <- sub("/*$", "", cran)
+    defaults <- c(
+      "@CRAN@",
+      "https://cloud.R-project.org",
+      "https://cran.rstudio.com",
+      "https://cran.rstudio.org"
+    )
+
+    if (tolower(cran) %in% tolower(defaults)) {
+      repos[["CRAN"]] <- config$ppm.url()
+      return(repos)
+    }
+
   }
 
   # repos appears to have been configured separately; just use it
@@ -18319,22 +18337,29 @@ renv_options_override <- function(scope, key, default = NULL, extra = NULL) {
 # package.R ------------------------------------------------------------------
 
 
-# NOTE: When lib.loc is NULL, renv will also check to see if a package matching
-# the provided name is currently loaded. This function will also intentionally
-# check the library paths before checking loaded namespaces.
-# This differs from the behavior of `find.package()`.
-renv_package_find <- function(package, lib.loc = NULL) {
-  map_chr(package, renv_package_find_impl, lib.loc = lib.loc)
+# NOTE: intentionally checks library paths before checking loaded namespaces
+renv_package_find <- function(package,
+                              lib.loc = renv_libpaths_all(),
+                              check.loaded = TRUE)
+{
+  map_chr(
+    package,
+    renv_package_find_impl,
+    lib.loc = lib.loc,
+    check.loaded = check.loaded
+  )
 }
 
-renv_package_find_impl <- function(package, lib.loc = NULL) {
-
+renv_package_find_impl <- function(package,
+                                   lib.loc = renv_libpaths_all(),
+                                   check.loaded = TRUE)
+{
   # if we've been given the path to an existing package, use it as-is
   if (grepl("/", package) && file.exists(file.path(package, "DESCRIPTION")))
     return(renv_path_normalize(package, mustWork = TRUE))
 
   # first, look in the library paths
-  for (libpath in (lib.loc %||% .libPaths())) {
+  for (libpath in lib.loc) {
     pkgpath <- file.path(libpath, package)
     descpath <- file.path(pkgpath, "DESCRIPTION")
     if (file.exists(descpath))
@@ -18342,7 +18367,7 @@ renv_package_find_impl <- function(package, lib.loc = NULL) {
   }
 
   # if that failed, check to see if it's loaded and use the associated path
-  if (is.null(lib.loc) && package %in% loadedNamespaces()) {
+  if (check.loaded && package %in% loadedNamespaces()) {
     path <- renv_namespace_path(package)
     if (file.exists(path))
       return(path)
@@ -18352,8 +18377,8 @@ renv_package_find_impl <- function(package, lib.loc = NULL) {
   ""
 }
 
-renv_package_installed <- function(package, lib.loc = NULL) {
-  paths <- renv_package_find(package, lib.loc = lib.loc %||% renv_libpaths_all())
+renv_package_installed <- function(package, lib.loc = renv_libpaths_all()) {
+  paths <- renv_package_find(package, lib.loc, check.loaded = FALSE)
   nzchar(paths)
 }
 
@@ -20080,15 +20105,10 @@ renv_ppm_platform_impl <- function(file = "/etc/os-release") {
     id <- properties$ID %||% ""
 
     case(
-      identical(id, "ubuntu")    ~ renv_ppm_platform_ubuntu(properties),
-      identical(id, "centos")    ~ renv_ppm_platform_centos(properties),
-      identical(id, "rhel")      ~ renv_ppm_platform_rhel(properties),
-      identical(id, "rocky")     ~ renv_ppm_platform_rocky(properties),
-      identical(id, "almalinux") ~ renv_ppm_platform_alma(properties),
-      grepl("suse\\b", id)       ~ renv_ppm_platform_suse(properties),
-      identical(id, "sles")      ~ renv_ppm_platform_sles(properties),
-      identical(id, "debian")    ~ renv_ppm_platform_debian(properties),
-      identical(id, "amzn")      ~ renv_ppm_platform_amzn(properties)
+      identical(id, "ubuntu") ~ renv_ppm_platform_ubuntu(properties),
+      identical(id, "centos") ~ renv_ppm_platform_centos(properties),
+      identical(id, "rhel")   ~ renv_ppm_platform_rhel(properties),
+      grepl("\\bsuse\\b", id) ~ renv_ppm_platform_suse(properties)
     )
 
   }
@@ -20120,33 +20140,11 @@ renv_ppm_platform_rhel <- function(properties) {
   id <- properties$VERSION_ID
   if (is.null(id))
     return(NULL)
-  rhel_version <- ifelse(numeric_version(id) < "9", "centos", "rhel")
 
-  paste0(rhel_version, substring(id, 1L, 1L))
-
-}
-
-renv_ppm_platform_rocky <- function(properties) {
-
-  id <- properties$VERSION_ID
-  if (is.null(id))
-    return(NULL)
-  rhel_version <- ifelse(numeric_version(id) < "9", "centos", "rhel")
-
-  paste0(rhel_version, substring(id, 1L, 1L))
+  paste0("centos", substring(id, 1L, 1L))
 
 }
 
-renv_ppm_platform_alma <- function(properties) {
-
-  id <- properties$VERSION_ID
-  if (is.null(id))
-    return(NULL)
-  rhel_version <- ifelse(numeric_version(id) < "9", "centos", "rhel")
-
-  paste0(rhel_version, substring(id, 1L, 1L))
-
-}
 
 renv_ppm_platform_suse <- function(properties) {
 
@@ -20155,41 +20153,7 @@ renv_ppm_platform_suse <- function(properties) {
     return(NULL)
 
   parts <- strsplit(id, ".", fixed = TRUE)[[1L]]
-  paste0("opensuse", parts[[1L]], parts[[2L]])
-
-}
-
-renv_ppm_platform_sles <- function(properties) {
-
-  id <- properties$VERSION_ID
-  if (is.null(id))
-    return(NULL)
-
-  parts <- strsplit(id, ".", fixed = TRUE)[[1L]]
-  paste0("opensuse", parts[[1L]], parts[[2L]])
-
-}
-
-renv_ppm_platform_debian <- function(properties) {
-
-  codename <- properties$VERSION_CODENAME
-  if (is.null(codename))
-    return(NULL)
-
-  codename
-
-}
-
-renv_ppm_platform_amzn <- function(properties) {
-
-  id <- properties$VERSION_ID
-  if (is.null(id))
-    return(NULL)
-
-  if (numeric_version(id) == "2")
-    return("centos7")
-
-  return(NULL)
+  paste0("opensuse", parts[[1L]])
 
 }
 
@@ -26105,7 +26069,7 @@ renv_robocopy_move <- function(source, target) {
 #'   in the lockfile will be, ensuring that (e.g.) CRAN packages are
 #'   re-installed from the same CRAN mirror.
 #'
-#'   Use `repos = getOption("repos")` to override with the repositories set
+#'   Use `repos = getOptions(repos)` to override with the repositories set
 #'   in the current session, or see the `repos.override` option in [config] for
 #'   an alternate way override.
 #'
@@ -27260,7 +27224,6 @@ renv_scope_tempfile <- function(pattern = "renv-tempfile-",
                                 fileext = "",
                                 scope  = parent.frame())
 {
-  tmpdir <- normalizePath(tmpdir, winslash = "/", mustWork = TRUE)
   path <- renv_path_normalize(tempfile(pattern, tmpdir, fileext))
   defer(unlink(path, recursive = TRUE, force = TRUE), scope = scope)
   invisible(path)
@@ -28947,7 +28910,7 @@ renv_snapshot_description <- function(path = NULL, package = NULL) {
 
   # resolve path
   path <- path %||% {
-    path <- renv_package_find(package, lib.loc = renv_libpaths_all())
+    path <- renv_package_find(package)
     if (!nzchar(path))
       stopf("package '%s' is not installed", package)
   }
@@ -32016,9 +31979,7 @@ read <- function(file) {
 }
 
 plural <- function(word, n) {
-  suffixes <- c("", "s")
-  indices <- as.integer(n != 1L) + 1L
-  paste0(word, suffixes[indices])
+  if (n == 1) word else paste(word, "s", sep = "")
 }
 
 nplural <- function(word, n) {

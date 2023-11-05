@@ -17,7 +17,8 @@ custom_packages <- c(
   "testthat",
   "knitr"
 )
-renv$snapshot(
+try(dockerfiler:::renv$initialize(),silent=TRUE)
+dockerfiler:::renv$snapshot(
   packages = custom_packages,
   lockfile = the_lockfile,
   prompt = FALSE

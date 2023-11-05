@@ -1,12 +1,19 @@
-# dockerfile 0.2.0 to 0.3.0
+# dockerfile 0.2.x to 0.3.0
 
-- fix: graceful failing in case no internet
+- fix : dont depend anymore  to {renv} use an internalised {renv} version (1.0.3) 
+
+- fix : remove `renv:::lockfile` and use `lockfile_read` instead
 
 - feat: Added `dock_from_renv()`, to create a Dockerfile from a renv.lock file (@JosiahParry, @statnmap)
 
-- feat: Added `parse_dockerfile()`, to Create a Dockerfile object from a Dockerfile (@JosiahParry)
+- feat: Added `parse_dockerfile()`, to Create a Dockerfile object from a Dockerfile file (@JosiahParry)
 
-- feat: Added `fix_renv_version` boolean parameter to `dock_from_renv` to be able to fix the renv version to use during `renv::restore()`
+- feat: Added `renv_version` parameter to `dock_from_renv` to be able to fix the renv version to use during `renv::restore()` (@campbead)
+
+
+# dockerfile 0.2.0 
+
+- fix: graceful failing in case no internet
 
 - fix: the dedicated `compact_sysreqs` function allow to deal with 'complex' sysreqs, such as chromimum installation
 

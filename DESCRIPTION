@@ -24,6 +24,7 @@ Imports:
     fs (>= 1.5.0),
     glue (>= 1.4.2),
     jsonlite (>= 1.7.2),
+    memoise,
     pak (>= 0.2.0),
     pkgbuild (>= 1.2.0),
     R6 (>= 2.5.0),

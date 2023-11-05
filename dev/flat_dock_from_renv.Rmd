@@ -52,6 +52,12 @@ available_distros <- c(
   "centos8"
 )
 
+#' @importFrom memoise memoise
+pkg_system_requirements_mem <- memoise::memoise(
+    pak::pkg_system_requirements
+)
+
+
 #' Create a Dockerfile from an `renv.lock` file
 #'
 #' @param lockfile Path to an `renv.lock` file to use as an input..
@@ -67,8 +73,7 @@ available_distros <- c(
 #' @param repos character. The URL(s) of the repositories to use for `options("repos")`.
 #' @param extra_sysreqs character vector. Extra debian system requirements.
 #'    Will be installed with apt-get install.
-#' @param fix_renv_version boolean. If `TRUE` the version of renv in the lockfile
-#'    will be used for the `renv::restore()` command
+#' @param renv_version character. The {renv} version to use in the generated Dockerfile. By default, it is set to the version specified in the `renv.lock` file. If the `renv.lock` file does not specify a {renv} version, the version of {renv} bundled with {dockerfiler}, specifically `dockerfiler:::renv$the$metadata$version`, will be used. If you set it to NULL, the latest available version of {renv} will be used.
 #' @importFrom utils getFromNamespace
 #' @return A R6 object of class `Dockerfile`.
 #' @details
@@ -96,11 +101,11 @@ dock_from_renv <- function(
   repos = c(CRAN = "https://cran.rstudio.com/"),
   expand = FALSE,
   extra_sysreqs = NULL,
-  fix_renv_version = FALSE
+  renv_version
 ) {
   distro <- match.arg(distro, available_distros)
   try(dockerfiler:::renv$initialize(),silent=TRUE)
-  lock <- lockfile_read(file = lockfile) # using vendored renv
+  lock <- dockerfiler:::renv$lockfile_read(file = lockfile) # using vendored renv
   # https://rstudio.github.io/renv/reference/vendor.html?q=vendor#null
 
   # start the dockerfile
@@ -115,7 +120,21 @@ dock_from_renv <- function(
   )
 
   # get renv version
-  renv_version <- lock$Packages$renv$Version
+  
+  if (missing(renv_version)) {
+    if (!is.null(lock$Packages$renv$Version)) {
+      renv_version <- lock$Packages$renv$Version
+    } else {
+      renv_version <-  dockerfiler:::renv$the$metadata$version
+    }
+  } 
+  # else if (is.null(renv_version)) {
+  #   renv_version <-  dockerfiler:::renv$the$metadata$version
+  # }
+  message("renv version = ", 
+          ifelse(!is.null(renv_version),renv_version,"the must up to date in the repos")
+          
+          )
 
   distro_args <- switch(
     distro,
@@ -203,11 +222,12 @@ dock_from_renv <- function(
       }
     )
 
+    
     pkg_sysreqs <- attempt::map_try_catch(
       pkg_os,
       function(x) {
         do.call(
-          pak::pkg_system_requirements,
+          pkg_system_requirements_mem,
           x
         )
       },
@@ -280,13 +300,13 @@ dock_from_renv <- function(
     )
   )
 
-  # check if fix_renv_version is true
-  if (fix_renv_version){
+
+  if (!is.null(renv_version)){
     dock$RUN("R -e 'install.packages(\"remotes\")'")
       install_renv_string <- paste0(
-        "R -e 'remotes::install_version(\"renv\", version = ",
+        "R -e 'remotes::install_version(\"renv\", version = \"",
         renv_version,
-        ")'"
+        "\")'"
       )
       dock$RUN(install_renv_string)
 
@@ -311,37 +331,8 @@ dock_from_renv <- function(
 ```
   
 
-```{r dock_from_renv, eval=FALSE}
+```{r test-dock_from_renv, eval=FALSE}
 # A temporary directory
-dir_build <- tempfile(pattern = "renv")
-dir.create(dir_build)
-
-# Create a lockfile
-the_lockfile <- file.path(dir_build, "renv.lock")
-custom_packages <- c(
-  # attachment::att_from_description(), # build from a DESCRIPTION file
-  "renv",
-  "cli", "glue", "golem", "shiny", "stats", "utils",
-  "testthat",
-  "knitr"
-)
-renv$snapshot(
-  packages = custom_packages,
-  lockfile = the_lockfile,
-  prompt = FALSE)
-
-# Create Dockerfile
-dock_from_renv(lockfile = the_lockfile,
-               distro = "focal", 
-               FROM = "rstudio/verse",
-               out_dir = dir_build
-              )
-
-# rstudioapi::navigateToFile(file.path(dir_build, "Dockerfile"))
-unlink(dir_build)
-```
-
-```{r tests-dock_from_renv, filename="dock_from_renv"}
 dir_build <- tempfile(pattern = "renv")
 dir.create(dir_build)
 
@@ -350,7 +341,6 @@ the_lockfile <- file.path(dir_build, "renv.lock")
 
 custom_packages <- c(
   # attachment::att_from_description(),
-  "renv",
   "cli",
   "glue", # "golem",
   "shiny",
@@ -359,7 +349,8 @@ custom_packages <- c(
   "testthat",
   "knitr"
 )
-renv$snapshot(
+try(dockerfiler:::renv$initialize(),silent=TRUE)
+dockerfiler:::renv$snapshot(
   packages = custom_packages,
   lockfile = the_lockfile,
   prompt = FALSE
@@ -419,6 +410,7 @@ test_that("dock_from_renv works", {
   )
 
   # System dependencies are different when build in interactive environment?
+  # yes.  strange.
   skip_if_not(interactive())
   dir.create(
     file.path(
@@ -484,60 +476,59 @@ test_that("gen_base_image works", {
 
 
 
-test_that("dock_from_renv works with old renv", {
-  out_true <- dock_from_renv(
-    lockfile = the_lockfile,
-    distro = "focal",
-    FROM = "rocker/verse",
-    fix_renv_version = TRUE
-  )
+test_that("dock_from_renv works with specific renv", {
+  
+the_lockfile1.0.0 <- system.file("renv_with_1.0.0.lock",package = "dockerfiler")
 
-  out_true$write(
-    file.path(
-      dir_build,
-      "Dockerfile_keep_true"
+for (lf in list(the_lockfile,the_lockfile1.0.0)){
+for (renv_version in list(NULL,"banana","missing")){
+
+
+  if (!is.null(renv_version) && renv_version == "missing") {
+    out <- dock_from_renv(lockfile = lf,
+                          distro = "focal",
+                          FROM = "rocker/verse")
+  } else{
+    out <- dock_from_renv(
+      lockfile = lf,
+      distro = "focal",
+      FROM = "rocker/verse",
+      renv_version = renv_version
     )
-  )
 
-  dock_created_true <- readLines(
-    file.path(
-      dir_build,
-      "Dockerfile_keep_true"
-    )
-  )
-  out_false <- dock_from_renv(
-    lockfile = the_lockfile,
-    distro = "focal",
-    FROM = "rocker/verse",
-    fix_renv_version = FALSE
-  )
+  }
+socle_install_version <- "remotes::install_version\\(\"renv\", version = \""
+  if (lf == the_lockfile &    is.null(renv_version)) {
+    test_string <- 'install.packages\\(c\\(\"renv\",\"remotes\"))'
+  } else if (lf == the_lockfile1.0.0 & is.null(renv_version)) {
+    test_string <- 'install.packages\\(c\\(\"renv\",\"remotes\"))'
+  } else if (lf == the_lockfile &  renv_version == "banana") {
+    test_string <-  paste0(socle_install_version,"banana"  ,"\"\\)")
+  } else if (lf == the_lockfile1.0.0 & renv_version == "banana") {
+    test_string <- paste0(socle_install_version,"banana","\"\\)")
+  } else if (lf == the_lockfile & renv_version == "missing") {
+    test_string <-
+      paste0(
+        socle_install_version,dockerfiler:::renv$the$metadata$version,"\"\\)"
+      )
+  } else if (lf == the_lockfile1.0.0 & renv_version == "missing") {
+    test_string <-paste0(socle_install_version,"1.0.0","\"\\)")
+  }
 
-  out_false$write(
-    file.path(
-      dir_build,
-      "Dockerfile_keep_false"
-    )
-  )
+  expect_true( any(   grepl(test_string , out$Dockerfile)    ),
+               info = paste(lf," & ",renv_version))
 
-  dock_created_false <- readLines(
-    file.path(
-      dir_build,
-      "Dockerfile_keep_false"
-    )
-  )
-  dock_created_false
-  dock_created_true
 
-  packageVersion("renv")
-  test_string <- paste0("remotes::install_version\\(\"renv\", version = ", packageVersion("renv")  ,"\\)")
-  expect_true( any(   grepl(test_string , dock_created_true)    ))
-
-  dock_created_false
-  test_string <- 'install.packages\\(c\\(\"renv\",\"remotes\"))'
-  expect_true( any(   grepl(test_string , dock_created_false)    ))
+}}  
+  
+  
+  
 
 })
+
 ```
+
+
 
 
 ```{r development-inflate, eval=FALSE}

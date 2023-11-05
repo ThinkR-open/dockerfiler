@@ -17,7 +17,7 @@ custom_packages <- c(
   "testthat",
   "knitr"
 )
-renv::snapshot(
+snapshot(
   packages = custom_packages,
   lockfile = the_lockfile,
   prompt = FALSE

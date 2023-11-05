@@ -1,5 +1,7 @@
 # dockerfile 0.2.x to 0.3.0
 
+- feat: use of {memoise} to cache call to `pak::pkg_system_requirements
+`
 - fix : dont depend anymore  to {renv} use an internalised {renv} version (1.0.3) 
 
 - fix : remove `renv:::lockfile` and use `lockfile_read` instead

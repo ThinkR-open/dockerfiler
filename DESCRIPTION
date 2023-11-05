@@ -28,7 +28,6 @@ Imports:
     pkgbuild (>= 1.2.0),
     R6 (>= 2.5.0),
     remotes (>= 2.2.0),
-    renv (>= 0.12.0),
     usethis (>= 2.0.1),
     utils
 Suggests:

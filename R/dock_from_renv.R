@@ -62,13 +62,11 @@ dock_from_renv <- function(
 ) {
   distro <- match.arg(distro, available_distros)
 
-  lock <- getFromNamespace("lockfile", "renv")(lockfile)
-
-  # lock$repos(CRAN = repos)
-  lockfile <- basename(lockfile)
+  lock <- lockfile_read(file = lockfile) # using vendored renv
+  # https://rstudio.github.io/renv/reference/vendor.html?q=vendor#null
 
   # start the dockerfile
-  R_major_minor <- lock$data()$R$Version
+  R_major_minor <- lock$R$Version
   dock <- Dockerfile$new(
     FROM = gen_base_image(
       distro = distro,
@@ -79,7 +77,7 @@ dock_from_renv <- function(
   )
 
   # get renv version
-  renv_version <- lock$data()$Packages$renv$Version
+  renv_version <- lock$Packages$renv$Version
 
   distro_args <- switch(
     distro,
@@ -139,7 +137,7 @@ dock_from_renv <- function(
     jammy = "rm -rf /var/lib/apt/lists/*"
   )
 
-  pkgs <- names(lock$data()$Packages)
+  pkgs <- names(lock$Packages)
 
   if (sysreqs) {
 
@@ -263,4 +261,5 @@ dock_from_renv <- function(
 
   dock
 }
+
 

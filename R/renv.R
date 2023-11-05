@@ -5,6 +5,14 @@
 #
 
 
+#' Internalised {renv}
+#'
+#' https://rstudio.github.io/renv/reference/vendor.html?q=vendor
+#'
+#' @export
+#' @name renv
+#' @alias renv
+#' @docType environment
 renv <- new.env(parent = new.env())
 
 renv$initialize <- function() {

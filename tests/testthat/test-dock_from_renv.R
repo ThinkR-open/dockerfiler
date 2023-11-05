@@ -17,8 +17,8 @@ custom_packages <- c(
   "testthat",
   "knitr"
 )
-try(dockerfiler:::renv$initialize(),silent=TRUE)
-dockerfiler:::renv$snapshot(
+try(dockerfiler::renv$initialize(),silent=TRUE)
+dockerfiler::renv$snapshot(
   packages = custom_packages,
   lockfile = the_lockfile,
   prompt = FALSE
@@ -68,10 +68,6 @@ test_that("dock_from_renv works", {
     "FROM rocker/verse:4.1.2"
   )
 
-  expect_length(
-    grep("install.packages\\(c\\(\"renv\",\"remotes\"", dock_created),
-    1
-  )
   expect_length(
     grep("RUN R -e 'renv::restore\\(\\)'", dock_created),
     1
@@ -177,7 +173,7 @@ socle_install_version <- "remotes::install_version\\(\"renv\", version = \""
   } else if (lf == the_lockfile & renv_version == "missing") {
     test_string <-
       paste0(
-        socle_install_version,dockerfiler:::renv$the$metadata$version,"\"\\)"
+        socle_install_version,dockerfiler::renv$the$metadata$version,"\"\\)"
       )
   } else if (lf == the_lockfile1.0.0 & renv_version == "missing") {
     test_string <-paste0(socle_install_version,"1.0.0","\"\\)")

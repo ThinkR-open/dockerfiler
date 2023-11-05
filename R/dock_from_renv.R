@@ -62,7 +62,8 @@ dock_from_renv <- function(
 ) {
   distro <- match.arg(distro, available_distros)
 
-  lock <- lockfile_read(file = lockfile) # using vendored renv
+  lock <- renv$lockfile_read(file = lockfile) # using vendored renv
+  # lock <- lockfile_read(file = lockfile) # using vendored renv
   # https://rstudio.github.io/renv/reference/vendor.html?q=vendor#null
 
   # start the dockerfile

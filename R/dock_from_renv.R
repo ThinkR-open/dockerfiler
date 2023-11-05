@@ -30,7 +30,7 @@ pkg_system_requirements_mem <- memoise::memoise(
 #' @param repos character. The URL(s) of the repositories to use for `options("repos")`.
 #' @param extra_sysreqs character vector. Extra debian system requirements.
 #'    Will be installed with apt-get install.
-#' @param renv_version character. The {renv} version to use in the generated Dockerfile. By default, it is set to the version specified in the `renv.lock` file. If the `renv.lock` file does not specify a {renv} version, the version of {renv} bundled with {dockerfiler}, specifically `dockerfiler:::renv$the$metadata$version`, will be used. If you set it to NULL, the latest available version of {renv} will be used.
+#' @param renv_version character. The {renv} version to use in the generated Dockerfile. By default, it is set to the version specified in the `renv.lock` file. If the `renv.lock` file does not specify a {renv} version, the version of {renv} bundled with {dockerfiler}, specifically `dockerfiler::renv$the$metadata$version`, will be used. If you set it to NULL, the latest available version of {renv} will be used.
 #' @importFrom utils getFromNamespace
 #' @return A R6 object of class `Dockerfile`.
 #' @details
@@ -66,8 +66,8 @@ dock_from_renv <- function(
   renv_version
 ) {
   distro <- match.arg(distro, available_distros)
-  try(dockerfiler:::renv$initialize(),silent=TRUE)
-  lock <- dockerfiler:::renv$lockfile_read(file = lockfile) # using vendored renv
+  try(dockerfiler::renv$initialize(),silent=TRUE)
+  lock <- dockerfiler::renv$lockfile_read(file = lockfile) # using vendored renv
   # https://rstudio.github.io/renv/reference/vendor.html?q=vendor#null
 
   # start the dockerfile
@@ -87,15 +87,12 @@ dock_from_renv <- function(
     if (!is.null(lock$Packages$renv$Version)) {
       renv_version <- lock$Packages$renv$Version
     } else {
-      renv_version <-  dockerfiler:::renv$the$metadata$version
+      renv_version <-  dockerfiler::renv$the$metadata$version
     }
   } 
-  # else if (is.null(renv_version)) {
-  #   renv_version <-  dockerfiler:::renv$the$metadata$version
-  # }
+
   message("renv version = ", 
           ifelse(!is.null(renv_version),renv_version,"the must up to date in the repos")
-          
           )
 
   distro_args <- switch(
@@ -277,7 +274,7 @@ dock_from_renv <- function(
   }
 
   dock$COPY(basename(lockfile), "renv.lock")
-  dock$RUN(r(renv::restore()))
+  dock$RUN("R -e 'renv::restore()'")
 
   dock
 }

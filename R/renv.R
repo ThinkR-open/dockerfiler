@@ -12,7 +12,7 @@
 #' @export
 #' @name renv
 #' @alias renv
-#' @docType environment
+#' @docType package
 renv <- new.env(parent = new.env())
 
 renv$initialize <- function() {

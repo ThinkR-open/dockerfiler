@@ -1,6 +1,6 @@
 Package: dockerfiler
 Title: Easy Dockerfile Creation from R
-Version: 0.2.1.9003
+Version: 0.2.1.9004
 Authors@R: c(
     person("Colin", "Fay", , "contact@colinfay.me", role = c("cre", "aut"),
            comment = c(ORCID = "0000-0001-7343-1846")),
@@ -24,11 +24,11 @@ Imports:
     fs (>= 1.5.0),
     glue (>= 1.4.2),
     jsonlite (>= 1.7.2),
+    memoise,
     pak (>= 0.2.0),
     pkgbuild (>= 1.2.0),
     R6 (>= 2.5.0),
     remotes (>= 2.2.0),
-    renv (>= 0.12.0),
     usethis (>= 2.0.1),
     utils
 Suggests:
@@ -36,8 +36,7 @@ Suggests:
     rmarkdown (>= 2.6),
     testthat (>= 3.0.0),
     withr
-VignetteBuilder: 
-    knitr
+VignetteBuilder: knitr
 Config/fusen/version: 0.5.2.9000
 Config/testthat/edition: 3
 Encoding: UTF-8

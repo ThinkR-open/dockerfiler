@@ -13,7 +13,7 @@ dock_from_renv(
   repos = c(CRAN = "https://cran.rstudio.com/"),
   expand = FALSE,
   extra_sysreqs = NULL,
-  fix_renv_version = FALSE
+  renv_version
 )
 }
 \arguments{
@@ -38,8 +38,9 @@ will contain sysreq installation.}
 \item{extra_sysreqs}{character vector. Extra debian system requirements.
 Will be installed with apt-get install.}
 
-\item{fix_renv_version}{boolean. If `TRUE` the version of renv in the lockfile
-will be used for the `renv::restore()` command}
+\item{renv_version}{character. The {renv} version to use in the generated Dockerfile. 
+By default, it is set to the version specified in the `renv.lock` file. 
+If the `renv.lock` file does not specify a {renv} version, the version of {renv} bundled with {dockerfiler}, specifically `dockerfiler::renv$the$metadata$version`, will be used. If you set it to NULL, the latest available version of {renv} will be used.}
 }
 \value{
 A R6 object of class `Dockerfile`.

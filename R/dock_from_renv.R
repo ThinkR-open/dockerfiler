@@ -9,6 +9,12 @@ available_distros <- c(
   "centos8"
 )
 
+#' @importFrom memoise memoise
+pkg_system_requirements_mem <- memoise::memoise(
+    pak::pkg_system_requirements
+)
+
+
 #' Create a Dockerfile from an `renv.lock` file
 #'
 #' @param lockfile Path to an `renv.lock` file to use as an input..
@@ -24,8 +30,9 @@ available_distros <- c(
 #' @param repos character. The URL(s) of the repositories to use for `options("repos")`.
 #' @param extra_sysreqs character vector. Extra debian system requirements.
 #'    Will be installed with apt-get install.
-#' @param fix_renv_version boolean. If `TRUE` the version of renv in the lockfile
-#'    will be used for the `renv::restore()` command
+#' @param renv_version character. The {renv} version to use in the generated Dockerfile. 
+#' By default, it is set to the version specified in the `renv.lock` file. 
+#' If the `renv.lock` file does not specify a {renv} version, the version of {renv} bundled with {dockerfiler}, specifically `dockerfiler::renv$the$metadata$version`, will be used. If you set it to NULL, the latest available version of {renv} will be used.
 #' @importFrom utils getFromNamespace
 #' @return A R6 object of class `Dockerfile`.
 #' @details
@@ -58,17 +65,15 @@ dock_from_renv <- function(
   repos = c(CRAN = "https://cran.rstudio.com/"),
   expand = FALSE,
   extra_sysreqs = NULL,
-  fix_renv_version = FALSE
+  renv_version
 ) {
   distro <- match.arg(distro, available_distros)
-
-  lock <- getFromNamespace("lockfile", "renv")(lockfile)
-
-  # lock$repos(CRAN = repos)
-  lockfile <- basename(lockfile)
+  try(dockerfiler::renv$initialize(),silent=TRUE)
+  lock <- dockerfiler::renv$lockfile_read(file = lockfile) # using vendored renv
+  # https://rstudio.github.io/renv/reference/vendor.html?q=vendor#null
 
   # start the dockerfile
-  R_major_minor <- lock$data()$R$Version
+  R_major_minor <- lock$R$Version
   dock <- Dockerfile$new(
     FROM = gen_base_image(
       distro = distro,
@@ -79,7 +84,18 @@ dock_from_renv <- function(
   )
 
   # get renv version
-  renv_version <- lock$data()$Packages$renv$Version
+  
+  if (missing(renv_version)) {
+    if (!is.null(lock$Packages$renv$Version)) {
+      renv_version <- lock$Packages$renv$Version
+    } else {
+      renv_version <-  dockerfiler::renv$the$metadata$version
+    }
+  } 
+
+  message("renv version = ", 
+          ifelse(!is.null(renv_version),renv_version,"the must up to date in the repos")
+          )
 
   distro_args <- switch(
     distro,
@@ -139,7 +155,7 @@ dock_from_renv <- function(
     jammy = "rm -rf /var/lib/apt/lists/*"
   )
 
-  pkgs <- names(lock$data()$Packages)
+  pkgs <- names(lock$Packages)
 
   if (sysreqs) {
 
@@ -167,11 +183,12 @@ dock_from_renv <- function(
       }
     )
 
+    
     pkg_sysreqs <- attempt::map_try_catch(
       pkg_os,
       function(x) {
         do.call(
-          pak::pkg_system_requirements,
+          pkg_system_requirements_mem,
           x
         )
       },
@@ -244,13 +261,13 @@ dock_from_renv <- function(
     )
   )
 
-  # check if fix_renv_version is true
-  if (fix_renv_version){
+
+  if (!is.null(renv_version)){
     dock$RUN("R -e 'install.packages(\"remotes\")'")
       install_renv_string <- paste0(
-        "R -e 'remotes::install_version(\"renv\", version = ",
+        "R -e 'remotes::install_version(\"renv\", version = \"",
         renv_version,
-        ")'"
+        "\")'"
       )
       dock$RUN(install_renv_string)
 
@@ -259,8 +276,9 @@ dock_from_renv <- function(
   }
 
   dock$COPY(basename(lockfile), "renv.lock")
-  dock$RUN(r(renv::restore()))
+  dock$RUN("R -e 'renv::restore()'")
 
   dock
 }
+
 

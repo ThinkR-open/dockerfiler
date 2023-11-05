@@ -11,5 +11,5 @@ flat_dock_from_renv.Rmd:
     vignette_name: Dockerfile from renv.lock
     open_vignette: false
     check: false
-    document: true
+    document: false
     overwrite: 'yes'

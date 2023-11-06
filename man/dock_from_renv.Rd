@@ -13,6 +13,7 @@ dock_from_renv(
   repos = c(CRAN = "https://cran.rstudio.com/"),
   expand = FALSE,
   extra_sysreqs = NULL,
+  use_pak = FALSE,
   renv_version
 )
 }
@@ -37,6 +38,8 @@ will contain sysreq installation.}
 
 \item{extra_sysreqs}{character vector. Extra debian system requirements.
 Will be installed with apt-get install.}
+
+\item{use_pak}{boolean. If `TRUE` use {pak} to deal with dependencies during `renv::restore()`. FALSE by default}
 
 \item{renv_version}{character. The {renv} version to use in the generated Dockerfile. 
 By default, it is set to the version specified in the `renv.lock` file. 

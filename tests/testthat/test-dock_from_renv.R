@@ -33,6 +33,7 @@ writeLines(renv_file, file.path(dir_build, "renv.lock"))
 
 # dock_from_renv ----
 test_that("dock_from_renv works", {
+  # testthat::skip_on_cran()
   # skip_if_not(interactive())
   # Create Dockerfile
 
@@ -141,7 +142,7 @@ test_that("gen_base_image works", {
 
 
 test_that("dock_from_renv works with specific renv", {
-  
+  # testthat::skip_on_cran()
 the_lockfile1.0.0 <- system.file("renv_with_1.0.0.lock",package = "dockerfiler")
 
 for (lf in list(the_lockfile,the_lockfile1.0.0)){

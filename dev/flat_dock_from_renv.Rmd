@@ -352,11 +352,14 @@ custom_packages <- c(
   "knitr"
 )
 try(dockerfiler::renv$initialize(),silent=TRUE)
+if ( !testthat:::on_cran()){
 dockerfiler::renv$snapshot(
   packages = custom_packages,
   lockfile = the_lockfile,
   prompt = FALSE
-)
+) } else {
+  the_lockfile <- system.file("renv.lock",package = "dockerfiler")
+}
 
 # Modify R version for tests
 renv_file <- readLines(file.path(dir_build, "renv.lock"))

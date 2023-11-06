@@ -11,7 +11,6 @@
 #'
 #' @export
 #' @name renv
-#' @alias renv
 #' @docType data
 renv <- new.env(parent = new.env())
 

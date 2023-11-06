@@ -25,7 +25,7 @@ dockerfiler::renv$snapshot(
   lockfile = the_lockfile,
   prompt = FALSE
 ) } else {
-  the_lockfile <- system.file("renv.lock",package = "dockerfiler")
+  file.copy(from = system.file("renv.lock",package = "dockerfiler"),to = the_lockfile)
 }
 
 # Modify R version for tests
@@ -188,10 +188,10 @@ socle_install_version <- "remotes::install_version\\(\"renv\", version = \""
                info = paste(lf," & ",renv_version))
 
 
-}}  
-  
-  
-  
+}}
+
+
+
 
 })
 

@@ -18,14 +18,13 @@ custom_packages <- c(
   "knitr"
 )
 try(dockerfiler::renv$initialize(),silent=TRUE)
-testthat:::on_cran()
 if ( !testthat:::on_cran()){
 dockerfiler::renv$snapshot(
   packages = custom_packages,
   lockfile = the_lockfile,
   prompt = FALSE
 ) } else {
-  file.copy(from = system.file("renv.lock",package = "dockerfiler"),to = the_lockfile)
+    file.copy(from = system.file("renv.lock",package = "dockerfiler"),to = the_lockfile)
 }
 
 # Modify R version for tests
@@ -188,10 +187,10 @@ socle_install_version <- "remotes::install_version\\(\"renv\", version = \""
                info = paste(lf," & ",renv_version))
 
 
-}}
-
-
-
+}}  
+  
+  
+  
 
 })
 

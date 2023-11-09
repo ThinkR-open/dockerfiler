@@ -39,11 +39,15 @@ will contain sysreq installation.}
 \item{extra_sysreqs}{character vector. Extra debian system requirements.
 Will be installed with apt-get install.}
 
-\item{use_pak}{boolean. If `TRUE` use {pak} to deal with dependencies during `renv::restore()`. FALSE by default}
+\item{use_pak}{boolean. If `TRUE` use {pak} to deal with dependencies 
+during `renv::restore()`. FALSE by default}
 
 \item{renv_version}{character. The {renv} version to use in the generated Dockerfile. 
 By default, it is set to the version specified in the `renv.lock` file. 
-If the `renv.lock` file does not specify a {renv} version, the version of {renv} bundled with {dockerfiler}, specifically `dockerfiler::renv$the$metadata$version`, will be used. If you set it to NULL, the latest available version of {renv} will be used.}
+  If the `renv.lock` file does not specify a {renv} version,
+  the version of {renv} bundled with {dockerfiler}, 
+  specifically 1.0.3, will be used.
+  If you set it to NULL, the latest available version of {renv} will be used.}
 }
 \value{
 A R6 object of class `Dockerfile`.

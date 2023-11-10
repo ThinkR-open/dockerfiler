@@ -9,7 +9,7 @@ get_sysreqs(packages, quiet = TRUE, batch_n = 30)
 \arguments{
 \item{packages}{character vector. Packages names.}
 
-\item{quiet}{Boolean. If `TRUE` the function is quiet.}
+\item{quiet}{Boolean. If \code{TRUE} the function is quiet.}
 
 \item{batch_n}{numeric. Number of simultaneous packages to ask.}
 }
@@ -18,6 +18,6 @@ A vector of system requirements.
 }
 \description{
 This function retrieves information about the
-system requirements using the <https://sysreqs.r-hub.io>
+system requirements using the \url{https://sysreqs.r-hub.io}
 API.
 }

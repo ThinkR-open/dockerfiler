@@ -5,7 +5,7 @@
 \alias{renv}
 \title{Internalised {renv}}
 \format{
-An object of class \code{environment} of length 1.
+An object of class \code{environment} of length 1446.
 }
 \usage{
 renv

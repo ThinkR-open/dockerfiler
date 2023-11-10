@@ -2,7 +2,7 @@
 % Please edit documentation in R/dock_from_renv.R
 \name{dock_from_renv}
 \alias{dock_from_renv}
-\title{Create a Dockerfile from an `renv.lock` file}
+\title{Create a Dockerfile from an \code{renv.lock} file}
 \usage{
 dock_from_renv(
   lockfile = "renv.lock",
@@ -18,51 +18,45 @@ dock_from_renv(
 )
 }
 \arguments{
-\item{lockfile}{Path to an `renv.lock` file to use as an input..}
+\item{lockfile}{Path to an \code{renv.lock} file to use as an input..}
 
-\item{distro}{One of "focal", "bionic", "xenial", "centos7",
-or "centos8". See available distributions
-at https://hub.docker.com/r/rstudio/r-base/.}
+\item{distro}{One of "focal", "bionic", "xenial", "centos7",or "centos8". See available distributions     at https://hub.docker.com/r/rstudio/r-base/.}
 
-\item{FROM}{Docker image to start FROM Default is
-FROM rocker/r-base}
+\item{FROM}{Docker image to start FROM Default is FROM rocker/r-base}
 
 \item{AS}{The AS of the Dockerfile. Default it NULL.}
 
-\item{sysreqs}{boolean. If `TRUE`, the Dockerfile
-will contain sysreq installation.}
+\item{sysreqs}{boolean. If \code{TRUE}, the Dockerfile will contain sysreq installation.}
 
-\item{repos}{character. The URL(s) of the repositories to use for `options("repos")`.}
+\item{repos}{character. The URL(s) of the repositories to use for \code{options("repos")}.}
 
-\item{expand}{boolean. If `TRUE` each system requirement will have its own `RUN` line.}
+\item{expand}{boolean. If \code{TRUE} each system requirement will have its own \code{RUN} line.}
 
 \item{extra_sysreqs}{character vector. Extra debian system requirements.
 Will be installed with apt-get install.}
 
-\item{use_pak}{boolean. If `TRUE` use {pak} to deal with dependencies 
-during `renv::restore()`. FALSE by default}
+\item{use_pak}{boolean. If \code{TRUE} use pak to deal with dependencies  during \code{renv::restore()}. FALSE by default}
 
-\item{renv_version}{character. The {renv} version to use in the generated Dockerfile. 
-By default, it is set to the version specified in the `renv.lock` file. 
-  If the `renv.lock` file does not specify a {renv} version,
-  the version of {renv} bundled with {dockerfiler}, 
-  specifically 1.0.3, will be used.
-  If you set it to NULL, the latest available version of {renv} will be used.}
+\item{renv_version}{character. The renv version to use in the generated Dockerfile. By default, it is set to the version specified in the \code{renv.lock} file.
+If the \code{renv.lock} file does not specify a renv version,
+the version of renv bundled with dockerfiler,
+specifically 1.0.3, will be used.
+If you set it to NULL, the latest available version of renv will be used.}
 }
 \value{
-A R6 object of class `Dockerfile`.
+A R6 object of class \code{Dockerfile}.
 }
 \description{
-Create a Dockerfile from an `renv.lock` file
+Create a Dockerfile from an \code{renv.lock} file
 }
 \details{
 System requirements for packages are provided
-through RStudio Package Manager via the {pak}
+through RStudio Package Manager via the pak
 package. The install commands provided from pak
-are added as `RUN` directives within the `Dockerfile`.
+are added as \code{RUN} directives within the \code{Dockerfile}.
 
-The R version is taken from the `renv.lock` file.
-Packages are installed using `renv::restore()` which ensures
+The R version is taken from the \code{renv.lock} file.
+Packages are installed using \code{renv::restore()} which ensures
 that the proper package version and source is used when installed.
 }
 \examples{

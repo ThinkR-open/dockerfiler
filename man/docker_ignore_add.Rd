@@ -10,7 +10,7 @@ docker_ignore_add(path)
 \item{path}{Where to write the file}
 }
 \value{
-The path to the `.dockerignore` file, invisibly.
+The path to the \code{.dockerignore} file, invisibly.
 }
 \description{
 Create a dockerignore file

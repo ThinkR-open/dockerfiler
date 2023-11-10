@@ -62,7 +62,7 @@ pkg_system_requirements_mem <- memoise::memoise(
 #'
 #' @param lockfile Path to an `renv.lock` file to use as an input..
 #' @param FROM Docker image to start FROM Default is FROM rocker/r-base
-#' @param AS The AS of the Dockerfile. Default it NULL.
+#' @param AS The AS of the Dockerfile. Default it `NULL`.
 #' @param distro One of "focal", "bionic", "xenial", "centos7",or "centos8". See available distributions     at https://hub.docker.com/r/rstudio/r-base/.
 #' @param sysreqs boolean. If `TRUE`, the Dockerfile will contain sysreq installation.
 #' @param expand boolean. If `TRUE` each system requirement will have its own `RUN` line.
@@ -73,7 +73,7 @@ pkg_system_requirements_mem <- memoise::memoise(
 #'   If the `renv.lock` file does not specify a renv version,
 #'   the version of renv bundled with dockerfiler, 
 #'   specifically `r dockerfiler::renv$initialize();toString(dockerfiler::renv$the$metadata$version)`, will be used.
-#'   If you set it to NULL, the latest available version of renv will be used.
+#'   If you set it to `NULL`, the latest available version of renv will be used.
 #' @param use_pak boolean. If `TRUE` use pak to deal with dependencies  during `renv::restore()`. FALSE by default
 #' @importFrom utils getFromNamespace
 #' @return A R6 object of class `Dockerfile`.

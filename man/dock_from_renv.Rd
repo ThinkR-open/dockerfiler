@@ -24,7 +24,7 @@ dock_from_renv(
 
 \item{FROM}{Docker image to start FROM Default is FROM rocker/r-base}
 
-\item{AS}{The AS of the Dockerfile. Default it NULL.}
+\item{AS}{The AS of the Dockerfile. Default it \code{NULL}.}
 
 \item{sysreqs}{boolean. If \code{TRUE}, the Dockerfile will contain sysreq installation.}
 
@@ -41,7 +41,7 @@ Will be installed with apt-get install.}
 If the \code{renv.lock} file does not specify a renv version,
 the version of renv bundled with dockerfiler,
 specifically 1.0.3, will be used.
-If you set it to NULL, the latest available version of renv will be used.}
+If you set it to \code{NULL}, the latest available version of renv will be used.}
 }
 \value{
 A R6 object of class \code{Dockerfile}.

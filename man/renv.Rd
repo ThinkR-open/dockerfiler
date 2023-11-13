@@ -3,7 +3,7 @@
 \docType{data}
 \name{renv}
 \alias{renv}
-\title{Internalised {renv}}
+\title{Internalised renv}
 \format{
 An object of class \code{environment} of length 1446.
 }

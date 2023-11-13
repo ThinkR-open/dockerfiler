@@ -1,4 +1,6 @@
-# dockerfile 0.2.x to 0.3.0
+# dockerfile 0.2.2
+
+- fix : create a `use_pak` parameters in `dock_from_renv` to set `renv.config.pak.enabled = FALSE` instead of `renv.config.pak.enabled = TRUE` to avoid issues with {pak} during `renv::restore()`
 
 - feat: use of {memoise} to cache call to `pak::pkg_system_requirements`
 

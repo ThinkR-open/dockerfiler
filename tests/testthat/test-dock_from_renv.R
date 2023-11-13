@@ -18,11 +18,14 @@ custom_packages <- c(
   "knitr"
 )
 try(dockerfiler::renv$initialize(),silent=TRUE)
+if ( !testthat:::on_cran()){
 dockerfiler::renv$snapshot(
   packages = custom_packages,
   lockfile = the_lockfile,
   prompt = FALSE
-)
+) } else {
+    file.copy(from = system.file("renv.lock",package = "dockerfiler"),to = the_lockfile)
+}
 
 # Modify R version for tests
 renv_file <- readLines(file.path(dir_build, "renv.lock"))
@@ -33,6 +36,7 @@ writeLines(renv_file, file.path(dir_build, "renv.lock"))
 
 # dock_from_renv ----
 test_that("dock_from_renv works", {
+  # testthat::skip_on_cran()
   # skip_if_not(interactive())
   # Create Dockerfile
 
@@ -141,7 +145,7 @@ test_that("gen_base_image works", {
 
 
 test_that("dock_from_renv works with specific renv", {
-  
+  # testthat::skip_on_cran()
 the_lockfile1.0.0 <- system.file("renv_with_1.0.0.lock",package = "dockerfiler")
 
 for (lf in list(the_lockfile,the_lockfile1.0.0)){

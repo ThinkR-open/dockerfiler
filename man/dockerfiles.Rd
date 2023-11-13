@@ -20,20 +20,20 @@ dock_from_desc(
 \item{path}{path to the DESCRIPTION file to use as an input.}
 
 \item{FROM}{The FROM of the Dockerfile. Default is
-FROM rocker/r-ver:`R.Version()$major`.`R.Version()$minor`.}
+FROM rocker/r-ver:\code{R.Version()$major}.\code{R.Version()$minor}.}
 
 \item{AS}{The AS of the Dockerfile. Default it NULL.}
 
 \item{sysreqs}{boolean. If TRUE, the Dockerfile will contain sysreq installation.}
 
-\item{repos}{character. The URL(s) of the repositories to use for `options("repos")`.}
+\item{repos}{character. The URL(s) of the repositories to use for \code{options("repos")}.}
 
-\item{expand}{boolean. If `TRUE` each system requirement will have its own `RUN` line.}
+\item{expand}{boolean. If \code{TRUE} each system requirement will have its own \code{RUN} line.}
 
-\item{update_tar_gz}{boolean. If `TRUE` and `build_from_source` is also `TRUE`,
+\item{update_tar_gz}{boolean. If \code{TRUE} and \code{build_from_source} is also \code{TRUE},
 an updated tar.gz is created.}
 
-\item{build_from_source}{boolean. If `TRUE` no tar.gz is created and
+\item{build_from_source}{boolean. If \code{TRUE} no tar.gz is created and
 the Dockerfile directly mount the source folder.}
 
 \item{extra_sysreqs}{character vector. Extra debian system requirements.

@@ -61,27 +61,26 @@ pkg_system_requirements_mem <- memoise::memoise(
 #' Create a Dockerfile from an `renv.lock` file
 #'
 #' @param lockfile Path to an `renv.lock` file to use as an input..
-#' @param FROM Docker image to start FROM Default is
-#'     FROM rocker/r-base
-#' @param AS The AS of the Dockerfile. Default it NULL.
-#' @param distro One of "focal", "bionic", "xenial", "centos7",
-#'     or "centos8". See available distributions
-#'     at https://hub.docker.com/r/rstudio/r-base/.
-#' @param sysreqs boolean. If `TRUE`, the Dockerfile
-#'     will contain sysreq installation.
+#' @param FROM Docker image to start FROM Default is FROM rocker/r-base
+#' @param AS The AS of the Dockerfile. Default it `NULL`.
+#' @param distro One of "focal", "bionic", "xenial", "centos7",or "centos8". See available distributions     at https://hub.docker.com/r/rstudio/r-base/.
+#' @param sysreqs boolean. If `TRUE`, the Dockerfile will contain sysreq installation.
 #' @param expand boolean. If `TRUE` each system requirement will have its own `RUN` line.
 #' @param repos character. The URL(s) of the repositories to use for `options("repos")`.
 #' @param extra_sysreqs character vector. Extra debian system requirements.
 #'    Will be installed with apt-get install.
-#' @param renv_version character. The {renv} version to use in the generated Dockerfile. 
-#' By default, it is set to the version specified in the `renv.lock` file. 
-#' If the `renv.lock` file does not specify a {renv} version, the version of {renv} bundled with {dockerfiler}, specifically `dockerfiler::renv$the$metadata$version`, will be used. If you set it to NULL, the latest available version of {renv} will be used.
+#' @param renv_version character. The renv version to use in the generated Dockerfile. By default, it is set to the version specified in the `renv.lock` file. 
+#'   If the `renv.lock` file does not specify a renv version,
+#'   the version of renv bundled with dockerfiler, 
+#'   specifically `r dockerfiler::renv$initialize();toString(dockerfiler::renv$the$metadata$version)`, will be used.
+#'   If you set it to `NULL`, the latest available version of renv will be used.
+#' @param use_pak boolean. If `TRUE` use pak to deal with dependencies  during `renv::restore()`. FALSE by default
 #' @importFrom utils getFromNamespace
 #' @return A R6 object of class `Dockerfile`.
 #' @details
 #'
 #' System requirements for packages are provided
-#' through RStudio Package Manager via the {pak}
+#' through RStudio Package Manager via the pak
 #' package. The install commands provided from pak
 #' are added as `RUN` directives within the `Dockerfile`.
 #'
@@ -103,6 +102,7 @@ dock_from_renv <- function(
   repos = c(CRAN = "https://cran.rstudio.com/"),
   expand = FALSE,
   extra_sysreqs = NULL,
+  use_pak = FALSE,
   renv_version
 ) {
   distro <- match.arg(distro, available_distros)
@@ -294,7 +294,8 @@ dock_from_renv <- function(
 
   dock$RUN(
     sprintf(
-      "echo \"options(renv.config.pak.enabled = TRUE, repos = %s, download.file.method = 'libcurl', Ncpus = 4)\" | tee /usr/local/lib/R/etc/Rprofile.site | tee /usr/lib/R/etc/Rprofile.site",
+      "echo \"options(renv.config.pak.enabled = %s, repos = %s, download.file.method = 'libcurl', Ncpus = 4)\" | tee /usr/local/lib/R/etc/Rprofile.site | tee /usr/lib/R/etc/Rprofile.site",
+      use_pak,
       repos_as_character
     )
   )
@@ -349,11 +350,14 @@ custom_packages <- c(
   "knitr"
 )
 try(dockerfiler::renv$initialize(),silent=TRUE)
+if ( !testthat:::on_cran()){
 dockerfiler::renv$snapshot(
   packages = custom_packages,
   lockfile = the_lockfile,
   prompt = FALSE
-)
+) } else {
+    file.copy(from = system.file("renv.lock",package = "dockerfiler"),to = the_lockfile)
+}
 
 # Modify R version for tests
 renv_file <- readLines(file.path(dir_build, "renv.lock"))
@@ -364,6 +368,7 @@ writeLines(renv_file, file.path(dir_build, "renv.lock"))
 
 # dock_from_renv ----
 test_that("dock_from_renv works", {
+  # testthat::skip_on_cran()
   # skip_if_not(interactive())
   # Create Dockerfile
 
@@ -472,7 +477,7 @@ test_that("gen_base_image works", {
 
 
 test_that("dock_from_renv works with specific renv", {
-  
+  # testthat::skip_on_cran()
 the_lockfile1.0.0 <- system.file("renv_with_1.0.0.lock",package = "dockerfiler")
 
 for (lf in list(the_lockfile,the_lockfile1.0.0)){
@@ -533,4 +538,7 @@ fusen::inflate(flat_file = "dev/flat_dock_from_renv.Rmd", vignette_name = "Docke
                document = FALSE
                # ,pkg_ignore = "renv"
                )
+# attention si la version de renv vendor change il faut éditer la doc
+
+
 ```

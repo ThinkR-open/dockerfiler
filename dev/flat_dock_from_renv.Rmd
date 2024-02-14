@@ -54,7 +54,7 @@ available_distros <- c(
 
 #' @importFrom memoise memoise
 pkg_system_requirements_mem <- memoise::memoise(
-    pak::pkg_system_requirements
+    pak::pkg_sysreqs
 )
 
 
@@ -138,8 +138,7 @@ dock_from_renv <- function(
   distro_args <- switch(
     distro,
     centos7 = list(
-      os = "centos",
-      os_release = "7"
+      sysreqs_platform = "centos-7"
     ),
     centos8 = list(
       os = "centos",
@@ -215,7 +214,7 @@ dock_from_renv <- function(
       pkgs,
       FUN = function(x) {
         c(
-          list(package = x),
+          list(pkg = x),
           distro_args
         )
       }

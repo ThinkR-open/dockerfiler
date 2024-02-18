@@ -53,7 +53,7 @@ available_distros <- c(
 )
 
 #' @importFrom memoise memoise
-pkg_system_requirements_mem <- memoise::memoise(
+pkg_sysreqs_mem <- memoise::memoise(
     pak::pkg_sysreqs
 )
 
@@ -90,7 +90,7 @@ pkg_system_requirements_mem <- memoise::memoise(
 #'
 #' @importFrom attempt map_try_catch
 #' @importFrom glue glue
-#' @importFrom pak pkg_system_requirements
+#' @importFrom pak pkg_sysreqs
 
 #' @export
 dock_from_renv <- function(
@@ -220,7 +220,7 @@ dock_from_renv <- function(
       pkg_os,
       function(x) {
         do.call(
-          pkg_system_requirements_mem,
+          pkg_sysreqs_mem,
           x
         )
       },

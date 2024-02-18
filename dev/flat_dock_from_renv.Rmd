@@ -141,24 +141,19 @@ dock_from_renv <- function(
       sysreqs_platform = "centos-7"
     ),
     centos8 = list(
-      os = "centos",
-      os_release = "8"
+      sysreqs_platform = "centos-8"
     ),
     xenial = list(
-      os = "ubuntu",
-      os_release = "16.04"
+      sysreqs_platform = "ubuntu-16.04"
     ),
     bionic = list(
-      os = "ubuntu",
-      os_release = "18.04"
+      sysreqs_platform = "ubuntu-18.04"
     ),
     focal = list(
-      os = "ubuntu",
-      os_release = "20.04"
+      sysreqs_platform = "ubuntu-20.04"
     ),
     jammy = list(
-      os = "ubuntu",
-      os_release = "22.04"
+      sysreqs_platform = "ubuntu-2.04"
     )
   )
 

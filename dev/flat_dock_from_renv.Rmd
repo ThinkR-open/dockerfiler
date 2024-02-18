@@ -222,10 +222,12 @@ dock_from_renv <- function(
         do.call(
           pkg_sysreqs_mem,
           x
-        )
+        ) |> 
+          keep_at(c("pre_install", "install_scripts"))
       },
       .e = ~ character(0)
-    )
+    ) |> 
+      unlist()
 
 
 

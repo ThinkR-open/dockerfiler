@@ -48,6 +48,7 @@ pkg_sysreqs_mem <- memoise::memoise(
 #' @importFrom attempt map_try_catch
 #' @importFrom glue glue
 #' @importFrom pak pkg_sysreqs
+#' @importFrom purrr keep_at
 
 #' @export
 #' @examples

@@ -10,8 +10,8 @@ available_distros <- c(
 )
 
 #' @importFrom memoise memoise
-pkg_system_requirements_mem <- memoise::memoise(
-    pak::pkg_system_requirements
+pkg_sysreqs_mem <- memoise::memoise(
+    pak::pkg_sysreqs
 )
 
 
@@ -47,7 +47,8 @@ pkg_system_requirements_mem <- memoise::memoise(
 #'
 #' @importFrom attempt map_try_catch
 #' @importFrom glue glue
-#' @importFrom pak pkg_system_requirements
+#' @importFrom pak pkg_sysreqs
+#' @importFrom purrr keep_at pluck
 
 #' @export
 #' @examples
@@ -100,28 +101,22 @@ dock_from_renv <- function(
   distro_args <- switch(
     distro,
     centos7 = list(
-      os = "centos",
-      os_release = "7"
+      sysreqs_platform = "centos-7"
     ),
     centos8 = list(
-      os = "centos",
-      os_release = "8"
+      sysreqs_platform = "centos-8"
     ),
     xenial = list(
-      os = "ubuntu",
-      os_release = "16.04"
+      sysreqs_platform = "ubuntu-16.04"
     ),
     bionic = list(
-      os = "ubuntu",
-      os_release = "18.04"
+      sysreqs_platform = "ubuntu-18.04"
     ),
     focal = list(
-      os = "ubuntu",
-      os_release = "20.04"
+      sysreqs_platform = "ubuntu-20.04"
     ),
     jammy = list(
-      os = "ubuntu",
-      os_release = "22.04"
+      sysreqs_platform = "ubuntu-2.04"
     )
   )
 
@@ -177,7 +172,7 @@ dock_from_renv <- function(
       pkgs,
       FUN = function(x) {
         c(
-          list(package = x),
+          list(pkg = x),
           distro_args
         )
       }
@@ -188,18 +183,22 @@ dock_from_renv <- function(
       pkg_os,
       function(x) {
         do.call(
-          pkg_system_requirements_mem,
+          pkg_sysreqs_mem,
           x
-        )
+        ) |> 
+          pluck("packages") |> 
+          keep_at("system_packages")
       },
       .e = ~ character(0)
-    )
+    ) |> 
+      unlist()
 
 
 
 
 
-    pkg_installs <- unique(pkg_sysreqs)
+    pkg_installs <- unique(pkg_sysreqs) |> 
+      lapply( function(.x) {paste0(install_cmd, " ", .x)})
 
     if (length(unlist(pkg_installs)) == 0) {
       cat_bullet(

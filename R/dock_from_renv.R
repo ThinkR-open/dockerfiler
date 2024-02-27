@@ -49,7 +49,6 @@ pkg_sysreqs_mem <- memoise::memoise(
 #' @importFrom glue glue
 #' @importFrom pak pkg_sysreqs
 #' @importFrom purrr keep_at pluck
-#' @importFrom stringr str_detect
 
 #' @export
 #' @examples
@@ -188,7 +187,7 @@ dock_from_renv <- function(
           x
         ) |> 
           pluck("packages") |> 
-          keep_at(c("pre_install", "system_packages"))
+          keep_at("system_packages")
       },
       .e = ~ character(0)
     ) |> 
@@ -199,11 +198,7 @@ dock_from_renv <- function(
 
 
     pkg_installs <- unique(pkg_sysreqs) |> 
-      lapply( function(.x) {if(str_detect(.x, install_cmd)) {
-        .x
-      } else {
-        paste0(install_cmd, " ", .x)
-      }})
+      lapply( function(.x) {paste0(install_cmd, " ", .x)})
 
     if (length(unlist(pkg_installs)) == 0) {
       cat_bullet(

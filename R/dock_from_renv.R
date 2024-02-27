@@ -48,7 +48,8 @@ pkg_sysreqs_mem <- memoise::memoise(
 #' @importFrom attempt map_try_catch
 #' @importFrom glue glue
 #' @importFrom pak pkg_sysreqs
-#' @importFrom purrr keep_at
+#' @importFrom purrr keep_at pluck
+#' @importFrom stringr str_detect
 
 #' @export
 #' @examples
@@ -186,7 +187,8 @@ dock_from_renv <- function(
           pkg_sysreqs_mem,
           x
         ) |> 
-          keep_at(c("pre_install", "install_scripts"))
+          pluck("packages") |> 
+          keep_at(c("pre_install", "system_packages"))
       },
       .e = ~ character(0)
     ) |> 
@@ -196,7 +198,12 @@ dock_from_renv <- function(
 
 
 
-    pkg_installs <- unique(pkg_sysreqs)
+    pkg_installs <- unique(pkg_sysreqs) |> 
+      lapply( function(.x) {if(str_detect(.x, install_cmd)) {
+        .x
+      } else {
+        paste0(install_cmd, " ", .x)
+      }})
 
     if (length(unlist(pkg_installs)) == 0) {
       cat_bullet(

@@ -63,43 +63,10 @@ get_batch_sysreqs <- function(
   all_deps,
   quiet = TRUE
 ) {
-  url <- sprintf(
-    "https://sysreqs.r-hub.io/pkg/%s/linux-x86_64-debian-gcc",
-    paste(all_deps, collapse = ",")
-  )
-  path <- file_temp()
 
-  # Try to download, may fail if
-  # no internet or sysreq unavailable.
-  # In that case, we return ""
-  is_downloaded <- try(
-    {
-      suppressWarnings({
-        utils::download.file(
-          url,
-          path,
-          mode = "wb",
-          quiet = quiet
-        )
-      })
-    },
-    silent = TRUE
-  )
-
-  if (attempt::is_try_error(is_downloaded)) {
-    cat_red_bullet("Unable to query the sysreqs.")
-    cat_red_bullet("Possible explanation: no internet connection or sysreqs.r-hub.io is unavailable.")
-    out <- ""
-  } else {
-    out <- jsonlite::fromJSON(path)
-  }
-
-  try(
-    {
-      fs::file_delete(path)
-    },
-    silent = TRUE
-  )
+ raw_output <- pak::pkg_system_requirements(package = all_deps,os = "ubuntu",os_release =  "20.04")
+ sys_dep <- gsub(pattern = "apt-get install -y ",replacement = "",x = raw_output)
+ out <- unlist(strsplit(x = sys_dep,split = " "))
 
   unique(out[!is.na(out)])
 }

@@ -1,8 +1,7 @@
 #' Get system requirements
 #'
 #' This function retrieves information about the
-#' system requirements using the <https://sysreqs.r-hub.io>
-#' API.
+#' system requirements using the `pak::pkg_sysreqs()`.
 #'
 #' @param packages character vector. Packages names.
 #' @param batch_n numeric. Number of simultaneous packages to ask.
@@ -30,43 +29,9 @@ get_sysreqs <- function(
       )
     )
   )
-
-  sp <- split(
-    all_deps,
-    ceiling(
-      seq_along(all_deps) / batch_n
-    )
-  )
-
-
-  sort(
-    unique(
-      unname(
-        unlist(
-          lapply(
-            sp,
-            function(.x) {
-              get_batch_sysreqs(
-                .x,
-                quiet = quiet
-              )
-            }
-          )
-        )
-      )
-    )
-  )
+  raw_output <- pak::pkg_sysreqs(pkg = all_deps,sysreqs_platform = "debian")
+  unlist(raw_output$packages$system_packages)
+  out <- unlist(raw_output$packages$system_packages)
+  sort(unique(out[!is.na(out)]))
 }
 
-#' @importFrom fs file_delete  file_temp
-get_batch_sysreqs <- function(
-  all_deps,
-  quiet = TRUE
-) {
-
- raw_output <- pak::pkg_system_requirements(package = all_deps,os = "ubuntu",os_release =  "20.04")
- sys_dep <- gsub(pattern = "apt-get install -y ",replacement = "",x = raw_output)
- out <- unlist(strsplit(x = sys_dep,split = " "))
-
-  unique(out[!is.na(out)])
-}

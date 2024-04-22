@@ -1,6 +1,6 @@
 test_that("get_sysreqs works", {
   skip_on_cran()
-  res <- get_batch_sysreqs(
+  res <- get_sysreqs(
     c("mongolite"),
     quiet = TRUE
   )

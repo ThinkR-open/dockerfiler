@@ -18,6 +18,5 @@ A vector of system requirements.
 }
 \description{
 This function retrieves information about the
-system requirements using the \url{https://sysreqs.r-hub.io}
-API.
+system requirements using the \code{pak::pkg_sysreqs()}.
 }

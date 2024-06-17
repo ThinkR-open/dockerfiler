@@ -1,8 +1,7 @@
 #' Get system requirements
 #'
 #' This function retrieves information about the
-#' system requirements using the <https://sysreqs.r-hub.io>
-#' API.
+#' system requirements using the `pak::pkg_sysreqs()`.
 #'
 #' @param packages character vector. Packages names.
 #' @param batch_n numeric. Number of simultaneous packages to ask.
@@ -30,76 +29,9 @@ get_sysreqs <- function(
       )
     )
   )
-
-  sp <- split(
-    all_deps,
-    ceiling(
-      seq_along(all_deps) / batch_n
-    )
-  )
-
-
-  sort(
-    unique(
-      unname(
-        unlist(
-          lapply(
-            sp,
-            function(.x) {
-              get_batch_sysreqs(
-                .x,
-                quiet = quiet
-              )
-            }
-          )
-        )
-      )
-    )
-  )
+  raw_output <- pak::pkg_sysreqs(pkg = all_deps,sysreqs_platform = "debian")
+  unlist(raw_output$packages$system_packages)
+  out <- unlist(raw_output$packages$system_packages)
+  sort(unique(out[!is.na(out)]))
 }
 
-#' @importFrom fs file_delete  file_temp
-get_batch_sysreqs <- function(
-  all_deps,
-  quiet = TRUE
-) {
-  url <- sprintf(
-    "https://sysreqs.r-hub.io/pkg/%s/linux-x86_64-debian-gcc",
-    paste(all_deps, collapse = ",")
-  )
-  path <- file_temp()
-
-  # Try to download, may fail if
-  # no internet or sysreq unavailable.
-  # In that case, we return ""
-  is_downloaded <- try(
-    {
-      suppressWarnings({
-        utils::download.file(
-          url,
-          path,
-          mode = "wb",
-          quiet = quiet
-        )
-      })
-    },
-    silent = TRUE
-  )
-
-  if (attempt::is_try_error(is_downloaded)) {
-    cat_red_bullet("Unable to query the sysreqs.")
-    cat_red_bullet("Possible explanation: no internet connection or sysreqs.r-hub.io is unavailable.")
-    out <- ""
-  } else {
-    out <- jsonlite::fromJSON(path)
-  }
-
-  try(
-    {
-      fs::file_delete(path)
-    },
-    silent = TRUE
-  )
-
-  unique(out[!is.na(out)])
-}

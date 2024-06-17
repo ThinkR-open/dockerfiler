@@ -1,3 +1,8 @@
+# 0.2.2.xxxx
+
+- remove sysreqs.r-hub.io to use {pak} instead for system requirement detection
+
+
 # dockerfile 0.2.2
 
 - fix : create a `use_pak` parameters in `dock_from_renv` to set `renv.config.pak.enabled = FALSE` instead of `renv.config.pak.enabled = TRUE` to avoid issues with {pak} during `renv::restore()`

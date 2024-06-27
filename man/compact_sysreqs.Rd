@@ -12,7 +12,7 @@ compact_sysreqs(
 )
 }
 \arguments{
-\item{pkg_installs}{pkg_sysreqs as vector, \code{pak::pkg_system_requirements} output}
+\item{pkg_installs}{pkg_sysreqs as vector, \code{pak::pkg_sysreqs} output}
 
 \item{update_cmd}{command used to update packages, "apt-get update -y" by default}
 

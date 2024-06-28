@@ -1,6 +1,6 @@
 #' Compact Sysreqs
 #'
-#' @param pkg_installs pkg_sysreqs as vector, `pak::pkg_system_requirements` output
+#' @param pkg_installs pkg_sysreqs as vector, `pak::pkg_sysreqs` output
 #' @param update_cmd command used to update packages, "apt-get update -y" by default
 #' @param install_cmd command used to install packages, "apt-get install -y" by default
 #' @param clean_cmd command used to clean package folder, "rm -rf /var/lib/apt/lists/*" by default

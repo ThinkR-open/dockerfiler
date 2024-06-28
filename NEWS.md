@@ -1,6 +1,7 @@
 # 0.2.2.xxxx
 
 - remove sysreqs.r-hub.io to use {pak} instead for system requirement detection
+- move from `pak::pkg_system_requirements` to `pak::pkg_sysreqs()` thanks to @B0ydT 
 
 
 # dockerfile 0.2.2

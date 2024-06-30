@@ -42,7 +42,6 @@ test_that("dock_from_renv works", {
 
   out <- dock_from_renv(
     lockfile = the_lockfile,
-    distro = "focal",
     FROM = "rocker/verse",
   )
   expect_s3_class(
@@ -53,6 +52,9 @@ test_that("dock_from_renv works", {
     out,
     "R6"
   )
+  #python3 is not a direct dependencies from custom_packages
+  expect_false(  any(grepl("python3",out$Dockerfile)))
+
   # read Dockerfile
   out$write(
     file.path(
@@ -76,6 +78,7 @@ test_that("dock_from_renv works", {
     grep("RUN R -e 'renv::restore\\(\\)'", dock_created),
     1
   )
+
 
   # System dependencies are different when build in interactive environment?
   # yes.  strange.
@@ -107,6 +110,34 @@ test_that("dock_from_renv works", {
   expect_equal(dock_created, dock_expected)
 })
 # rstudioapi::navigateToFile(file.path(dir_build, "Dockerfile"))
+
+test_that("dock_from_renv works with full dependencies", {
+  # testthat::skip_on_cran()
+  # skip_if_not(interactive())
+  # Create Dockerfile
+
+  out <- dock_from_renv(
+    dependencies = TRUE,
+    lockfile = the_lockfile,
+    FROM = "rocker/verse",
+  )
+  expect_s3_class(
+    out,
+    "Dockerfile"
+  )
+  expect_s3_class(
+    out,
+    "R6"
+  )
+  #python3 is  a un-direct dependencies from custom_packages
+  expect_true(  any(grepl("python3",out$Dockerfile)))
+})
+# rstudioapi::navigateToFile(file.path(dir_build, "Dockerfile"))
+
+
+
+
+
 unlink(dir_build)
 
 # repos_as_character ----
@@ -126,14 +157,12 @@ test_that("repos_as_character works", {
 # gen_base_image ----
 test_that("gen_base_image works", {
   out <- dockerfiler:::gen_base_image(
-    distro = "focal",
     r_version = "4.0",
     FROM = "rstudio/r-base"
   )
-  expect_equal(out, "rstudio/r-base:4.0-focal")
+  expect_equal(out, "rstudio/r-base:4.0")
 
   out <- dockerfiler:::gen_base_image(
-    distro = "focal",
     r_version = "4.0",
     FROM = "rocker/verse"
   )
@@ -154,12 +183,10 @@ for (renv_version in list(NULL,"banana","missing")){
 
   if (!is.null(renv_version) && renv_version == "missing") {
     out <- dock_from_renv(lockfile = lf,
-                          distro = "focal",
                           FROM = "rocker/verse")
   } else{
     out <- dock_from_renv(
       lockfile = lf,
-      distro = "focal",
       FROM = "rocker/verse",
       renv_version = renv_version
     )

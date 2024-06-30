@@ -6,7 +6,7 @@
 \usage{
 dock_from_renv(
   lockfile = "renv.lock",
-  distro = "focal",
+  distro = NULL,
   FROM = "rocker/r-base",
   AS = NULL,
   sysreqs = TRUE,
@@ -21,7 +21,9 @@ dock_from_renv(
 \arguments{
 \item{lockfile}{Path to an \code{renv.lock} file to use as an input..}
 
-\item{distro}{One of "focal", "bionic", "xenial", "centos7",or "centos8". See available distributions     at https://hub.docker.com/r/rstudio/r-base/.}
+\item{distro}{\itemize{
+\item deprecated - only debian/ubuntu based images are supported
+}}
 
 \item{FROM}{Docker image to start FROM Default is FROM rocker/r-base}
 

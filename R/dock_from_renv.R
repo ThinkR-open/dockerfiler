@@ -32,6 +32,7 @@ pkg_sysreqs_mem <- memoise::memoise(
 #'   specifically `r dockerfiler::renv$initialize();toString(dockerfiler::renv$the$metadata$version)`, will be used.
 #'   If you set it to `NULL`, the latest available version of renv will be used.
 #' @param use_pak boolean. If `TRUE` use pak to deal with dependencies  during `renv::restore()`. FALSE by default
+#' @param user Name of the user to specify in the Dockerfile with the USER instruction. Default is `NULL`, in which case the user from the FROM image is used.
 #' @importFrom utils getFromNamespace
 #' @return A R6 object of class `Dockerfile`.
 #' @details
@@ -66,6 +67,7 @@ dock_from_renv <- function(
   expand = FALSE,
   extra_sysreqs = NULL,
   use_pak = FALSE,
+  user = NULL,
   renv_version
 ) {
   distro <- match.arg(distro, available_distros)
@@ -83,7 +85,9 @@ dock_from_renv <- function(
     ),
     AS = AS
   )
-
+  if (!is.null(user)) {
+    dock$USER(user)
+  }
   # get renv version
   
   if (missing(renv_version)) {

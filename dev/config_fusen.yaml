@@ -13,3 +13,4 @@ flat_dock_from_renv.Rmd:
     check: false
     document: false
     overwrite: 'yes'
+    clean: ask

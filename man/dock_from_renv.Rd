@@ -14,6 +14,7 @@ dock_from_renv(
   expand = FALSE,
   extra_sysreqs = NULL,
   use_pak = FALSE,
+  user = NULL,
   renv_version
 )
 }
@@ -36,6 +37,8 @@ dock_from_renv(
 Will be installed with apt-get install.}
 
 \item{use_pak}{boolean. If \code{TRUE} use pak to deal with dependencies  during \code{renv::restore()}. FALSE by default}
+
+\item{user}{Name of the user to specify in the Dockerfile with the USER instruction. Default is \code{NULL}, in which case the user from the FROM image is used.}
 
 \item{renv_version}{character. The renv version to use in the generated Dockerfile. By default, it is set to the version specified in the \code{renv.lock} file.
 If the \code{renv.lock} file does not specify a renv version,

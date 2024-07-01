@@ -31,6 +31,7 @@ pkg_sysreqs_mem <- memoise::memoise(
 #'     dependencies,
 #'   - `FALSE`: do not install any dependencies. (You might end up with a
 #'     non-working package, and/or the installation might fail.)
+#' @param sysreqs_platform System requirements platform.`ubuntu` by default. If `NULL`, then the  current platform is used. Can be : "ubuntu-22.04", or "rhel-9" if needed to fit with the `FROM` Operating System.
 #' @importFrom utils getFromNamespace
 #' @return A R6 object of class `Dockerfile`.
 #' @details
@@ -67,6 +68,7 @@ dock_from_renv <- function(
   use_pak = FALSE,
   user = NULL,
   dependencies = NA,
+  sysreqs_platform = "ubuntu",
   renv_version
 ) {
   try(dockerfiler::renv$initialize(),silent=TRUE)
@@ -100,12 +102,7 @@ dock_from_renv <- function(
           )
   
   
-  # ici il faut connaire l'image utilisé par l'image.
-  
-
-  # distro_args <- list(sysreqs_platform = "ubuntu-22.04")
-  
-  distro_args <- list(sysreqs_platform = "ubuntu")
+  distro_args <- list(sysreqs_platform = sysreqs_platform)
 
   install_cmd <- "apt-get install -y"
   update_cmd <-"apt-get update -y"

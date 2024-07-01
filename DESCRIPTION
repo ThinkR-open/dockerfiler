@@ -25,7 +25,7 @@ Imports:
     glue (>= 1.4.2),
     jsonlite (>= 1.7.2),
     memoise,
-    pak (>= 0.2.0),
+    pak (>= 0.6.0),
     pkgbuild (>= 1.2.0),
     purrr,
     R6 (>= 2.5.0),

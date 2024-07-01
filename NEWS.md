@@ -1,11 +1,11 @@
-# 0.2.2.xxxx
+# dockerfile 0.2.3
 
 - remove sysreqs.r-hub.io to use {pak} instead for system requirement detection
 - move from `pak::pkg_system_requirements` to `pak::pkg_sysreqs()` thanks to @B0ydT 
 - `dock_from_renv` allow to specify user to use in Dockerfile
 - the `dependencies` parameter in `dock_from_renv` if set to `TRUE` will install required dependencies plus optional and development dependencies. defaut is `NA` only required (hard) dependencies,
 
-# dockerfile 0.2.2
+# dockerfiler 0.2.2
 
 - fix : create a `use_pak` parameters in `dock_from_renv` to set `renv.config.pak.enabled = FALSE` instead of `renv.config.pak.enabled = TRUE` to avoid issues with {pak} during `renv::restore()`
 
@@ -22,7 +22,7 @@
 - feat: Added `renv_version` parameter to `dock_from_renv` to be able to fix the renv version to use during `renv::restore()` (@campbead)
 
 
-# dockerfile 0.2.0 
+# dockerfiler 0.2.0 
 
 - fix: graceful failing in case no internet
 

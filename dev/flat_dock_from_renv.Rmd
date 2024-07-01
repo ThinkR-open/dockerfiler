@@ -22,17 +22,17 @@ library(testthat)
 #'
 #' @keywords internal
 gen_base_image <- function(
-  distro = "bionic",
+  distro = NULL,
   r_version = "4.0",
   FROM = "rstudio/r-base"
 ) {
-  distro <- match.arg(distro, available_distros)
 
-  if (FROM == "rstudio/r-base") {
-    glue::glue("{FROM}:{r_version}-{distro}")
-  } else {
+if (!is.null(distro)){
+  warning("the `distro` parameter is not used anymore, only debian/ubuntu based images are supported")
+}
+
     glue::glue("{FROM}:{r_version}")
-  }
+
 }
 ```
   
@@ -41,17 +41,9 @@ gen_base_image <- function(
 
 # Create a Dockerfile from a renv.lock file
 
+
     
 ```{r function-dock_from_renv}
-# ignoring opensuse for the time being
-available_distros <- c(
-  "xenial",
-  "bionic",
-  "focal",
-  "centos7",
-  "centos8"
-)
-
 #' @importFrom memoise memoise
 pkg_sysreqs_mem <- memoise::memoise(
     pak::pkg_sysreqs
@@ -63,7 +55,7 @@ pkg_sysreqs_mem <- memoise::memoise(
 #' @param lockfile Path to an `renv.lock` file to use as an input..
 #' @param FROM Docker image to start FROM Default is FROM rocker/r-base
 #' @param AS The AS of the Dockerfile. Default it `NULL`.
-#' @param distro One of "focal", "bionic", "xenial", "centos7",or "centos8". See available distributions     at https://hub.docker.com/r/rstudio/r-base/.
+#' @param distro - deprecated - only debian/ubuntu based images are supported
 #' @param sysreqs boolean. If `TRUE`, the Dockerfile will contain sysreq installation.
 #' @param expand boolean. If `TRUE` each system requirement will have its own `RUN` line.
 #' @param repos character. The URL(s) of the repositories to use for `options("repos")`.
@@ -76,6 +68,13 @@ pkg_sysreqs_mem <- memoise::memoise(
 #'   If you set it to `NULL`, the latest available version of renv will be used.
 #' @param use_pak boolean. If `TRUE` use pak to deal with dependencies  during `renv::restore()`. FALSE by default
 #' @param user Name of the user to specify in the Dockerfile with the USER instruction. Default is `NULL`, in which case the user from the FROM image is used.
+#' @param dependencies What kinds of dependencies to install. Most commonly
+#'   one of the following values:
+#'   - `NA`: only required (hard) dependencies,
+#'   - `TRUE`: required dependencies plus optional and development
+#'     dependencies,
+#'   - `FALSE`: do not install any dependencies. (You might end up with a
+#'     non-working package, and/or the installation might fail.)
 #' @importFrom utils getFromNamespace
 #' @return A R6 object of class `Dockerfile`.
 #' @details
@@ -97,7 +96,7 @@ pkg_sysreqs_mem <- memoise::memoise(
 #' @export
 dock_from_renv <- function(
   lockfile = "renv.lock",
-  distro = "focal",
+  distro = NULL,
   FROM = "rocker/r-base",
   AS = NULL,
   sysreqs = TRUE,
@@ -106,9 +105,9 @@ dock_from_renv <- function(
   extra_sysreqs = NULL,
   use_pak = FALSE,
   user = NULL,
+  dependencies = NA,
   renv_version
 ) {
-  distro <- match.arg(distro, available_distros)
   try(dockerfiler::renv$initialize(),silent=TRUE)
   lock <- dockerfiler::renv$lockfile_read(file = lockfile) # using vendored renv
   # https://rstudio.github.io/renv/reference/vendor.html?q=vendor#null
@@ -117,7 +116,6 @@ dock_from_renv <- function(
   R_major_minor <- lock$R$Version
   dock <- Dockerfile$new(
     FROM = gen_base_image(
-      distro = distro,
       r_version = R_major_minor,
       FROM = FROM
     ),
@@ -139,58 +137,18 @@ dock_from_renv <- function(
   message("renv version = ", 
           ifelse(!is.null(renv_version),renv_version,"the must up to date in the repos")
           )
+  
+  
+  # ici il faut connaire l'image utilisé par l'image.
+  
 
-  distro_args <- switch(
-    distro,
-    centos7 = list(
-      sysreqs_platform = "centos-7"
-    ),
-    centos8 = list(
-      sysreqs_platform = "centos-8"
-    ),
-    xenial = list(
-      sysreqs_platform = "ubuntu-16.04"
-    ),
-    bionic = list(
-      sysreqs_platform = "ubuntu-18.04"
-    ),
-    focal = list(
-      sysreqs_platform = "ubuntu-20.04"
-    ),
-    jammy = list(
-      sysreqs_platform = "ubuntu-2.04"
-    )
-  )
+  # distro_args <- list(sysreqs_platform = "ubuntu-22.04")
+  
+  distro_args <- list(sysreqs_platform = "ubuntu")
 
-  install_cmd <- switch(
-    distro,
-    centos7 = "yum install -y",
-    centos8 = "yum install -y",
-    xenial = "apt-get install -y",
-    bionic = "apt-get install -y",
-    focal = "apt-get install -y",
-    jammy = "apt-get install -y"
-  )
-
-  update_cmd <- switch(
-    distro,
-    centos7 = "yum update -y",
-    centos8 = "yum update -y",
-    xenial = "apt-get update -y",
-    bionic = "apt-get update -y",
-    focal = "apt-get update -y",
-    jammy = "apt-get update -y"
-  )
-
-  clean_cmd <- switch(
-    distro,
-    centos7 = "yum clean all && rm -rf /var/cache/yum",
-    centos8 = "yum clean all && rm -rf /var/cache/yum",
-    xenial = "rm -rf /var/lib/apt/lists/*",
-    bionic = "rm -rf /var/lib/apt/lists/*",
-    focal = "rm -rf /var/lib/apt/lists/*",
-    jammy = "rm -rf /var/lib/apt/lists/*"
-  )
+  install_cmd <- "apt-get install -y"
+  update_cmd <-"apt-get update -y"
+  clean_cmd <- "rm -rf /var/lib/apt/lists/*"
 
   pkgs <- names(lock$Packages)
 
@@ -214,7 +172,8 @@ dock_from_renv <- function(
       pkgs,
       FUN = function(x) {
         c(
-          list(pkg = x),
+          list(pkg = x,
+               dependencies = dependencies),
           distro_args
         )
       }
@@ -377,7 +336,6 @@ test_that("dock_from_renv works", {
 
   out <- dock_from_renv(
     lockfile = the_lockfile,
-    distro = "focal",
     FROM = "rocker/verse",
   )
   expect_s3_class(
@@ -388,6 +346,9 @@ test_that("dock_from_renv works", {
     out,
     "R6"
   )
+  #python3 is not a direct dependencies from custom_packages
+  expect_false(  any(grepl("python3",out$Dockerfile)))
+
   # read Dockerfile
   out$write(
     file.path(
@@ -411,6 +372,7 @@ test_that("dock_from_renv works", {
     grep("RUN R -e 'renv::restore\\(\\)'", dock_created),
     1
   )
+
 
   # System dependencies are different when build in interactive environment?
   # yes.  strange.
@@ -442,6 +404,34 @@ test_that("dock_from_renv works", {
   expect_equal(dock_created, dock_expected)
 })
 # rstudioapi::navigateToFile(file.path(dir_build, "Dockerfile"))
+
+test_that("dock_from_renv works with full dependencies", {
+  # testthat::skip_on_cran()
+  # skip_if_not(interactive())
+  # Create Dockerfile
+
+  out <- dock_from_renv(
+    dependencies = TRUE,
+    lockfile = the_lockfile,
+    FROM = "rocker/verse",
+  )
+  expect_s3_class(
+    out,
+    "Dockerfile"
+  )
+  expect_s3_class(
+    out,
+    "R6"
+  )
+  #python3 is  a un-direct dependencies from custom_packages
+  expect_true(  any(grepl("python3",out$Dockerfile)))
+})
+# rstudioapi::navigateToFile(file.path(dir_build, "Dockerfile"))
+
+
+
+
+
 unlink(dir_build)
 
 # repos_as_character ----
@@ -461,14 +451,12 @@ test_that("repos_as_character works", {
 # gen_base_image ----
 test_that("gen_base_image works", {
   out <- dockerfiler:::gen_base_image(
-    distro = "focal",
     r_version = "4.0",
     FROM = "rstudio/r-base"
   )
-  expect_equal(out, "rstudio/r-base:4.0-focal")
+  expect_equal(out, "rstudio/r-base:4.0")
 
   out <- dockerfiler:::gen_base_image(
-    distro = "focal",
     r_version = "4.0",
     FROM = "rocker/verse"
   )
@@ -489,12 +477,10 @@ for (renv_version in list(NULL,"banana","missing")){
 
   if (!is.null(renv_version) && renv_version == "missing") {
     out <- dock_from_renv(lockfile = lf,
-                          distro = "focal",
                           FROM = "rocker/verse")
   } else{
     out <- dock_from_renv(
       lockfile = lf,
-      distro = "focal",
       FROM = "rocker/verse",
       renv_version = renv_version
     )

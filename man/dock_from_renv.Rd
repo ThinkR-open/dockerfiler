@@ -16,6 +16,7 @@ dock_from_renv(
   use_pak = FALSE,
   user = NULL,
   dependencies = NA,
+  sysreqs_platform = "ubuntu",
   renv_version
 )
 }
@@ -52,6 +53,8 @@ dependencies,
 \item \code{FALSE}: do not install any dependencies. (You might end up with a
 non-working package, and/or the installation might fail.)
 }}
+
+\item{sysreqs_platform}{System requirements platform.\code{ubuntu} by default. If \code{NULL}, then the  current platform is used. Can be : "ubuntu-22.04" if needed to fit with the \code{FROM} Operating System. Only debian or ubuntu based images are supported}
 
 \item{renv_version}{character. The renv version to use in the generated Dockerfile. By default, it is set to the version specified in the \code{renv.lock} file.
 If the \code{renv.lock} file does not specify a renv version,

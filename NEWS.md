@@ -5,7 +5,7 @@
 - `dock_from_renv` allow to specify user to use in Dockerfile
 - the `dependencies` parameter in `dock_from_renv` if set to `TRUE` will install required dependencies plus optional and development dependencies. defaut is `NA` only required (hard) dependencies,
 - Set the minimum version of the {pak} package to 0.6.0. 
-- Parameterize the `sysreqs_platform` used to find system dependencies in pkg_sysreqs
+- Parameterize the `sysreqs_platform` used to find system dependencies in pkg_sysreqs (only debian/ubuntu based images are supported)
 
 
 # dockerfiler 0.2.2

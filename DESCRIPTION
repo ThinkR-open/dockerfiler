@@ -30,7 +30,6 @@ Imports:
     purrr,
     R6 (>= 2.5.0),
     remotes (>= 2.2.0),
-    renv,
     usethis (>= 2.0.1),
     utils
 Suggests:

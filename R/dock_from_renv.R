@@ -31,7 +31,7 @@ pkg_sysreqs_mem <- memoise::memoise(
 #'     dependencies,
 #'   - `FALSE`: do not install any dependencies. (You might end up with a
 #'     non-working package, and/or the installation might fail.)
-#' @param sysreqs_platform System requirements platform.`ubuntu` by default. If `NULL`, then the  current platform is used. Can be : "ubuntu-22.04", or "rhel-9" if needed to fit with the `FROM` Operating System.
+#' @param sysreqs_platform System requirements platform.`ubuntu` by default. If `NULL`, then the  current platform is used. Can be : "ubuntu-22.04" if needed to fit with the `FROM` Operating System. Only debian or ubuntu based images are supported
 #' @importFrom utils getFromNamespace
 #' @return A R6 object of class `Dockerfile`.
 #' @details

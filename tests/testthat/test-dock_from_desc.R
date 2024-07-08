@@ -37,6 +37,9 @@ withr::with_dir(
   descdir,
   {
     test_that("dock_from_desc works", {
+
+      skip_if(is_rdevel, "skip on R-devel")
+
       my_dock <- dock_from_desc(file.path(".", "DESCRIPTION__"))
 
       expect_s3_class(my_dock, "R6")

@@ -17,6 +17,8 @@ Description: Build a Dockerfile straight from your R session.
 License: MIT + file LICENSE
 URL: https://github.com/ThinkR-open/dockerfiler
 BugReports: https://github.com/ThinkR-open/dockerfiler/issues
+Depends: 
+    R (>= 4.1.0)
 Imports:
     attempt (>= 0.3.1),
     cli (>= 2.3.0),
@@ -38,12 +40,11 @@ Suggests:
     rmarkdown (>= 2.6),
     testthat (>= 3.0.0),
     withr
-VignetteBuilder: knitr
+VignetteBuilder: 
+    knitr
 Config/fusen/version: 0.6.0
 Config/testthat/edition: 3
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.1
-Depends: 
-    R (>= 4.1.0)

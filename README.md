@@ -18,7 +18,7 @@ You’re reading the doc about version :
 
 ``` r
 desc::desc_get_version()
-#> [1] '0.2.2'
+#> [1] '0.2.3'
 ```
 
 The check results are:
@@ -26,8 +26,8 @@ The check results are:
 ``` r
 devtools::check(quiet = TRUE)
 #> ℹ Loading dockerfiler
-#> ── R CMD check results ────────────────────────────────── dockerfiler 0.2.2 ────
-#> Duration: 1m 0.6s
+#> ── R CMD check results ────────────────────────────────── dockerfiler 0.2.3 ────
+#> Duration: 1m 31.3s
 #> 
 #> 0 errors ✔ | 0 warnings ✔ | 0 notes ✔
 ```

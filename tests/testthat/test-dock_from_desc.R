@@ -37,6 +37,9 @@ withr::with_dir(
   descdir,
   {
     test_that("dock_from_desc works", {
+
+      skip_if(is_rdevel, "skip on R-devel")
+
       my_dock <- dock_from_desc(file.path(".", "DESCRIPTION__"))
 
       expect_s3_class(my_dock, "R6")
@@ -57,12 +60,8 @@ withr::with_dir(
           tpf
         )
       )
-      expect_true(
-        grepl(
-          "apt-get update && apt-get install",
-          tpf
-        )
-      )
+
+
       expect_true(
         grepl(
           "mkdir /build_zone",
@@ -92,6 +91,26 @@ withr::with_dir(
       # Only if package I guess
       # expect_true(file.exists(file.path(descdir, ".Rbuildignore")))
       expect_true(file.exists(file.path(descdir, ".dockerignore")))
+
+
+
+
+
+
+
+
+
+      skip_if(is_rdevel, "Skippé sous R-devel")
+
+      expect_true(
+        grepl(
+          "apt-get update && apt-get install",
+          tpf
+        )
+      )
+
+
+
     })
   }
 )

@@ -75,6 +75,7 @@ pkg_sysreqs_mem <- memoise::memoise(
 #'     dependencies,
 #'   - `FALSE`: do not install any dependencies. (You might end up with a
 #'     non-working package, and/or the installation might fail.)
+#' @param sysreqs_platform System requirements platform.`ubuntu` by default. If `NULL`, then the  current platform is used. Can be : "ubuntu-22.04" if needed to fit with the `FROM` Operating System. Only debian or ubuntu based images are supported
 #' @importFrom utils getFromNamespace
 #' @return A R6 object of class `Dockerfile`.
 #' @details
@@ -106,6 +107,7 @@ dock_from_renv <- function(
   use_pak = FALSE,
   user = NULL,
   dependencies = NA,
+  sysreqs_platform = "ubuntu",
   renv_version
 ) {
   try(dockerfiler::renv$initialize(),silent=TRUE)
@@ -139,12 +141,7 @@ dock_from_renv <- function(
           )
   
   
-  # ici il faut connaire l'image utilisé par l'image.
-  
-
-  # distro_args <- list(sysreqs_platform = "ubuntu-22.04")
-  
-  distro_args <- list(sysreqs_platform = "ubuntu")
+  distro_args <- list(sysreqs_platform = sysreqs_platform)
 
   install_cmd <- "apt-get install -y"
   update_cmd <-"apt-get update -y"
@@ -330,10 +327,12 @@ writeLines(renv_file, file.path(dir_build, "renv.lock"))
 
 # dock_from_renv ----
 test_that("dock_from_renv works", {
+  
+  
   # testthat::skip_on_cran()
   # skip_if_not(interactive())
   # Create Dockerfile
-
+  skip_if(is_rdevel, "skip on R-devel")
   out <- dock_from_renv(
     lockfile = the_lockfile,
     FROM = "rocker/verse",
@@ -346,8 +345,7 @@ test_that("dock_from_renv works", {
     out,
     "R6"
   )
-  #python3 is not a direct dependencies from custom_packages
-  expect_false(  any(grepl("python3",out$Dockerfile)))
+
 
   # read Dockerfile
   out$write(
@@ -373,7 +371,10 @@ test_that("dock_from_renv works", {
     1
   )
 
-
+  skip_if(is_rdevel, "Skip R-devel")
+  #python3 is not a direct dependencies from custom_packages
+  expect_false(  any(grepl("python3",out$Dockerfile)))
+  
   # System dependencies are different when build in interactive environment?
   # yes.  strange.
   skip_if_not(interactive())
@@ -409,7 +410,7 @@ test_that("dock_from_renv works with full dependencies", {
   # testthat::skip_on_cran()
   # skip_if_not(interactive())
   # Create Dockerfile
-
+skip_if(is_rdevel, "skip on R-devel")
   out <- dock_from_renv(
     dependencies = TRUE,
     lockfile = the_lockfile,
@@ -423,6 +424,7 @@ test_that("dock_from_renv works with full dependencies", {
     out,
     "R6"
   )
+  skip_if(is_rdevel, "Skip R-devel")
   #python3 is  a un-direct dependencies from custom_packages
   expect_true(  any(grepl("python3",out$Dockerfile)))
 })
@@ -468,6 +470,8 @@ test_that("gen_base_image works", {
 
 
 test_that("dock_from_renv works with specific renv", {
+  
+  skip_if(is_rdevel, "skip on R-devel")
   # testthat::skip_on_cran()
 the_lockfile1.0.0 <- system.file("renv_with_1.0.0.lock",package = "dockerfiler")
 

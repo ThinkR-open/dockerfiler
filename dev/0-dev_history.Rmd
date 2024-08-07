@@ -77,3 +77,39 @@ pkgdown::build_site()
 devtools::build()
 ```
 
+# Checks for CRAN release ----
+
+## Copy the latest version of PREPARE_FOR_CRAN ----
+
+```{r}
+url <- "https://raw.githubusercontent.com/ThinkR-open/prepare-for-cran/master/README.md"
+destination <- "dev/dev_history_PREPARE_FOR_CRAN.md"
+download.file(url, destfile = destination, mode = "wb")
+
+line <- grep(pattern = "# Prepare for CRAN ----", readLines(destination))
+rstudioapi::navigateToFile(destination, line = line)
+```
+
+### Run the automated tests
+
+## {dockerfiler} specificity : ----
+
+### If `Check reverse dependencies` doesn't work`with `revdep_check()`:
+### retrieve the GitHub files of the {dockerfiler}-dependent packages (golem),
+### install attachment locally and check().
+
+## BEFORE RELEASE: ----
+
+### Add comments for CRAN
+### Need to .gitignore this file
+
+```{r}
+usethis::use_cran_comments(open = rlang::is_interactive())
+```
+
+### Why we have `\dontrun{}`
+
+```{r}
+usethis::use_git_ignore("cran-comments.md")
+usethis::use_git_ignore("CRAN-SUBMISSION")
+```

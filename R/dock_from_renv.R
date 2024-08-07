@@ -137,27 +137,32 @@ dock_from_renv <- function(
       }
     )
 
-    
-    pkg_sysreqs <- attempt::map_try_catch(
+
+    pkg_sysreqs <- unlist(attempt::map_try_catch(
       pkg_os,
       function(x) {
-        do.call(
-          pkg_sysreqs_mem,
-          x
-        ) |> 
-          pluck("packages") |> 
-          keep_at("system_packages")
+        keep_at(
+          pluck(
+            do.call(pkg_sysreqs_mem, x),
+            "packages"
+          ),
+          "system_packages"
+        )
       },
       .e = ~ character(0)
-    ) |> 
-      unlist()
+    ))
 
 
 
 
 
-    pkg_installs <- unique(pkg_sysreqs) |> 
-      lapply( function(.x) {paste0(install_cmd, " ", .x)})
+    pkg_installs <-
+      lapply(
+        X = unique(pkg_sysreqs),
+        FUN = function(.x) {
+          paste0(install_cmd, " ", .x)
+        }
+      )
 
     if (length(unlist(pkg_installs)) == 0) {
       cat_bullet(

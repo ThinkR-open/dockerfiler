@@ -1,3 +1,8 @@
+# dockerfiler 0.2.4
+
+- remove native pipe thanks to @HenningLorenzen-ext-bayer, this enable to use of older R versions
+- update `dock_from_renv()` test to catch all output lines
+
 # dockerfile 0.2.3
 
 - remove sysreqs.r-hub.io to use {pak} instead for system requirement detection

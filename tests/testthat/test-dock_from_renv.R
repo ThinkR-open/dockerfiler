@@ -36,16 +36,23 @@ writeLines(renv_file, file.path(dir_build, "renv.lock"))
 
 # dock_from_renv ----
 test_that("dock_from_renv works", {
-  
-  
+
   # testthat::skip_on_cran()
   # skip_if_not(interactive())
   # Create Dockerfile
   skip_if(is_rdevel, "skip on R-devel")
-  out <- dock_from_renv(
-    lockfile = the_lockfile,
-    FROM = "rocker/verse",
+
+  testthat::with_mocked_bindings(code = {
+    out <- dock_from_renv(
+      lockfile = the_lockfile,
+      FROM = "rocker/verse",
+      renv_version = "0.0.0"
+    )
+  },
+  compact_sysreqs = function(...) "fake sys reqs",
+  repos_as_character = function(...) "fake repos"
   )
+
   expect_s3_class(
     out,
     "Dockerfile"
@@ -54,7 +61,6 @@ test_that("dock_from_renv works", {
     out,
     "R6"
   )
-
 
   # read Dockerfile
   out$write(
@@ -70,48 +76,17 @@ test_that("dock_from_renv works", {
       "Dockerfile"
     )
   )
-  expect_equal(
-    dock_created[1],
-    "FROM rocker/verse:4.1.2"
+
+  dock_expected <- readLines(
+    testthat::test_path("renv_Dockerfile")
   )
 
-  expect_length(
-    grep("RUN R -e 'renv::restore\\(\\)'", dock_created),
-    1
-  )
+  expect_equal(dock_created, dock_expected)
 
   skip_if(is_rdevel, "Skip R-devel")
   #python3 is not a direct dependencies from custom_packages
   expect_false(  any(grepl("python3",out$Dockerfile)))
-  
-  # System dependencies are different when build in interactive environment?
-  # yes.  strange.
-  skip_if_not(interactive())
-  dir.create(
-    file.path(
-      dir_build,
-      "inst"
-    )
-  )
-  file.copy(
-    file.path(
-      dir_build,
-      "Dockerfile"
-    ),
-    file.path(
-      dir_build,
-      "inst"
-    ),
-    overwrite = TRUE
-  )
-  dock_expected <- readLines(
-    system.file(
-      "renv_Dockefile",
-      package = "dockerfiler"
-    )
-  )
 
-  expect_equal(dock_created, dock_expected)
 })
 # rstudioapi::navigateToFile(file.path(dir_build, "Dockerfile"))
 

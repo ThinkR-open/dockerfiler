@@ -116,10 +116,6 @@ skip_if(is_rdevel, "skip on R-devel")
 
 
 
-
-
-unlink(dir_build)
-
 # repos_as_character ----
 test_that("repos_as_character works", {
   out <- dockerfiler:::repos_as_character(
@@ -202,4 +198,6 @@ socle_install_version <- "remotes::install_version\\(\"renv\", version = \""
   
 
 })
+
+unlink(dir_build, recursive = TRUE)
 

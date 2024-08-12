@@ -4,7 +4,7 @@
 #' Create a Dockerfile object from a Dockerfile.
 #'
 #' @param path path to the Dockerfile
-#' @returns A Dockerfile object
+#' @return A Dockerfile object
 #' @export
 #' @examples
 #' parse_dockerfile(system.file("Dockerfile", package = "dockerfiler"))

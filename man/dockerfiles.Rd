@@ -39,6 +39,9 @@ the Dockerfile directly mount the source folder.}
 \item{extra_sysreqs}{character vector. Extra debian system requirements.
 Will be installed with apt-get install.}
 }
+\value{
+Dockerfile
+}
 \description{
 Create a Dockerfile from a DESCRIPTION
 }

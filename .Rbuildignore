@@ -19,3 +19,5 @@ tests/testthat/.dockerignore
 ^cran-comments\.md$
 ^CRAN-SUBMISSION$
 ^revdep$
+^doc$
+^Meta$

@@ -4,7 +4,7 @@
 
 [![R-CMD-check](https://github.com/ThinkR-open/dockerfiler/workflows/R-CMD-check/badge.svg)](https://github.com/ThinkR-open/dockerfiler/actions)
 [![Coverage
-status](https://codecov.io/gh/ThinkR-open/dockerfiler/branch/master/graph/badge.svg)](https://codecov.io/github/ThinkR-open/dockerfiler?branch=master)
+status](https://codecov.io/gh/ThinkR-open/dockerfiler/branch/master/graph/badge.svg)](https://app.codecov.io/github/ThinkR-open/dockerfiler?branch=master)
 <!-- badges: end -->
 
 # `{dockerfiler}`

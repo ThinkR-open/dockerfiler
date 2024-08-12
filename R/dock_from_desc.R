@@ -63,7 +63,7 @@ quote_not_na <- function(x){
 #' @importFrom usethis use_build_ignore
 #' @importFrom pkgbuild build
 #'
-#' @export
+#' @return Dockerfile
 dock_from_desc <- function(
   path = "DESCRIPTION",
   FROM = paste0(

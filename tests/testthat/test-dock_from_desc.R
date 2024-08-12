@@ -109,8 +109,12 @@ withr::with_dir(
         )
       )
 
+      unlink(tpf, recursive = TRUE)
+
 
 
     })
   }
 )
+
+unlink(descdir, recursive = TRUE)

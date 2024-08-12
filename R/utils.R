@@ -4,6 +4,7 @@ set_name <- function(x, y) {
 }
 
 #' @importFrom cli cat_bullet
+#' @noRd
 cat_green_tick <- function(...) {
   cat_bullet(
     ...,
@@ -13,6 +14,7 @@ cat_green_tick <- function(...) {
 }
 
 #' @importFrom cli cat_bullet
+#' @noRd
 cat_red_bullet <- function(...) {
   cat_bullet(
     ...,
@@ -22,6 +24,7 @@ cat_red_bullet <- function(...) {
 }
 
 #' @importFrom cli cat_bullet
+#' @noRd
 cat_info <- function(...) {
   cat_bullet(
     ...,

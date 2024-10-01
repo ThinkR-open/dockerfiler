@@ -40,6 +40,7 @@ my_dock <- Dockerfile$new()
 \item \href{#method-Dockerfile-SHELL}{\code{Dockerfile$SHELL()}}
 \item \href{#method-Dockerfile-MAINTAINER}{\code{Dockerfile$MAINTAINER()}}
 \item \href{#method-Dockerfile-custom}{\code{Dockerfile$custom()}}
+\item \href{#method-Dockerfile-COMMENT}{\code{Dockerfile$COMMENT()}}
 \item \href{#method-Dockerfile-print}{\code{Dockerfile$print()}}
 \item \href{#method-Dockerfile-write}{\code{Dockerfile$write()}}
 \item \href{#method-Dockerfile-switch_cmd}{\code{Dockerfile$switch_cmd()}}
@@ -433,6 +434,26 @@ Add a custom command.
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{base, cmd}}{The base and command to add.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+the Dockerfile object, invisibly.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Dockerfile-COMMENT"></a>}}
+\if{latex}{\out{\hypertarget{method-Dockerfile-COMMENT}{}}}
+\subsection{Method \code{COMMENT()}}{
+Add a comment.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Dockerfile$COMMENT(comment)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{comment}}{The comment to add.}
 }
 \if{html}{\out{</div>}}
 }

@@ -60,6 +60,12 @@ my_dock <- Dockerfile$new()
 my_dock$MAINTAINER("Colin FAY", "contact@colinfay.me")
 ```
 
+Add comments to your Dockerfile
+
+``` r
+my_dock$COMMENT("Install required R package.")
+```
+
 Wrap your raw R Code inside the `r()` function to turn it into a bash
 command with `R -e`.
 
@@ -70,10 +76,12 @@ my_dock$RUN(r(install.packages("attempt", repo = "http://cran.irsn.fr/")))
 Classical Docker stuffs:
 
 ``` r
+my_dock$COMMENT("Copy Plumber API and main script to container.")
 my_dock$RUN("mkdir /usr/scripts")
 my_dock$RUN("cd /usr/scripts")
 my_dock$COPY("plumberfile.R", "/usr/scripts/plumber.R")
 my_dock$COPY("torun.R", "/usr/scripts/torun.R")
+my_dock$COMMENT("Expose the API port and run the main script when the container starts")
 my_dock$EXPOSE(8000)
 my_dock$CMD("Rscript /usr/scripts/torun.R ")
 ```

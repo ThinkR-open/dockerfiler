@@ -111,6 +111,11 @@ add_custom <- function(base, cmd) {
   glue("{base} {cmd}")
 }
 
+
+add_comment <- function(comment) {
+  glue("# {comment}")
+}
+
 switch_them <- function(vec, a, b) {
   what <- vec[a]
   whbt <- vec[b]

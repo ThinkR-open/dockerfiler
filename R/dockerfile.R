@@ -162,9 +162,10 @@ cat(self$Dockerfile, sep = "\n")
 #' @description
 #' Write the Dockerfile to a file.
 #' @param as The file to write to.
+#' @param append boolean, if TRUE append to file.
 #' @return used for side effect
-write = function(as = "Dockerfile") {
-base::write(self$Dockerfile, file = as)
+write = function(as = "Dockerfile", append = FALSE) {
+base::write(self$Dockerfile, file = as, append = append)
 },
 #' @description
 #' Switch commands.

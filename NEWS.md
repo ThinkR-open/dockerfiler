@@ -1,3 +1,7 @@
+# dockerfiler 0.2.4.9xxx
+
+- allow multistage dockerfile creation
+
 # dockerfiler 0.2.4
 
 - remove native pipe thanks to @HenningLorenzen-ext-bayer, this enable to use of older R versions

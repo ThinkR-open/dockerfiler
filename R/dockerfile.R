@@ -39,9 +39,10 @@ self$Dockerfile <- c(self$Dockerfile, add_add(from, to, force))
 #' @param from The source file.
 #' @param to The destination file.
 #' @param force If TRUE, overwrite the destination file.
+#' @param stage Optional. Name of the build stage (e.g., `"builder"`) to copy files from. This corresponds to the `--from=` part in a Dockerfile COPY instruction (e.g., `COPY --from=builder /source /dest`). If `NULL`, the `--from=` argument is omitted.
 #' @return the Dockerfile object, invisibly.
-COPY = function(from, to, force = TRUE) {
-self$Dockerfile <- c(self$Dockerfile, add_copy(from, to, force))
+COPY = function(from, to, stage= NULL , force = TRUE) {
+self$Dockerfile <- c(self$Dockerfile, add_copy(from, to, stage, force))
 },
 #' @description
 #' Add a WORKDIR command.
@@ -162,9 +163,10 @@ cat(self$Dockerfile, sep = "\n")
 #' @description
 #' Write the Dockerfile to a file.
 #' @param as The file to write to.
+#' @param append boolean, if TRUE append to file.
 #' @return used for side effect
-write = function(as = "Dockerfile") {
-base::write(self$Dockerfile, file = as)
+write = function(as = "Dockerfile", append = FALSE) {
+base::write(self$Dockerfile, file = as, append = append)
 },
 #' @description
 #' Switch commands.

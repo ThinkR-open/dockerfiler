@@ -45,6 +45,8 @@ test_that("R6 creation works", {
   expect_captured_length(my_dock, 17)
   my_dock$switch_cmd(5, 6)
   expect_captured_length(my_dock, 17)
+  my_dock$COMMENT("Just testing Dockerfile comments.")
+  expect_captured_length(my_dock, 18)
 
   my_dock <- Dockerfile$new(FROM = "plop")
   expect_match(my_dock$Dockerfile, "plop")

@@ -15,7 +15,7 @@ Description: Build a Dockerfile straight from your R session.
     'dockerfiler' allows you to create step by step a Dockerfile, and
     provide convenient tools to wrap R code inside this Dockerfile.
 License: MIT + file LICENSE
-URL: https://github.com/ThinkR-open/dockerfiler
+URL: https://thinkr-open.github.io/dockerfiler/, https://github.com/ThinkR-open/dockerfiler
 BugReports: https://github.com/ThinkR-open/dockerfiler/issues
 Imports:
     attempt (>= 0.3.1),

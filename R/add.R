@@ -114,6 +114,11 @@ add_custom <- function(base, cmd) {
   glue("{base} {cmd}")
 }
 
+
+add_comment <- function(comment) {
+  paste0("# ", strsplit(comment, "\n")[[1]], collapse = "\n")
+}
+
 switch_them <- function(vec, a, b) {
   what <- vec[a]
   whbt <- vec[b]

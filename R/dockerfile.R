@@ -155,6 +155,13 @@ custom = function(base, cmd) {
 self$Dockerfile <- c(self$Dockerfile, add_custom(base, cmd))
 },
 #' @description
+#' Add a comment.
+#' @param comment The comment to add.
+#' @return the Dockerfile object, invisibly.
+COMMENT = function(comment) {
+self$Dockerfile <- c(self$Dockerfile, add_comment(comment))
+},
+#' @description
 #' Print the Dockerfile.
 #' @return used for side effect
 print = function() {

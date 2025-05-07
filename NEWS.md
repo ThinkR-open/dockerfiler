@@ -1,6 +1,7 @@
 # dockerfiler 0.2.4.9xxx
 
 - allow multistage dockerfile creation
+- add dedicated cache for `renv::restore`
 
 # dockerfiler 0.2.4
 

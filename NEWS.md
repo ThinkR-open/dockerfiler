@@ -1,7 +1,10 @@
-# dockerfiler 0.2.4.9xxx
+# dockerfiler 0.2.5
 
-- allow multistage dockerfile creation
-- add dedicated cache for `renv::restore`
+- feat: allow multistage dockerfile creation
+- feat: COPY function can now specify a stage to copy from. 
+- feat: add dedicated cache for `renv::restore`
+- feat: add COMMENT function to add comment in Dockerfile thanks to @jcrodriguez1989
+
 
 # dockerfiler 0.2.4
 

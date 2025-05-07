@@ -32,12 +32,6 @@ You're reading the doc about version :
 desc::desc_get_version()
 ```
 
-The check results are:
-
-```{r eval = TRUE}
-devtools::check(quiet = TRUE)
-```
-
 ## Installation
 
 You can install dockerfiler from GitHub with:
@@ -134,6 +128,31 @@ Save your Dockerfile:
 ```{r eval = FALSE}
 my_dock$write()
 ```
+
+
+## Multi-stage dockerfile
+
+Here is an example of generating a multi-stage Dockerfile directly from R: we create two Dockerfile objects, one for the build stage (builder) and one for the final stage (final), and then merge them into a single file.
+
+```{r}
+stage_1 <- Dockerfile$new(
+  FROM = "alpine",AS ="builder"
+)
+stage_1$RUN('echo "Hi from builder" > /coucou.txt')
+
+stage_2 <- Dockerfile$new(
+  FROM = "ubuntu", AS = "final"
+)
+stage_2$COMMENT("copy /coucou.txt from builder to /truc.txt in final")
+stage_2$COPY(from = "/coucou",to = "/truc.txt",force = TRUE, stage ="builder")
+stage_2$RUN( "cat /truc.txt")
+
+stage_1$write()
+stage_2$write(append = TRUE)
+#file.edit("Dockerfile")
+```
+
+
 
 ## Create a Dockerfile from a DESCRIPTION
 

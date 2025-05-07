@@ -11,6 +11,7 @@ Build a Dockerfile straight from your R session. 'dockerfiler' allows you to cre
 \seealso{
 Useful links:
 \itemize{
+  \item \url{https://thinkr-open.github.io/dockerfiler/}
   \item \url{https://github.com/ThinkR-open/dockerfiler}
   \item Report bugs at \url{https://github.com/ThinkR-open/dockerfiler/issues}
 }

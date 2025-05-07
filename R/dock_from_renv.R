@@ -18,9 +18,9 @@ pkg_sysreqs_mem <- memoise::memoise(
 #' @param repos character. The URL(s) of the repositories to use for `options("repos")`.
 #' @param extra_sysreqs character vector. Extra debian system requirements.
 #'    Will be installed with apt-get install.
-#' @param renv_version character. The renv version to use in the generated Dockerfile. By default, it is set to the version specified in the `renv.lock` file. 
+#' @param renv_version character. The renv version to use in the generated Dockerfile. By default, it is set to the version specified in the `renv.lock` file.
 #'   If the `renv.lock` file does not specify a renv version,
-#'   the version of renv bundled with dockerfiler, 
+#'   the version of renv bundled with dockerfiler,
 #'   specifically `r dockerfiler::renv$initialize();toString(dockerfiler::renv$the$metadata$version)`, will be used.
 #'   If you set it to `NULL`, the latest available version of renv will be used.
 #' @param use_pak boolean. If `TRUE` use pak to deal with dependencies  during `renv::restore()`. FALSE by default
@@ -89,20 +89,20 @@ dock_from_renv <- function(
     dock$USER(user)
   }
   # get renv version
-  
+
   if (missing(renv_version)) {
     if (!is.null(lock$Packages$renv$Version)) {
       renv_version <- lock$Packages$renv$Version
     } else {
       renv_version <-  dockerfiler::renv$the$metadata$version
     }
-  } 
+  }
 
-  message("renv version = ", 
+  message("renv version = ",
           ifelse(!is.null(renv_version),renv_version,"the must up to date in the repos")
           )
-  
-  
+
+
   distro_args <- list(sysreqs_platform = sysreqs_platform)
 
   install_cmd <- "apt-get install -y"
@@ -241,8 +241,7 @@ dock_from_renv <- function(
   }
 
   dock$COPY(basename(lockfile), "renv.lock")
-  dock$RUN("R -e 'renv::restore()'")
-
+  dock$RUN("--mount=type=cache,id=renv-cache,target=/root/.cache/R/renv R -e 'renv::restore()'")
   dock
 }
 

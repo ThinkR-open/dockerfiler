@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">dockerfiler</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.4.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.5</span>
       </span>
     </div>
 
@@ -93,25 +93,17 @@
 <p>You’re reading the doc about version :</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">desc</span><span class="fu">::</span><span class="fu"><a href="https://desc.r-lib.org/reference/desc_get_version.html" class="external-link">desc_get_version</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] '0.2.3'</span></span></code></pre></div>
-<p>The check results are:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">check</span><span class="op">(</span>quiet <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; ℹ Loading dockerfiler</span></span>
-<span><span class="co">#&gt; ── R CMD check results ────────────────────────────────── dockerfiler 0.2.3 ────</span></span>
-<span><span class="co">#&gt; Duration: 1m 31.3s</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; 0 errors ✔ | 0 warnings ✔ | 0 notes ✔</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] '0.2.5'</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
 <p>You can install dockerfiler from GitHub with:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># install.packages("remotes")</span></span>
 <span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"ThinkR-open/dockerfiler"</span><span class="op">)</span></span></code></pre></div>
 <p>Or from CRAN with :</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"dockerfiler"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
@@ -119,19 +111,19 @@
 </h2>
 <p>By default, Dockerfiles are created with <code>FROM "rocker/r-base"</code>.</p>
 <p>You can set another FROM in <code>new()</code></p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://thinkr-open.github.io/dockerfiler/" class="external-link">dockerfiler</a></span><span class="op">)</span></span>
 <span><span class="co"># Create a dockerfile template</span></span>
 <span><span class="va">my_dock</span> <span class="op">&lt;-</span> <span class="va"><a href="reference/Dockerfile.html">Dockerfile</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">my_dock</span><span class="op">$</span><span class="fu">MAINTAINER</span><span class="op">(</span><span class="st">"Colin FAY"</span>, <span class="st">"contact@colinfay.me"</span><span class="op">)</span></span></code></pre></div>
 <p>Add comments to your Dockerfile</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">my_dock</span><span class="op">$</span><span class="fu">COMMENT</span><span class="op">(</span><span class="st">"Install required R package."</span><span class="op">)</span></span></code></pre></div>
 <p>Wrap your raw R Code inside the <code><a href="reference/r.html">r()</a></code> function to turn it into a bash command with <code>R -e</code>.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">my_dock</span><span class="op">$</span><span class="fu">RUN</span><span class="op">(</span><span class="fu"><a href="reference/r.html">r</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"attempt"</span>, repo <span class="op">=</span> <span class="st">"http://cran.irsn.fr/"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>Classical Docker stuffs:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">my_dock</span><span class="op">$</span><span class="fu">COMMENT</span><span class="op">(</span><span class="st">"Copy Plumber API and main script to container."</span><span class="op">)</span></span>
 <span><span class="va">my_dock</span><span class="op">$</span><span class="fu">RUN</span><span class="op">(</span><span class="st">"mkdir /usr/scripts"</span><span class="op">)</span></span>
 <span><span class="va">my_dock</span><span class="op">$</span><span class="fu">RUN</span><span class="op">(</span><span class="st">"cd /usr/scripts"</span><span class="op">)</span></span>
@@ -141,30 +133,51 @@
 <span><span class="va">my_dock</span><span class="op">$</span><span class="fu">EXPOSE</span><span class="op">(</span><span class="fl">8000</span><span class="op">)</span></span>
 <span><span class="va">my_dock</span><span class="op">$</span><span class="fu">CMD</span><span class="op">(</span><span class="st">"Rscript /usr/scripts/torun.R "</span><span class="op">)</span></span></code></pre></div>
 <p>See your Dockerfile :</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">my_dock</span></span></code></pre></div>
 <p>If you’ve made a mistake in your script, you can switch lines with the <code>switch_cmd</code> method. This function takes as arguments the positions of the two cmd you want to switch :</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Switch line 8 and 7</span></span>
 <span><span class="va">my_dock</span><span class="op">$</span><span class="fu">switch_cmd</span><span class="op">(</span><span class="fl">8</span>, <span class="fl">7</span><span class="op">)</span></span>
 <span><span class="va">my_dock</span></span></code></pre></div>
 <p>You can also remove a cmd with <code>remove_cmd</code>:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">my_dock</span><span class="op">$</span><span class="fu">remove_cmd</span><span class="op">(</span><span class="fl">8</span><span class="op">)</span></span>
 <span><span class="va">my_dock</span></span></code></pre></div>
 <p>This also works with a vector:</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">my_dock</span><span class="op">$</span><span class="fu">remove_cmd</span><span class="op">(</span><span class="fl">5</span><span class="op">:</span><span class="fl">7</span><span class="op">)</span></span>
 <span><span class="va">my_dock</span></span></code></pre></div>
 <p><code>add_after</code> add a command after a given line.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">my_dock</span><span class="op">$</span><span class="fu">add_after</span><span class="op">(</span></span>
 <span>  cmd <span class="op">=</span> <span class="st">"RUN R -e 'remotes::install_cran(\"rlang\")'"</span>,</span>
 <span>  after <span class="op">=</span> <span class="fl">3</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p>Save your Dockerfile:</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">my_dock</span><span class="op">$</span><span class="fu">write</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="multi-stage-dockerfile">Multi-stage dockerfile<a class="anchor" aria-label="anchor" href="#multi-stage-dockerfile"></a>
+</h2>
+<p>Here is an example of generating a multi-stage Dockerfile directly from R: we create two Dockerfile objects, one for the build stage (builder) and one for the final stage (final), and then merge them into a single file.</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">stage_1</span> <span class="op">&lt;-</span> <span class="va"><a href="reference/Dockerfile.html">Dockerfile</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span></span>
+<span>  FROM <span class="op">=</span> <span class="st">"alpine"</span>,AS <span class="op">=</span><span class="st">"builder"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">stage_1</span><span class="op">$</span><span class="fu">RUN</span><span class="op">(</span><span class="st">'echo "Hi from builder" &gt; /coucou.txt'</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">stage_2</span> <span class="op">&lt;-</span> <span class="va"><a href="reference/Dockerfile.html">Dockerfile</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span></span>
+<span>  FROM <span class="op">=</span> <span class="st">"ubuntu"</span>, AS <span class="op">=</span> <span class="st">"final"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">stage_2</span><span class="op">$</span><span class="fu">COMMENT</span><span class="op">(</span><span class="st">"copy /coucou.txt from builder to /truc.txt in final"</span><span class="op">)</span></span>
+<span><span class="va">stage_2</span><span class="op">$</span><span class="fu">COPY</span><span class="op">(</span>from <span class="op">=</span> <span class="st">"/coucou"</span>,to <span class="op">=</span> <span class="st">"/truc.txt"</span>,force <span class="op">=</span> <span class="cn">TRUE</span>, stage <span class="op">=</span><span class="st">"builder"</span><span class="op">)</span></span>
+<span><span class="va">stage_2</span><span class="op">$</span><span class="fu">RUN</span><span class="op">(</span> <span class="st">"cat /truc.txt"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">stage_1</span><span class="op">$</span><span class="fu">write</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">stage_2</span><span class="op">$</span><span class="fu">write</span><span class="op">(</span>append <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="co">#file.edit("Dockerfile")</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="create-a-dockerfile-from-a-description">Create a Dockerfile from a DESCRIPTION<a class="anchor" aria-label="anchor" href="#create-a-dockerfile-from-a-description"></a>

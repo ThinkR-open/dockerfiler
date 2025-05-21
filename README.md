@@ -1,5 +1,6 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
+
 <!-- badges: start -->
 
 [![R-CMD-check](https://github.com/ThinkR-open/dockerfiler/workflows/R-CMD-check/badge.svg)](https://github.com/ThinkR-open/dockerfiler/actions)
@@ -18,18 +19,7 @@ You’re reading the doc about version :
 
 ``` r
 desc::desc_get_version()
-#> [1] '0.2.3'
-```
-
-The check results are:
-
-``` r
-devtools::check(quiet = TRUE)
-#> ℹ Loading dockerfiler
-#> ── R CMD check results ────────────────────────────────── dockerfiler 0.2.3 ────
-#> Duration: 1m 31.3s
-#> 
-#> 0 errors ✔ | 0 warnings ✔ | 0 notes ✔
+#> [1] '0.2.5'
 ```
 
 ## Installation
@@ -129,6 +119,31 @@ Save your Dockerfile:
 
 ``` r
 my_dock$write()
+```
+
+## Multi-stage dockerfile
+
+Here is an example of generating a multi-stage Dockerfile directly from
+R: we create two Dockerfile objects, one for the build stage (builder)
+and one for the final stage (final), and then merge them into a single
+file.
+
+``` r
+stage_1 <- Dockerfile$new(
+  FROM = "alpine",AS ="builder"
+)
+stage_1$RUN('echo "Hi from builder" > /coucou.txt')
+
+stage_2 <- Dockerfile$new(
+  FROM = "ubuntu", AS = "final"
+)
+stage_2$COMMENT("copy /coucou.txt from builder to /truc.txt in final")
+stage_2$COPY(from = "/coucou",to = "/truc.txt",force = TRUE, stage ="builder")
+stage_2$RUN( "cat /truc.txt")
+
+stage_1$write()
+stage_2$write(append = TRUE)
+#file.edit("Dockerfile")
 ```
 
 ## Create a Dockerfile from a DESCRIPTION

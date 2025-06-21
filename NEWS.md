@@ -1,3 +1,8 @@
+# dockerfiler dev version
+
+- feat: In dock_from_renv, introduce build-arg RENV_PATHS_CACHE (default /root/.cache/R/renv) and propagate it as an ENV variable for configurable renv cache paths.
+- feat: In dock_from_renv, update cache mounting to --mount=type=cache,id=renv-cache,target=${RENV_PATHS_CACHE} and use renv::restore(clean=FALSE) to speed up and harden the Docker build.
+
 # dockerfiler 0.2.5
 
 - feat: allow multistage dockerfile creation

@@ -1,8 +1,10 @@
 FROM rocker/verse:4.1.2
+ARG RENV_PATHS_CACHE=/root/.cache/R/renv
+ENV "RENV_PATHS_CACHE"="${RENV_PATHS_CACHE}"
 RUN fake sys reqs
 RUN mkdir -p /usr/local/lib/R/etc/ /usr/lib/R/etc/
 RUN echo "options(renv.config.pak.enabled = FALSE, repos = fake repos, download.file.method = 'libcurl', Ncpus = 4)" | tee /usr/local/lib/R/etc/Rprofile.site | tee /usr/lib/R/etc/Rprofile.site
 RUN R -e 'install.packages("remotes")'
 RUN R -e 'remotes::install_version("renv", version = "0.0.0")'
 COPY renv.lock renv.lock
-RUN --mount=type=cache,id=renv-cache,target=/root/.cache/R/renv R -e 'renv::restore()'
+RUN --mount=type=cache,id=renv-cache,target=${RENV_PATHS_CACHE} R -e 'renv::restore(clean = FALSE)'

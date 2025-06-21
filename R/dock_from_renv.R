@@ -84,6 +84,9 @@ dock_from_renv <- function(
     ),
     AS = AS
   )
+  dock$ARG("RENV_PATHS_CACHE=/root/.cache/R/renv")
+  dock$ENV(key = "RENV_PATHS_CACHE",value = "${RENV_PATHS_CACHE}")
+
   if (!is.null(user)) {
     dock$USER(user)
   }
@@ -240,7 +243,8 @@ dock_from_renv <- function(
   }
 
   dock$COPY(basename(lockfile), "renv.lock")
-  dock$RUN("--mount=type=cache,id=renv-cache,target=/root/.cache/R/renv R -e 'renv::restore()'")
+  dock$RUN("--mount=type=cache,id=renv-cache,target=${RENV_PATHS_CACHE} R -e 'renv::restore(clean = FALSE)'")
+
   dock
 }
 

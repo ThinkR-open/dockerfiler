@@ -16,7 +16,12 @@
   untouched.
 - `dock_from_renv()` no longer installs `remotes` when `renv_version = NULL`,
   since `remotes` was only needed for the `install_version()` path.
-
+- feat: `dock_from_renv()` introduces a build-arg `RENV_PATHS_CACHE` (default
+  `/root/.cache/R/renv`), propagated as an `ENV` variable, for configurable
+  renv cache paths.
+- feat: `dock_from_renv()` cache mount is now
+  `--mount=type=cache,id=renv-cache,target=${RENV_PATHS_CACHE}` and uses
+  `renv::restore(clean = FALSE)` to speed up and harden the Docker build.
 
 # dockerfiler 0.2.5
 

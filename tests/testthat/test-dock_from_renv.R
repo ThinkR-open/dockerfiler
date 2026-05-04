@@ -198,5 +198,49 @@ socle_install_version <- "remotes::install_version\\(\"renv\", version = \""
 
 })
 
+test_that("dock_from_renv injects PPM HTTPUserAgent, codename and renv override when repos is PPM", {
+  skip_if(is_rdevel, "skip on R-devel")
+  out <- dock_from_renv(
+    lockfile = the_lockfile,
+    FROM = "rocker/verse",
+    repos = c(CRAN = "https://packagemanager.posit.co/cran/latest"),
+    renv_version = "0.0.0"
+  )
+  df <- paste(out$Dockerfile, collapse = "\n")
+  expect_match(df, "__linux__/\\$VERSION_CODENAME/")
+  expect_match(df, "HTTPUserAgent = sprintf\\('R \\(")
+  expect_match(df, "\\. /etc/os-release && ")
+  expect_match(df, "renv\\.config\\.repos\\.override = c\\(CRAN = '")
+})
+
+test_that("dock_from_renv leaves non-PPM repos untouched", {
+  skip_if(is_rdevel, "skip on R-devel")
+  out <- dock_from_renv(
+    lockfile = the_lockfile,
+    FROM = "rocker/verse",
+    repos = c(CRAN = "https://cran.rstudio.com/"),
+    renv_version = "0.0.0"
+  )
+  df <- paste(out$Dockerfile, collapse = "\n")
+  expect_false(any(grepl("__linux__", out$Dockerfile)))
+  expect_false(any(grepl("HTTPUserAgent", out$Dockerfile)))
+  expect_false(any(grepl("/etc/os-release", out$Dockerfile)))
+  expect_false(any(grepl("renv\\.config\\.repos\\.override", out$Dockerfile)))
+})
+
+test_that("dock_from_renv preserves user-pinned PPM codename", {
+  skip_if(is_rdevel, "skip on R-devel")
+  out <- dock_from_renv(
+    lockfile = the_lockfile,
+    FROM = "rocker/verse",
+    repos = c(CRAN = "https://packagemanager.posit.co/cran/__linux__/jammy/latest"),
+    renv_version = "0.0.0"
+  )
+  df <- paste(out$Dockerfile, collapse = "\n")
+  expect_match(df, "__linux__/jammy/", fixed = TRUE)
+  expect_false(any(grepl("\\$VERSION_CODENAME", out$Dockerfile)))
+  expect_match(df, "HTTPUserAgent = sprintf")
+})
+
 unlink(dir_build, recursive = TRUE)
 

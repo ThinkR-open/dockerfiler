@@ -14,6 +14,8 @@
   `packagemanager.rstudio.com` and internal mirrors) are preserved on
   rewrite. Multi-entry `repos` vectors and non-PPM repos are left
   untouched.
+- `dock_from_renv()` no longer installs `remotes` when `renv_version = NULL`,
+  since `remotes` was only needed for the `install_version()` path.
 
 
 # dockerfiler 0.2.5

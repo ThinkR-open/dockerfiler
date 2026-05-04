@@ -237,7 +237,9 @@ dock_from_renv <- function(
       dock$RUN(install_renv_string)
 
   } else {
-    dock$RUN("R -e 'install.packages(c(\"renv\",\"remotes\"))'")
+    # renv_version = NULL: use the latest renv from the configured repos.
+    # `remotes` is only needed for the install_version() path above.
+    dock$RUN("R -e 'install.packages(\"renv\")'")
   }
 
   dock$COPY(basename(lockfile), "renv.lock")

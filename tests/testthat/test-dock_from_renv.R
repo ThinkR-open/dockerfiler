@@ -171,9 +171,9 @@ for (renv_version in list(NULL,"banana","missing")){
   }
 socle_install_version <- "remotes::install_version\\(\"renv\", version = \""
   if (lf == the_lockfile &    is.null(renv_version)) {
-    test_string <- 'install.packages\\(c\\(\"renv\",\"remotes\"))'
+    test_string <- 'install.packages\\(\"renv\"\\)'
   } else if (lf == the_lockfile1.0.0 & is.null(renv_version)) {
-    test_string <- 'install.packages\\(c\\(\"renv\",\"remotes\"))'
+    test_string <- 'install.packages\\(\"renv\"\\)'
   } else if (lf == the_lockfile &  renv_version == "banana") {
     test_string <-  paste0(socle_install_version,"banana"  ,"\"\\)")
   } else if (lf == the_lockfile1.0.0 & renv_version == "banana") {
@@ -190,6 +190,13 @@ socle_install_version <- "remotes::install_version\\(\"renv\", version = \""
   expect_true( any(   grepl(test_string , out$Dockerfile)    ),
                info = paste(lf," & ",renv_version))
 
+  if (is.null(renv_version)) {
+    # When using the latest renv, `remotes` must not be installed at all.
+    expect_false(
+      any(grepl("remotes", out$Dockerfile)),
+      info = paste(lf, " & NULL renv_version => no remotes")
+    )
+  }
 
 }}
 

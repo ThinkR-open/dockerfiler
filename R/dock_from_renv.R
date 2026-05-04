@@ -252,7 +252,7 @@ dock_from_renv <- function(
 #' line previously written by `dock_from_renv()`:
 #'  1. CRAN URL rewritten to the `__linux__/$VERSION_CODENAME/` PPM variant
 #'     (codename resolved from /etc/os-release at image build time). Skipped
-#'     if the user already pinned `__linux__/<codename>/` themselves.
+#'     if the user already pinned a codename or a snapshot date.
 #'  2. `HTTPUserAgent` added in the strict format required by PPM
 #'     (`R (<version> <platform> <arch> <os>)`). Without it, PPM falls back
 #'     to source even with a `__linux__/` URL.
@@ -260,45 +260,54 @@ dock_from_renv <- function(
 #'     `renv::restore()` uses PPM instead of the repo URL recorded in the
 #'     lockfile (renv prefers lockfile repos by default; without this
 #'     override, fixes 1 and 2 are bypassed during `restore()`).
-#'  4. The `RUN` is prefixed with `. /etc/os-release && ` so that
-#'     `$VERSION_CODENAME` is defined when the shell evaluates the line.
+#'  4. The `RUN` is prefixed with `. /etc/os-release && ` when (and only
+#'     when) `$VERSION_CODENAME` ends up in the line.
 #'
-#' Only applies when at least one URL in `repos` looks like PPM.
+#' Only fires when `repos` is a single-entry vector named `CRAN` whose URL
+#' is on PPM. Multi-entry vectors and other shapes are intentionally left
+#' untouched -- rebuilding a multi-key `repos = c(...)` block robustly is
+#' out of scope.
 #' @noRd
 .patch_rprofile_for_ppm <- function(dock, repos) {
-  if (!any(grepl("packagemanager\\.(posit|rstudio)\\.(co|com)", repos))) {
+  ppm_pattern <- "^https?://packagemanager\\.(posit|rstudio)\\.(co|com)/"
+  if (length(repos) != 1L || !identical(names(repos), "CRAN")) {
     return(invisible(NULL))
   }
+  user_url <- repos[["CRAN"]]
+  if (!grepl(ppm_pattern, user_url)) {
+    return(invisible(NULL))
+  }
+
   rps_idx <- grep("tee /usr/local/lib/R/etc/Rprofile\\.site", dock$Dockerfile)
   if (length(rps_idx) != 1L) return(invisible(NULL))
 
   patched <- dock$Dockerfile[rps_idx]
+  ppm_codename_url <- "https://packagemanager.posit.co/cran/__linux__/$VERSION_CODENAME/latest"
 
-  ppm_url <- "https://packagemanager.posit.co/cran/__linux__/$VERSION_CODENAME/latest"
-
-  # Don't rewrite if the user already pinned a Linux codename in the URL.
-  if (!grepl("__linux__/", patched)) {
+  # Only rewrite when the URL is the bare `cran` or `cran/latest` form.
+  # Anything else (already-pinned codename, snapshot date, custom path)
+  # is left alone so we never silently clobber the user's intent.
+  url_suffix <- sub("^.*/cran/?", "", user_url)
+  rewrite_url <- url_suffix == "" || url_suffix == "latest"
+  if (rewrite_url) {
     patched <- sub(
       "repos = c\\(CRAN = '[^']*'\\)",
-      sprintf("repos = c(CRAN = '%s')", ppm_url),
+      sprintf("repos = c(CRAN = '%s')", ppm_codename_url),
       patched
     )
+    override_url <- ppm_codename_url
+  } else {
+    override_url <- user_url
   }
 
   # Force renv::restore() to use the configured PPM URL instead of the repos
   # recorded in the lockfile (cf. ?renv::config -- option declared as
-  # "primarily useful for deployment / continuous integration"). Without this,
-  # the URL rewrite above is bypassed during restore().
+  # "primarily useful for deployment / continuous integration"). Without
+  # this, the URL rewrite above is bypassed during restore().
   if (!grepl("renv\\.config\\.repos\\.override", patched)) {
-    # Reuse whatever URL ended up on the `repos = c(CRAN = '...')` line so the
-    # override matches even when the user supplied their own PPM URL.
-    cran_url <- sub(
-      ".*repos = c\\(CRAN = '([^']*)'\\).*", "\\1",
-      patched
-    )
     repos_override <- sprintf(
       ", renv.config.repos.override = c(CRAN = '%s')",
-      cran_url
+      override_url
     )
     patched <- sub(
       "(renv\\.config\\.pak\\.enabled = (TRUE|FALSE))",
@@ -323,7 +332,10 @@ dock_from_renv <- function(
     )
   }
 
-  if (!grepl("/etc/os-release", patched)) {
+  # Only prefix `. /etc/os-release && ` when the line actually references
+  # $VERSION_CODENAME -- otherwise the prefix is dead weight.
+  if (grepl("\\$VERSION_CODENAME", patched) &&
+      !grepl("/etc/os-release", patched)) {
     patched <- sub("^RUN ", "RUN . /etc/os-release && ", patched)
   }
 

@@ -18,7 +18,8 @@ dock_from_renv(
   dependencies = NA,
   sysreqs_platform = "ubuntu",
   renv_version,
-  github_pat = c("none", "build_arg", "secret")
+  github_pat = c("none", "build_arg", "secret"),
+  renv_paths_cache = "/root/.cache/R/renv"
 )
 }
 \arguments{
@@ -72,6 +73,12 @@ visible in the image metadata), or \code{"secret"} (BuildKit secret
 mount on the \code{renv::restore()} RUN; the PAT is never persisted in
 the image; requires BuildKit, so pass with
 \verb{DOCKER_BUILDKIT=1 docker build --secret id=github_pat,env=GITHUB_PAT ...}).}
+
+\item{renv_paths_cache}{character. Path used as the default of the
+\code{RENV_PATHS_CACHE} build-arg, propagated as an \code{ENV} variable, and
+used as the cache mount target for \code{renv::restore()}. Lets users
+override the renv cache location at image build time via
+\verb{--build-arg RENV_PATHS_CACHE=...}.}
 }
 \value{
 A R6 object of class \code{Dockerfile}.

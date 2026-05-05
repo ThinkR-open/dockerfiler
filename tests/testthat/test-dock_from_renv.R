@@ -401,11 +401,53 @@ test_that("dock_from_renv emits a secret mount on restore() when github_pat = 's
     fixed = TRUE
   )
   # The renv cache mount must coexist with the secret mount on the same RUN.
+  # Cache target uses ${RENV_PATHS_CACHE} since renv_paths_cache landed.
   expect_match(
     df,
-    "--mount=type=cache,id=renv-cache,target=/root/.cache/R/renv --mount=type=secret,id=github_pat GITHUB_PAT=$(cat /run/secrets/github_pat) R -e 'renv::restore()'",
+    "--mount=type=cache,id=renv-cache,target=${RENV_PATHS_CACHE} --mount=type=secret,id=github_pat GITHUB_PAT=$(cat /run/secrets/github_pat) R -e 'renv::restore()'",
     fixed = TRUE
   )
+})
+
+test_that("dock_from_renv emits the RENV_PATHS_CACHE build-arg by default", {
+  skip_if(is_rdevel, "skip on R-devel")
+  out <- dock_from_renv(
+    lockfile = the_lockfile,
+    FROM = "rocker/verse",
+    renv_version = "0.0.0"
+  )
+  df <- paste(out$Dockerfile, collapse = "\n")
+  expect_match(df, "ARG RENV_PATHS_CACHE=/root/.cache/R/renv", fixed = TRUE)
+  expect_match(df, 'ENV "RENV_PATHS_CACHE"="${RENV_PATHS_CACHE}"', fixed = TRUE)
+  expect_match(
+    df,
+    "--mount=type=cache,id=renv-cache,target=${RENV_PATHS_CACHE}",
+    fixed = TRUE
+  )
+})
+
+test_that("dock_from_renv honors a custom renv_paths_cache path", {
+  skip_if(is_rdevel, "skip on R-devel")
+  out <- dock_from_renv(
+    lockfile = the_lockfile,
+    FROM = "rocker/verse",
+    renv_paths_cache = "/srv/renv-cache",
+    renv_version = "0.0.0"
+  )
+  df <- paste(out$Dockerfile, collapse = "\n")
+  # Only the build-arg default changes -- the ENV value and the mount
+  # target keep referencing the variable, so users overriding the path
+  # at `docker build --build-arg RENV_PATHS_CACHE=...` still take effect
+  # even if they don't change the dockerfile generation defaults.
+  expect_match(df, "ARG RENV_PATHS_CACHE=/srv/renv-cache", fixed = TRUE)
+  expect_match(df, 'ENV "RENV_PATHS_CACHE"="${RENV_PATHS_CACHE}"', fixed = TRUE)
+  expect_match(
+    df,
+    "--mount=type=cache,id=renv-cache,target=${RENV_PATHS_CACHE}",
+    fixed = TRUE
+  )
+  # The hard-coded /root/.cache/R/renv path must NOT remain in the file.
+  expect_false(grepl("target=/root/.cache/R/renv", df, fixed = TRUE))
 })
 
 unlink(dir_build, recursive = TRUE)

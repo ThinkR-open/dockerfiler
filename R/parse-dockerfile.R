@@ -12,7 +12,7 @@
 parse_dockerfile <- function(path) {
 
   # note that MAINTAINER is deprecated but there
-  # for backwards compatability
+  # for backwards compatibility
   DOCKER_INSTRUCTIONS <- c(
     "#", # for detecting comments
     # "^$", # to capture empty lines

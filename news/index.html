@@ -64,6 +64,8 @@
 <h2 class="page-header" data-toc-text="0.2.6" id="dockerfiler-026">dockerfiler 0.2.6<a class="anchor" aria-label="anchor" href="#dockerfiler-026"></a></h2>
 <ul><li>
 <code><a href="../reference/dock_from_renv.html">dock_from_renv()</a></code> now auto-configures the generated Dockerfile to fetch Linux binaries from Posit Package Manager when <code>repos</code> is a single CRAN-keyed PPM URL. Four things happen: the PPM URL is rewritten to include <code>__linux__/$VERSION_CODENAME/</code> (resolved at image build time from <code>/etc/os-release</code>) when it was <code>cran</code> or <code>cran/latest</code>; <code>HTTPUserAgent</code> is set to the strict format PPM requires; <code>renv.config.repos.override</code> is set so that <code>renv::restore()</code> uses PPM instead of the lockfile’s repo URL; and the RUN is prefixed with <code>. /etc/os-release &amp;&amp;</code> when the line uses <code>$VERSION_CODENAME</code>. User-pinned codenames and snapshot-date URLs (e.g. <code>cran/2024-01-15</code>) are preserved as-is. The user’s PPM scheme and host (including <code>packagemanager.rstudio.com</code> and internal mirrors) are preserved on rewrite. Multi-entry <code>repos</code> vectors and non-PPM repos are left untouched.</li>
+<li>
+<code><a href="../reference/dock_from_renv.html">dock_from_renv()</a></code> no longer installs <code>remotes</code> when <code>renv_version = NULL</code>, since <code>remotes</code> was only needed for the <code>install_version()</code> path.</li>
 </ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.2.5" id="dockerfiler-025">dockerfiler 0.2.5<small>2025-05-07</small><a class="anchor" aria-label="anchor" href="#dockerfiler-025"></a></h2>

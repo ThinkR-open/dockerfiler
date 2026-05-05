@@ -13,7 +13,8 @@ dock_from_desc(
   expand = FALSE,
   update_tar_gz = TRUE,
   build_from_source = TRUE,
-  extra_sysreqs = NULL
+  extra_sysreqs = NULL,
+  github_pat = c("none", "build_arg", "secret")
 )
 }
 \arguments{
@@ -38,6 +39,16 @@ the Dockerfile directly mount the source folder.}
 
 \item{extra_sysreqs}{character vector. Extra debian system requirements.
 Will be installed with apt-get install.}
+
+\item{github_pat}{character. How to provide a GitHub PAT to
+\code{remotes::install_github()} for private dependency repositories.
+One of \code{"none"} (default; the generated Dockerfile does not
+reference any PAT), \code{"build_arg"} (emit \verb{ARG GITHUB_PAT} + \code{ENV}
+propagation; pass with \verb{--build-arg GITHUB_PAT=$GITHUB_PAT}; the
+PAT will be visible in the image metadata), or \code{"secret"}
+(BuildKit secret mount on each \code{install_github()} / \code{install_local()}
+RUN; the PAT is never persisted in the image; pass with
+\verb{docker build --secret id=github_pat,env=GITHUB_PAT ...}).}
 }
 \value{
 Dockerfile

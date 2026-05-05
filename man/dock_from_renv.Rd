@@ -17,7 +17,8 @@ dock_from_renv(
   user = NULL,
   dependencies = NA,
   sysreqs_platform = "ubuntu",
-  renv_version
+  renv_version,
+  github_pat = c("none", "build_arg", "secret")
 )
 }
 \arguments{
@@ -61,6 +62,16 @@ If the \code{renv.lock} file does not specify a renv version,
 the version of renv bundled with dockerfiler,
 specifically 1.0.3, will be used.
 If you set it to \code{NULL}, the latest available version of renv will be used.}
+
+\item{github_pat}{character. How to provide a GitHub PAT to
+\code{renv::restore()} for private dependency repositories. One of
+\code{"none"} (default; the generated Dockerfile does not reference
+any PAT), \code{"build_arg"} (emit \verb{ARG GITHUB_PAT} + \code{ENV} propagation;
+pass with \verb{--build-arg GITHUB_PAT=$GITHUB_PAT}; the PAT will be
+visible in the image metadata), or \code{"secret"} (BuildKit secret
+mount on the \code{renv::restore()} RUN; the PAT is never persisted in
+the image; pass with
+\verb{docker build --secret id=github_pat,env=GITHUB_PAT ...}).}
 }
 \value{
 A R6 object of class \code{Dockerfile}.

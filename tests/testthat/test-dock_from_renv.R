@@ -358,5 +358,55 @@ test_that("dock_from_renv preserves the user's PPM host on rewrite", {
   expect_false(grepl("packagemanager.posit.co", df, fixed = TRUE))
 })
 
+test_that("dock_from_renv emits no GITHUB_PAT plumbing by default", {
+  skip_if(is_rdevel, "skip on R-devel")
+  out <- dock_from_renv(
+    lockfile = the_lockfile,
+    FROM = "rocker/verse",
+    renv_version = "0.0.0"
+  )
+  df <- paste(out$Dockerfile, collapse = "\n")
+  expect_false(grepl("GITHUB_PAT", df))
+  expect_false(grepl("--mount=type=secret", df, fixed = TRUE))
+})
+
+test_that("dock_from_renv emits ARG/ENV GITHUB_PAT when github_pat = 'build_arg'", {
+  skip_if(is_rdevel, "skip on R-devel")
+  out <- dock_from_renv(
+    lockfile = the_lockfile,
+    FROM = "rocker/verse",
+    renv_version = "0.0.0",
+    github_pat = "build_arg"
+  )
+  df <- paste(out$Dockerfile, collapse = "\n")
+  expect_match(df, "ARG GITHUB_PAT", fixed = TRUE)
+  expect_match(df, 'ENV "GITHUB_PAT"="${GITHUB_PAT}"', fixed = TRUE)
+  expect_false(grepl("--mount=type=secret", df, fixed = TRUE))
+})
+
+test_that("dock_from_renv emits a secret mount on restore() when github_pat = 'secret'", {
+  skip_if(is_rdevel, "skip on R-devel")
+  out <- dock_from_renv(
+    lockfile = the_lockfile,
+    FROM = "rocker/verse",
+    renv_version = "0.0.0",
+    github_pat = "secret"
+  )
+  df <- paste(out$Dockerfile, collapse = "\n")
+  expect_false(grepl("ARG GITHUB_PAT", df, fixed = TRUE))
+  expect_false(grepl('ENV "GITHUB_PAT"', df, fixed = TRUE))
+  expect_match(
+    df,
+    "--mount=type=secret,id=github_pat,env=GITHUB_PAT",
+    fixed = TRUE
+  )
+  # The renv cache mount must coexist with the secret mount on the same RUN.
+  expect_match(
+    df,
+    "--mount=type=cache,id=renv-cache,target=/root/.cache/R/renv --mount=type=secret,id=github_pat,env=GITHUB_PAT R -e 'renv::restore()'",
+    fixed = TRUE
+  )
+})
+
 unlink(dir_build, recursive = TRUE)
 

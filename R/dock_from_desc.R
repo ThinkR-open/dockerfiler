@@ -53,6 +53,15 @@ quote_not_na <- function(x){
 #'     an updated tar.gz is created.
 #' @param extra_sysreqs character vector. Extra debian system requirements.
 #'    Will be installed with apt-get install.
+#' @param github_pat character. How to provide a GitHub PAT to
+#'   `remotes::install_github()` for private dependency repositories.
+#'   One of `"none"` (default; the generated Dockerfile does not
+#'   reference any PAT), `"build_arg"` (emit `ARG GITHUB_PAT` + `ENV`
+#'   propagation; pass with `--build-arg GITHUB_PAT=$GITHUB_PAT`; the
+#'   PAT will be visible in the image metadata), or `"secret"`
+#'   (BuildKit secret mount on each `install_github()` / `install_local()`
+#'   RUN; the PAT is never persisted in the image; pass with
+#'   `docker build --secret id=github_pat,env=GITHUB_PAT ...`).
 #'
 #' @export
 #' @rdname dockerfiles
@@ -78,8 +87,10 @@ dock_from_desc <- function(
   expand = FALSE,
   update_tar_gz = TRUE,
   build_from_source = TRUE,
-  extra_sysreqs = NULL
+  extra_sysreqs = NULL,
+  github_pat = c("none", "build_arg", "secret")
 ) {
+  github_pat <- match.arg(github_pat)
   path <- fs::path_abs(path)
 
   packages <- desc_get_deps(path)$package
@@ -158,6 +169,7 @@ dock_from_desc <- function(
     FROM = FROM,
     AS = AS
   )
+  .github_pat_setup(dock, github_pat)
 
   if (length(system_requirement) > 0) {
     if (!expand) {
@@ -233,7 +245,8 @@ dock_from_desc <- function(
       function(dock, ver, nm) {
         res <- dock$RUN(
           sprintf(
-            "Rscript -e 'remotes::install_github(\"%s\")'",
+            "%sRscript -e 'remotes::install_github(\"%s\")'",
+            .github_pat_run_prefix(github_pat),
             ver
           )
         )
@@ -300,13 +313,23 @@ dock_from_desc <- function(
       from = paste0(read.dcf(path)[1], "_*.tar.gz"),
       to = "/app.tar.gz"
     )
-    dock$RUN("R -e 'remotes::install_local(\"/app.tar.gz\",upgrade=\"never\")'")
+    dock$RUN(
+      paste0(
+        .github_pat_run_prefix(github_pat),
+        "R -e 'remotes::install_local(\"/app.tar.gz\",upgrade=\"never\")'"
+      )
+    )
     dock$RUN("rm /app.tar.gz")
   } else {
     dock$RUN("mkdir /build_zone")
     dock$ADD(from = ".", to = "/build_zone")
     dock$WORKDIR("/build_zone")
-    dock$RUN("R -e 'remotes::install_local(upgrade=\"never\")'")
+    dock$RUN(
+      paste0(
+        .github_pat_run_prefix(github_pat),
+        "R -e 'remotes::install_local(upgrade=\"never\")'"
+      )
+    )
     dock$RUN("rm -rf /build_zone")
   }
   # Add a dockerignore
@@ -314,6 +337,7 @@ dock_from_desc <- function(
     path = dirname(path)
   )
 
+  .github_pat_announce(github_pat)
   dock
 }
 

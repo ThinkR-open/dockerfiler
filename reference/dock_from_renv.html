@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">dockerfiler</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.0</span>
       </span>
     </div>
 
@@ -124,7 +124,7 @@ Will be installed with apt-get install.</p></dd>
 
 
 <dt id="arg-use-pak">use_pak<a class="anchor" aria-label="anchor" href="#arg-use-pak"></a></dt>
-<dd><p>boolean. If <code>TRUE</code> use pak to deal with dependencies  during <code>renv::restore()</code>. FALSE by default</p></dd>
+<dd><p>boolean. If <code>TRUE</code> use pak to deal with dependencies  during <code><a href="https://rstudio.github.io/renv/reference/restore.html" class="external-link">renv::restore()</a></code>. FALSE by default</p></dd>
 
 
 <dt id="arg-user">user<a class="anchor" aria-label="anchor" href="#arg-user"></a></dt>
@@ -148,19 +148,19 @@ non-working package, and/or the installation might fail.)</p></li>
 <dt id="arg-renv-version">renv_version<a class="anchor" aria-label="anchor" href="#arg-renv-version"></a></dt>
 <dd><p>character. The renv version to use in the generated Dockerfile. By default, it is set to the version specified in the <code>renv.lock</code> file.
 If the <code>renv.lock</code> file does not specify a renv version,
-the version of renv bundled with dockerfiler,
-specifically 1.0.3, will be used.
-If you set it to <code>NULL</code>, the latest available version of renv will be used.</p></dd>
+the latest available version of renv will be installed.
+Set it to <code>NULL</code> to force installing the latest renv even when the
+lockfile pins a specific version.</p></dd>
 
 
 <dt id="arg-github-pat">github_pat<a class="anchor" aria-label="anchor" href="#arg-github-pat"></a></dt>
 <dd><p>character. How to provide a GitHub PAT to
-<code>renv::restore()</code> for private dependency repositories. One of
+<code><a href="https://rstudio.github.io/renv/reference/restore.html" class="external-link">renv::restore()</a></code> for private dependency repositories. One of
 <code>"none"</code> (default; the generated Dockerfile does not reference
 any PAT), <code>"build_arg"</code> (emit <code>ARG GITHUB_PAT</code> + <code>ENV</code> propagation;
 pass with <code>--build-arg GITHUB_PAT=$GITHUB_PAT</code>; the PAT will be
 visible in the image metadata), or <code>"secret"</code> (BuildKit secret
-mount on the <code>renv::restore()</code> RUN; the PAT is never persisted in
+mount on the <code><a href="https://rstudio.github.io/renv/reference/restore.html" class="external-link">renv::restore()</a></code> RUN; the PAT is never persisted in
 the image; requires BuildKit, so pass with
 <code>DOCKER_BUILDKIT=1 docker build --secret id=github_pat,env=GITHUB_PAT ...</code>).</p></dd>
 
@@ -168,7 +168,7 @@ the image; requires BuildKit, so pass with
 <dt id="arg-renv-paths-cache">renv_paths_cache<a class="anchor" aria-label="anchor" href="#arg-renv-paths-cache"></a></dt>
 <dd><p>character. Path used as the default of the
 <code>RENV_PATHS_CACHE</code> build-arg, propagated as an <code>ENV</code> variable, and
-used as the cache mount target for <code>renv::restore()</code>. Lets users
+used as the cache mount target for <code><a href="https://rstudio.github.io/renv/reference/restore.html" class="external-link">renv::restore()</a></code>. Lets users
 override the renv cache location at image build time via
 <code>--build-arg RENV_PATHS_CACHE=...</code>.</p></dd>
 
@@ -184,7 +184,7 @@ through RStudio Package Manager via the pak
 package. The install commands provided from pak
 are added as <code>RUN</code> directives within the <code>Dockerfile</code>.</p>
 <p>The R version is taken from the <code>renv.lock</code> file.
-Packages are installed using <code>renv::restore()</code> which ensures
+Packages are installed using <code><a href="https://rstudio.github.io/renv/reference/restore.html" class="external-link">renv::restore()</a></code> which ensures
 that the proper package version and source is used when installed.</p>
     </div>
 

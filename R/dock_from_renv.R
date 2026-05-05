@@ -117,7 +117,7 @@ dock_from_renv <- function(
   }
 
   message("renv version = ",
-          ifelse(!is.null(renv_version),renv_version,"the must up to date in the repos")
+          ifelse(!is.null(renv_version), renv_version, "the most up to date version in the repos")
           )
 
 

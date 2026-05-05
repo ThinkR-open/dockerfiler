@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">dockerfiler</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.6</span>
       </span>
     </div>
 
@@ -57,9 +57,14 @@
   <div class="col-md-9 contents">
     <div class="page-header">
       <h1 data-toc-skip>Changelog <small></small></h1>
-      <small>Source: <a href="https://github.com/ThinkR-open/dockerfiler/blob/v0.2.5/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
+      <small>Source: <a href="https://github.com/ThinkR-open/dockerfiler/blob/master/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.2.6" id="dockerfiler-026">dockerfiler 0.2.6<a class="anchor" aria-label="anchor" href="#dockerfiler-026"></a></h2>
+<ul><li>
+<code><a href="../reference/dock_from_renv.html">dock_from_renv()</a></code> now auto-configures the generated Dockerfile to fetch Linux binaries from Posit Package Manager when <code>repos</code> is a single CRAN-keyed PPM URL. Four things happen: the PPM URL is rewritten to include <code>__linux__/$VERSION_CODENAME/</code> (resolved at image build time from <code>/etc/os-release</code>) when it was <code>cran</code> or <code>cran/latest</code>; <code>HTTPUserAgent</code> is set to the strict format PPM requires; <code>renv.config.repos.override</code> is set so that <code>renv::restore()</code> uses PPM instead of the lockfile’s repo URL; and the RUN is prefixed with <code>. /etc/os-release &amp;&amp;</code> when the line uses <code>$VERSION_CODENAME</code>. User-pinned codenames and snapshot-date URLs (e.g. <code>cran/2024-01-15</code>) are preserved as-is. The user’s PPM scheme and host (including <code>packagemanager.rstudio.com</code> and internal mirrors) are preserved on rewrite. Multi-entry <code>repos</code> vectors and non-PPM repos are left untouched.</li>
+</ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.2.5" id="dockerfiler-025">dockerfiler 0.2.5<small>2025-05-07</small><a class="anchor" aria-label="anchor" href="#dockerfiler-025"></a></h2>
 <ul><li>feat: allow multistage dockerfile creation</li>
@@ -118,7 +123,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
       </footer></div>

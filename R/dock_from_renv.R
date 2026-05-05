@@ -105,7 +105,7 @@ dock_from_renv <- function(
     AS = AS
   )
   .github_pat_setup(dock, github_pat)
-  dock$ARG(sprintf("RENV_PATHS_CACHE=%s", renv_paths_cache))
+  dock$ARG("RENV_PATHS_CACHE", default = renv_paths_cache)
   dock$ENV(key = "RENV_PATHS_CACHE", value = "${RENV_PATHS_CACHE}")
   if (!is.null(user)) {
     dock$USER(user)
@@ -313,8 +313,11 @@ dock_from_renv <- function(
 
   # Strip a single trailing slash so `cran/latest/` matches `cran/latest`.
   user_url_norm <- sub("/$", "", user_url)
-  # Preserve the user's scheme + host (so a `packagemanager.rstudio.com`
-  # URL or an internal mirror is not silently rewritten to posit.co).
+  # Preserve the user's scheme + host on rewrite (so a
+  # `packagemanager.rstudio.com` URL stays on rstudio.com and is not
+  # silently swapped to posit.co). The PPM detection regex above only
+  # matches the two official PPM hosts; non-PPM internal mirrors are
+  # not entered into this branch at all.
   user_host_prefix <- sub("/cran(/.*)?$", "", user_url_norm)
 
   # Only rewrite when the URL is the bare `cran` or `cran/latest` form.

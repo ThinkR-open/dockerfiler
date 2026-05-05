@@ -7,8 +7,6 @@
 #' @importFrom fs path file_exists file_create
 #' @importFrom cli cat_bullet
 #'
-#' @export
-#'
 #' @examples
 #' \dontrun{
 #'   docker_ignore_add()

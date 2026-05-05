@@ -209,7 +209,7 @@ dock_from_desc <- function(
 
   dock$RUN("R -e 'install.packages(\"remotes\")'")
 
-  if (length(packages_on_cran > 0)) {
+  if (length(packages_on_cran) > 0) {
     ping <- mapply(
       function(dock, ver, nm) {
         res <- dock$RUN(sprintf("Rscript -e 'remotes::install_version(\"%s\",upgrade=\"never\", version = %s)'",
@@ -221,7 +221,7 @@ dock_from_desc <- function(
     )
   }
 
-  if (length(packages_not_on_cran > 0)) {
+  if (length(packages_not_on_cran) > 0) {
     nn <- as.data.frame(
       do.call(
         rbind,
@@ -301,7 +301,7 @@ dock_from_desc <- function(
           )
         )
       } else {
-        stop("please install {pkgbuild}")
+        stop("please install pkgbuild")
       }
     }
     # we use an already built tar.gz file

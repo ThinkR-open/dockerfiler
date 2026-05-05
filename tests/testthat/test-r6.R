@@ -101,3 +101,15 @@ test_that("add_arg errors when both `arg` contains `=` and `default` is supplied
   expect_no_error(dockerfiler:::add_arg("MYVAR=oldval"))
   expect_no_error(dockerfiler:::add_arg("MYVAR", default = "newval"))
 })
+
+test_that("legacy inlined form `dock$ARG(\"NAME=value\")` keeps emitting `ARG NAME=value`", {
+  # Backward-compat regression test: callers who pre-date the `default`
+  # parameter must see the same output as before.
+  my_dock <- Dockerfile$new(FROM = "plop")
+  my_dock$ARG("MYVAR=myval")
+  expect_true(any(my_dock$Dockerfile == "ARG MYVAR=myval"))
+  expect_equal(
+    as.character(dockerfiler:::add_arg("MYVAR=myval")),
+    "ARG MYVAR=myval"
+  )
+})

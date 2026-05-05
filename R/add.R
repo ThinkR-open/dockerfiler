@@ -92,9 +92,9 @@ add_arg <- function(arg, default = NULL) {
   } else {
     if (grepl("=", arg, fixed = TRUE)) {
       stop(
-        "`arg` already contains an `=` sign; pass either ",
-        "`add_arg(\"NAME=value\")` or `add_arg(\"NAME\", default = \"value\")`, ",
-        "but not both."
+        "`arg` already contains an `=` sign. Pass either the inlined ",
+        "form (`\"NAME=value\"`) or the explicit default ",
+        "(`default = \"value\"`), but not both."
       )
     }
     glue("ARG {arg}={default}")

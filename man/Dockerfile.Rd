@@ -318,7 +318,9 @@ Add a ARG command.
 \item{\code{ahead}}{If TRUE, add the argument at the beginning of the Dockerfile.}
 
 \item{\code{default}}{Optional default value. When not \code{NULL}, the directive
-becomes \verb{ARG <arg>=<default>}.}
+becomes \verb{ARG <arg>=<default>}. Requires \code{arg} to be just the name
+(no embedded \code{=}); supplying both an inlined \code{=} in \code{arg} and a
+non-\code{NULL} \code{default} errors.}
 }
 \if{html}{\out{</div>}}
 }

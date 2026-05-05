@@ -105,7 +105,9 @@ self$Dockerfile <- c(self$Dockerfile, add_user(user))
 #' @param arg The argument to add.
 #' @param ahead If TRUE, add the argument at the beginning of the Dockerfile.
 #' @param default Optional default value. When not `NULL`, the directive
-#'   becomes `ARG <arg>=<default>`.
+#'   becomes `ARG <arg>=<default>`. Requires `arg` to be just the name
+#'   (no embedded `=`); supplying both an inlined `=` in `arg` and a
+#'   non-`NULL` `default` errors.
 #' @return the Dockerfile object, invisibly.
 ARG = function(arg, ahead = FALSE, default = NULL) {
 if (ahead) {

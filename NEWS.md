@@ -78,7 +78,7 @@
   `. /etc/os-release && ` when the line uses `$VERSION_CODENAME`.
   User-pinned codenames and snapshot-date URLs (e.g. `cran/2024-01-15`)
   are preserved as-is. The user's PPM scheme and host (so a
-  `packagemanager.rstudio.com` URL stays on rstudio.com) is preserved
+  `packagemanager.rstudio.com` URL stays on rstudio.com) are preserved
   on rewrite. Non-PPM repos (including internal mirrors not on the
   official PPM hosts) and multi-entry `repos` vectors are left
   untouched.

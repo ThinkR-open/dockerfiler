@@ -113,3 +113,19 @@ test_that("legacy inlined form `dock$ARG(\"NAME=value\")` keeps emitting `ARG NA
     "ARG MYVAR=myval"
   )
 })
+
+test_that("dock$custom appends `<base> <cmd>` verbatim", {
+  my_dock <- Dockerfile$new(FROM = "plop")
+  my_dock$custom(base = "ONBUILD", cmd = "RUN echo hi")
+  expect_true(any(my_dock$Dockerfile == "ONBUILD RUN echo hi"))
+})
+
+test_that("dock$add_after inserts a command at the requested position", {
+  my_dock <- Dockerfile$new(FROM = "plop")
+  my_dock$RUN("first")
+  my_dock$RUN("third")
+  my_dock$add_after(cmd = "RUN second", after = 2)
+  expect_equal(my_dock$Dockerfile[3], "RUN second")
+  expect_equal(my_dock$Dockerfile[2], "RUN first")
+  expect_equal(my_dock$Dockerfile[4], "RUN third")
+})

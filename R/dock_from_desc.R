@@ -301,7 +301,7 @@ dock_from_desc <- function(
           )
         )
       } else {
-        stop("please install pkgbuild")
+        stop("please install {pkgbuild}")
       }
     }
     # we use an already built tar.gz file

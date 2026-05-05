@@ -15,8 +15,7 @@
 
 - chore: small polish bundle (no behavioural changes for end users):
   fix two `length(x > 0)` typos in `dock_from_desc()` (intent was
-  `length(x) > 0`); drop fake-`{glue}` braces from a `stop()` message
-  in the same file; drop a duplicate `@export` tag in `dockerignore.R`;
+  `length(x) > 0`); drop a duplicate `@export` tag in `dockerignore.R`;
   use the new `dock$ARG(name, default = ...)` form internally instead
   of inlining the `=`; tighten a previously brittle regression test
   that checked for any occurrence of `"remotes"` in the generated

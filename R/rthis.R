@@ -10,5 +10,5 @@
 #' r(install.packages("plumber", repo = "http://cran.irsn.fr/"))
 r <- function(code) {
   code <- paste(trimws(deparse(substitute(code))), collapse = " ")
-  glue("R -e '{code}'")
+  glue("R -e {shQuote(code, type = 'sh')}")
 }

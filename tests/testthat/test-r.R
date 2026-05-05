@@ -18,6 +18,30 @@ test_that("r preserves spaces inside string literals", {
   expect_equal(as.character(out), 'R -e \'cat("a  b")\'')
 })
 
+test_that("r escapes apostrophes inside string literals so the shell receives intact code", {
+  out <- r(message("don't"))
+  expect_equal(
+    as.character(out),
+    "R -e \"message(\\\"don't\\\")\""
+  )
+
+  tf <- tempfile()
+  on.exit(unlink(tf), add = TRUE)
+  writeLines(
+    paste0(
+      "set -- ",
+      as.character(out),
+      "; for a; do printf \"%s\\n\" \"$a\"; done"
+    ),
+    con = tf
+  )
+  shelled <- system2(command = "sh", args = tf, stdout = TRUE, stderr = TRUE)
+  expect_equal(
+    shelled,
+    c("R", "-e", "message(\"don't\")")
+  )
+})
+
 test_that("r normalises deparse line-wrap indentation on long expressions", {
   long_call <- r(install.packages(
     c("aaa", "bbb", "ccc", "ddd", "eee", "fff", "ggg", "hhh", "iii",

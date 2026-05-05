@@ -10,6 +10,13 @@
   line then `paste(collapse = " ")`: only the line-wrap indentation
   added by `deparse()` is removed, internal whitespace is preserved.
   Closes #95.
+- fix: `r()` now wraps the deparsed R expression with
+  `shQuote(., type = "sh")` instead of inlining it inside a hand-rolled
+  single-quoted shell string. Apostrophes inside string literals no
+  longer break the emitted command: `r(message("don't"))` used to emit
+  `R -e 'message("don't")'`, which the shell refuses to parse
+  (unterminated quoted string). The new wrapping is shell-safe by
+  construction.
 - `dock$ARG()` and the internal `add_arg()` helper gain a `default`
   parameter to emit `ARG <name>=<default>` instead of `ARG <name>`.
   Closes #8.

@@ -1,9 +1,14 @@
 # dockerfiler (development version)
 
-- fix: `r()` no longer silently deletes the digit `2` or commas
-  preceded by a space (e.g. `r(c(1, 2, 3))` now returns
-  `R -e 'c(1, 2, 3)'` instead of `R -e 'c(1, , 3)'`). The internal
-  regex was a typo for `{2,}` collapsed to `[2,]` (a character class).
+- fix: `r()` no longer silently rewrites user code. The previous
+  implementation called `gsub(" [2,]", " ", code)` (a typo for
+  `{2,}`) which deleted any digit `2` or comma preceded by a space:
+  `r(c(1, 2, 3))` returned `R -e 'c(1, , 3)'`. The replacement
+  approach (`gsub("[ ]{2,}", " ", code)`) still collapsed runs of
+  spaces inside string literals (`r(cat("a  b"))` would emit
+  `R -e 'cat("a b")'`). The fix uses `trimws()` on each `deparse()`
+  line then `paste(collapse = " ")`: only the line-wrap indentation
+  added by `deparse()` is removed, internal whitespace is preserved.
   Closes #95.
 - `dock$ARG()` and the internal `add_arg()` helper gain a `default`
   parameter to emit `ARG <name>=<default>` instead of `ARG <name>`.

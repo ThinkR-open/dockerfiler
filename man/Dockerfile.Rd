@@ -307,7 +307,7 @@ the Dockerfile object, invisibly.
 \subsection{Method \code{ARG()}}{
 Add a ARG command.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Dockerfile$ARG(arg, ahead = FALSE)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Dockerfile$ARG(arg, ahead = FALSE, default = NULL)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -316,6 +316,9 @@ Add a ARG command.
 \item{\code{arg}}{The argument to add.}
 
 \item{\code{ahead}}{If TRUE, add the argument at the beginning of the Dockerfile.}
+
+\item{\code{default}}{Optional default value. When not \code{NULL}, the directive
+becomes \verb{ARG <arg>=<default>}.}
 }
 \if{html}{\out{</div>}}
 }

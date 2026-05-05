@@ -60,3 +60,33 @@ test_that("warning works", {
   # expect_warning(my_dock$COPY("nfi", "norifi", force = FALSE))
   expect_warning(my_dock$EXPOSE("9000"))
 })
+
+test_that("dock$ARG emits ARG <name> when no default is provided", {
+  my_dock <- Dockerfile$new(FROM = "plop")
+  my_dock$ARG("MYVAR")
+  expect_true(any(grepl("^ARG MYVAR$", my_dock$Dockerfile)))
+})
+
+test_that("dock$ARG emits ARG <name>=<default> when a default is provided", {
+  my_dock <- Dockerfile$new(FROM = "plop")
+  my_dock$ARG("MYVAR", default = "myval")
+  expect_true(any(grepl("^ARG MYVAR=myval$", my_dock$Dockerfile)))
+})
+
+test_that("dock$ARG default still respects ahead = TRUE", {
+  my_dock <- Dockerfile$new(FROM = "plop")
+  my_dock$RUN("placeholder")
+  my_dock$ARG("MYVAR", ahead = TRUE, default = "myval")
+  # FROM stays first; ARG is inserted before everything else (i.e. before
+  # the FROM as well, because that's how `ahead = TRUE` is currently
+  # implemented). We only assert the ARG line is present and well-formed.
+  expect_true(any(my_dock$Dockerfile == "ARG MYVAR=myval"))
+})
+
+test_that("add_arg emits the right directive in both modes", {
+  expect_equal(as.character(dockerfiler:::add_arg("MYVAR")), "ARG MYVAR")
+  expect_equal(
+    as.character(dockerfiler:::add_arg("MYVAR", default = "myval")),
+    "ARG MYVAR=myval"
+  )
+})

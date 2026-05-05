@@ -1,4 +1,4 @@
-n_temp <- tempdir()
+n_temp <- withr::local_tempdir(pattern = "dockerbuild")
 file.copy("renv.lock", n_temp)
 skip_if(is_rdevel, "skip on R-devel")
 withr::with_dir(

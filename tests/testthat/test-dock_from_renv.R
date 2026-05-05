@@ -94,6 +94,10 @@ test_that("dock_from_renv works with full dependencies", {
   # skip_if_not(interactive())
   # Create Dockerfile
 skip_if(is_rdevel, "skip on R-devel")
+  # pak::pkg_sysreqs(sysreqs_platform = "ubuntu") returns no
+  # system_packages on macOS hosts, so the python3 sysreq line is
+  # never emitted and the assertion below cannot pass.
+  skip_on_os("mac")
   out <- dock_from_renv(
     dependencies = TRUE,
     lockfile = the_lockfile,
@@ -141,6 +145,20 @@ test_that("gen_base_image works", {
     r_version = "4.0",
     FROM = "rocker/verse"
   )
+  expect_equal(out, "rocker/verse:4.0")
+})
+
+test_that("gen_base_image warns when the deprecated `distro` is supplied", {
+  expect_warning(
+    out <- dockerfiler:::gen_base_image(
+      distro = "xenial",
+      r_version = "4.0",
+      FROM = "rocker/verse"
+    ),
+    "distro"
+  )
+  # Even though the deprecation fires, the resulting image string still
+  # comes from FROM + r_version (distro is dead).
   expect_equal(out, "rocker/verse:4.0")
 })
 
@@ -449,6 +467,100 @@ test_that("dock_from_renv honors a custom renv_paths_cache path", {
   )
   # The hard-coded /root/.cache/R/renv path must NOT remain in the file.
   expect_false(grepl("target=/root/.cache/R/renv", df, fixed = TRUE))
+})
+
+test_that("dock_from_renv emits a USER directive when `user` is non-NULL", {
+  skip_if(is_rdevel, "skip on R-devel")
+  out <- dock_from_renv(
+    lockfile = the_lockfile,
+    FROM = "rocker/verse",
+    renv_version = "0.0.0",
+    user = "rstudio"
+  )
+  expect_true(any(out$Dockerfile == "USER rstudio"))
+})
+
+test_that("dock_from_renv with sysreqs = FALSE skips sysreq computation and emits no apt-get install", {
+  skip_if(is_rdevel, "skip on R-devel")
+  out <- dock_from_renv(
+    lockfile = the_lockfile,
+    FROM = "rocker/verse",
+    renv_version = "0.0.0",
+    sysreqs = FALSE
+  )
+  df <- out$Dockerfile
+  expect_false(any(grepl("apt-get install", df)))
+  expect_false(any(grepl("apt-get update", df)))
+})
+
+test_that("dock_from_renv with sysreqs = FALSE + extra_sysreqs emits an apt-get install for the extras", {
+  skip_if(is_rdevel, "skip on R-devel")
+  out <- dock_from_renv(
+    lockfile = the_lockfile,
+    FROM = "rocker/verse",
+    renv_version = "0.0.0",
+    sysreqs = FALSE,
+    extra_sysreqs = c("libsodium-dev", "libxml2-dev")
+  )
+  df <- paste(out$Dockerfile, collapse = "\n")
+  # The two extras must end up in a compact apt-get install RUN.
+  expect_match(df, "apt-get install -y[^\n]*libsodium-dev")
+  expect_match(df, "apt-get install -y[^\n]*libxml2-dev")
+})
+
+test_that("dock_from_renv with expand = TRUE emits one apt-get install RUN per requirement plus update / clean", {
+  skip_if(is_rdevel, "skip on R-devel")
+  out <- dock_from_renv(
+    lockfile = the_lockfile,
+    FROM = "rocker/verse",
+    renv_version = "0.0.0",
+    sysreqs = FALSE,
+    expand = TRUE,
+    extra_sysreqs = c("libsodium-dev", "libxml2-dev")
+  )
+  df <- out$Dockerfile
+  expect_true(any(df == "RUN apt-get update -y"))
+  expect_true(any(df == "RUN apt-get install -y libsodium-dev"))
+  expect_true(any(df == "RUN apt-get install -y libxml2-dev"))
+  expect_true(any(df == "RUN rm -rf /var/lib/apt/lists/*"))
+})
+
+test_that(".patch_rprofile_for_ppm returns invisibly when no Rprofile.site tee line is present", {
+  # Build a minimal dock that does NOT contain the `tee /usr/local/lib/R/etc/Rprofile.site` line
+  # so the defensive `length(rps_idx) != 1L` guard fires. The function must
+  # return invisible(NULL) without altering the dock.
+  dock <- Dockerfile$new(FROM = "plop")
+  before <- dock$Dockerfile
+  res <- dockerfiler:::.patch_rprofile_for_ppm(
+    dock,
+    repos = c(CRAN = "https://packagemanager.posit.co/cran/latest")
+  )
+  expect_null(res)
+  expect_identical(dock$Dockerfile, before)
+})
+
+test_that(".patch_rprofile_for_ppm returns invisibly when more than one Rprofile.site tee line is present", {
+  # The other half of the `length(rps_idx) != 1L` guard: when a dock
+  # already carries two RUN lines that match the Rprofile.site tee
+  # pattern (which would happen if a caller injected an extra
+  # configuration RUN before the patch), the function must refuse to
+  # rewrite either of them.
+  dock <- Dockerfile$new(FROM = "plop")
+  dock$RUN(
+    "echo \"options(repos = c(CRAN = 'https://packagemanager.posit.co/cran/latest'), download.file.method = 'libcurl', Ncpus = 4)\" | tee /usr/local/lib/R/etc/Rprofile.site | tee /usr/lib/R/etc/Rprofile.site"
+  )
+  dock$RUN(
+    "echo \"options(repos = c(CRAN = 'https://packagemanager.posit.co/cran/latest'), download.file.method = 'libcurl', Ncpus = 4)\" | tee /usr/local/lib/R/etc/Rprofile.site | tee /usr/lib/R/etc/Rprofile.site"
+  )
+  before <- dock$Dockerfile
+
+  res <- dockerfiler:::.patch_rprofile_for_ppm(
+    dock,
+    repos = c(CRAN = "https://packagemanager.posit.co/cran/latest")
+  )
+
+  expect_null(res)
+  expect_identical(dock$Dockerfile, before)
 })
 
 unlink(dir_build, recursive = TRUE)

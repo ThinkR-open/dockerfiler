@@ -156,6 +156,53 @@ withr::with_dir(
         fixed = TRUE
       )
     })
+
+    test_that("dock_from_desc(build_from_source = FALSE, update_tar_gz = FALSE) copies a prebuilt tar.gz", {
+      skip_if(is_rdevel, "skip on R-devel")
+      my_dock <- testthat::with_mocked_bindings(
+        code = dock_from_desc(
+          file.path(".", "DESCRIPTION__"),
+          build_from_source = FALSE,
+          update_tar_gz = FALSE
+        ),
+        get_sysreqs = function(...) character(0)
+      )
+      df <- paste(my_dock$Dockerfile, collapse = "\n")
+      expect_match(df, "tar.gz", fixed = TRUE)
+      expect_match(df, "remotes::install_local", fixed = TRUE)
+      expect_match(df, "rm /app.tar.gz", fixed = TRUE)
+      expect_false(grepl("mkdir /build_zone", df, fixed = TRUE))
+    })
+
+    test_that("dock_from_desc(build_from_source = FALSE, update_tar_gz = TRUE) builds a fresh tar.gz", {
+      skip_if(is_rdevel, "skip on R-devel")
+      build_called <- FALSE
+      use_build_ignore_called <- FALSE
+      my_dock <- testthat::with_mocked_bindings(
+        code = dock_from_desc(
+          file.path(".", "DESCRIPTION__"),
+          build_from_source = FALSE,
+          update_tar_gz = TRUE
+        ),
+        get_sysreqs = function(...) character(0),
+        build = function(path, dest_path, vignettes) {
+          build_called <<- TRUE
+          fake <- file.path(dest_path, "fakepkg_0.0.0.tar.gz")
+          file.create(fake)
+          fake
+        },
+        use_build_ignore = function(files) {
+          use_build_ignore_called <<- TRUE
+          invisible(TRUE)
+        }
+      )
+      # Both surviving lines from the dead-code-removal must execute on
+      # this code path.
+      expect_true(build_called)
+      expect_true(use_build_ignore_called)
+      df <- paste(my_dock$Dockerfile, collapse = "\n")
+      expect_match(df, "remotes::install_local", fixed = TRUE)
+    })
   }
 )
 

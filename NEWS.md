@@ -17,6 +17,12 @@
   `R -e 'message("don't")'`, which the shell refuses to parse
   (unterminated quoted string). The new wrapping is shell-safe by
   construction.
+- fix: `dock_from_desc(build_from_source = FALSE)` no longer carries
+  a dead-code branch (`if (missing(out))`) on the locally-assigned
+  result of `pkgbuild::build()`. `missing()` only reports unsupplied
+  function arguments, so the branch was unreachable; the success path
+  always ran when `build()` returned. The branch is removed; failures
+  of `pkgbuild::build()` propagate normally via `stop()`. Closes #98.
 - `dock$ARG()` and the internal `add_arg()` helper gain a `default`
   parameter to emit `ARG <name>=<default>` instead of `ARG <name>`.
   Closes #8.

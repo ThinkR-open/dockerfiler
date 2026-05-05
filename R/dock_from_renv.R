@@ -41,6 +41,11 @@ pkg_sysreqs_mem <- memoise::memoise(
 #'   mount on the `renv::restore()` RUN; the PAT is never persisted in
 #'   the image; requires BuildKit, so pass with
 #'   `DOCKER_BUILDKIT=1 docker build --secret id=github_pat,env=GITHUB_PAT ...`).
+#' @param renv_paths_cache character. Path used as the default of the
+#'   `RENV_PATHS_CACHE` build-arg, propagated as an `ENV` variable, and
+#'   used as the cache mount target for `renv::restore()`. Lets users
+#'   override the renv cache location at image build time via
+#'   `--build-arg RENV_PATHS_CACHE=...`.
 #' @importFrom utils getFromNamespace
 #' @return A R6 object of class `Dockerfile`.
 #' @details
@@ -79,7 +84,8 @@ dock_from_renv <- function(
   dependencies = NA,
   sysreqs_platform = "ubuntu",
   renv_version,
-  github_pat = c("none", "build_arg", "secret")
+  github_pat = c("none", "build_arg", "secret"),
+  renv_paths_cache = "/root/.cache/R/renv"
 ) {
   github_pat <- match.arg(github_pat)
   try(dockerfiler::renv$initialize(),silent=TRUE)
@@ -96,6 +102,8 @@ dock_from_renv <- function(
     AS = AS
   )
   .github_pat_setup(dock, github_pat)
+  dock$ARG(sprintf("RENV_PATHS_CACHE=%s", renv_paths_cache))
+  dock$ENV(key = "RENV_PATHS_CACHE", value = "${RENV_PATHS_CACHE}")
   if (!is.null(user)) {
     dock$USER(user)
   }
@@ -257,7 +265,7 @@ dock_from_renv <- function(
   dock$COPY(basename(lockfile), "renv.lock")
   dock$RUN(
     paste0(
-      "--mount=type=cache,id=renv-cache,target=/root/.cache/R/renv ",
+      "--mount=type=cache,id=renv-cache,target=${RENV_PATHS_CACHE} ",
       .github_pat_run_prefix(github_pat),
       "R -e 'renv::restore()'"
     )

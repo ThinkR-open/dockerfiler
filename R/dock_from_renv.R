@@ -17,11 +17,17 @@ pkg_sysreqs_mem <- memoise::memoise(
 #' @param repos character. The URL(s) of the repositories to use for `options("repos")`.
 #' @param extra_sysreqs character vector. Extra debian system requirements.
 #'    Will be installed with apt-get install.
-#' @param renv_version character. The renv version to use in the generated Dockerfile. By default, it is set to the version specified in the `renv.lock` file.
-#'   If the `renv.lock` file does not specify a renv version,
-#'   the latest available version of renv will be installed.
-#'   Set it to `NULL` to force installing the latest renv even when the
-#'   lockfile pins a specific version.
+#' @param renv_version character or `NULL`. The renv version to install.
+#'   The argument has three distinct modes, deliberately encoded with
+#'   the missing-vs-`NULL` distinction:
+#'   - **not supplied (default)**: read the renv version from the
+#'     `renv.lock` file. If the lockfile does not pin renv either,
+#'     the latest available version is installed.
+#'   - `NULL` (explicit): always install the latest renv from the
+#'     configured repos, even when the lockfile pins a specific
+#'     version.
+#'   - a character string such as `"1.0.0"`: install that specific
+#'     version regardless of what the lockfile says.
 #' @param use_pak boolean. If `TRUE` use pak to deal with dependencies  during `renv::restore()`. FALSE by default
 #' @param user Name of the user to specify in the Dockerfile with the USER instruction. Default is `NULL`, in which case the user from the FROM image is used.
 #' @param dependencies What kinds of dependencies to install. Most commonly

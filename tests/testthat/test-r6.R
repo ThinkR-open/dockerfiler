@@ -90,3 +90,14 @@ test_that("add_arg emits the right directive in both modes", {
     "ARG MYVAR=myval"
   )
 })
+
+test_that("add_arg errors when both `arg` contains `=` and `default` is supplied", {
+  # Avoids producing the silently invalid `ARG MYVAR=oldval=newval`.
+  expect_error(
+    dockerfiler:::add_arg("MYVAR=oldval", default = "newval"),
+    "already contains an `=` sign"
+  )
+  # Either form is fine on its own.
+  expect_no_error(dockerfiler:::add_arg("MYVAR=oldval"))
+  expect_no_error(dockerfiler:::add_arg("MYVAR", default = "newval"))
+})

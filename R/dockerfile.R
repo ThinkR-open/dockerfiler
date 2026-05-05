@@ -109,9 +109,9 @@ self$Dockerfile <- c(self$Dockerfile, add_user(user))
 #' @return the Dockerfile object, invisibly.
 ARG = function(arg, ahead = FALSE, default = NULL) {
 if (ahead) {
-self$Dockerfile <- c(add_arg(arg, default), self$Dockerfile)
+self$Dockerfile <- c(add_arg(arg, default = default), self$Dockerfile)
 } else {
-self$Dockerfile <- c(self$Dockerfile, add_arg(arg, default))
+self$Dockerfile <- c(self$Dockerfile, add_arg(arg, default = default))
 }
 },
 #' @description

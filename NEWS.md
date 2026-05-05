@@ -13,13 +13,6 @@
 
 ## New features
 
-- chore: small polish bundle (no behavioural changes for end users):
-  fix two `length(x > 0)` typos in `dock_from_desc()` (intent was
-  `length(x) > 0`); drop a duplicate `@export` tag in `dockerignore.R`;
-  use the new `dock$ARG(name, default = ...)` form internally instead
-  of inlining the `=`; tighten a previously brittle regression test
-  that checked for any occurrence of `"remotes"` in the generated
-  Dockerfile.
 - `dock$ARG()` and the internal `add_arg()` helper gain a `default`
   parameter to emit `ARG <name>=<default>` instead of `ARG <name>`.
   Closes #8.
@@ -63,6 +56,13 @@
   function arguments, so the branch was unreachable; the success path
   always ran when `build()` returned. The branch is removed; failures
   of `pkgbuild::build()` propagate normally via `stop()`. Closes #98.
+- Small polish bundle (no behavioural changes for end users): fix two
+  `length(x > 0)` typos in `dock_from_desc()` (intent was
+  `length(x) > 0`); drop a duplicate `@export` tag in `dockerignore.R`;
+  use the new `dock$ARG(name, default = ...)` form internally instead
+  of inlining the `=`; tighten a previously brittle regression test
+  that checked for any occurrence of `"remotes"` in the generated
+  Dockerfile.
 
 
 # dockerfiler 0.2.6

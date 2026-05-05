@@ -18,7 +18,7 @@ You’re reading the doc about version :
 
 ``` r
 desc::desc_get_version()
-#> [1] '0.2.6'
+#> [1] '0.3.0'
 ```
 
 ## Installation

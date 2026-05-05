@@ -86,8 +86,19 @@ add_user <- function(user) {
   glue("USER {user}")
 }
 
-add_arg <- function(arg) {
-  glue("ARG {arg}")
+add_arg <- function(arg, default = NULL) {
+  if (is.null(default)) {
+    glue("ARG {arg}")
+  } else {
+    if (grepl("=", arg, fixed = TRUE)) {
+      stop(
+        "`arg` already contains an `=` sign. Pass either the inlined ",
+        "form (`\"NAME=value\"`) or the explicit default ",
+        "(`default = \"value\"`), but not both."
+      )
+    }
+    glue("ARG {arg}={default}")
+  }
 }
 
 add_onbuild <- function(cmd) {

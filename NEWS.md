@@ -1,3 +1,10 @@
+# dockerfiler (development version)
+
+- `dock$ARG()` and the internal `add_arg()` helper gain a `default`
+  parameter to emit `ARG <name>=<default>` instead of `ARG <name>`.
+  Closes #8.
+
+
 # dockerfiler 0.2.6
 
 - `dock_from_renv()` now auto-configures the generated Dockerfile to fetch

@@ -75,7 +75,8 @@
 <span>  expand <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  update_tar_gz <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  build_from_source <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  extra_sysreqs <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  extra_sysreqs <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  github_pat <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"none"</span>, <span class="st">"build_arg"</span>, <span class="st">"secret"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -121,6 +122,19 @@ the Dockerfile directly mount the source folder.</p></dd>
 <dt id="arg-extra-sysreqs">extra_sysreqs<a class="anchor" aria-label="anchor" href="#arg-extra-sysreqs"></a></dt>
 <dd><p>character vector. Extra debian system requirements.
 Will be installed with apt-get install.</p></dd>
+
+
+<dt id="arg-github-pat">github_pat<a class="anchor" aria-label="anchor" href="#arg-github-pat"></a></dt>
+<dd><p>character. How to provide a GitHub PAT to
+<code><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">remotes::install_github()</a></code> for private dependency repositories.
+One of <code>"none"</code> (default; the generated Dockerfile does not
+reference any PAT), <code>"build_arg"</code> (emit <code>ARG GITHUB_PAT</code> + <code>ENV</code>
+propagation; pass with <code>--build-arg GITHUB_PAT=$GITHUB_PAT</code>; the
+PAT will be visible in the image metadata), or <code>"secret"</code>
+(BuildKit secret mount on each <code>install_github()</code> / <code>install_local()</code>
+RUN; the PAT is never persisted in the image; requires BuildKit, so
+pass with
+<code>DOCKER_BUILDKIT=1 docker build --secret id=github_pat,env=GITHUB_PAT ...</code>).</p></dd>
 
 </dl></div>
     <div id="value">

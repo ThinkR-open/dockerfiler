@@ -64,6 +64,8 @@
 <h2 class="page-header" data-toc-text="development version" id="dockerfiler-development-version">dockerfiler (development version)<a class="anchor" aria-label="anchor" href="#dockerfiler-development-version"></a></h2>
 <ul><li>
 <code>dock$ARG()</code> and the internal <code>add_arg()</code> helper gain a <code>default</code> parameter to emit <code>ARG &lt;name&gt;=&lt;default&gt;</code> instead of <code>ARG &lt;name&gt;</code>. Closes <a href="https://github.com/ThinkR-open/dockerfiler/issues/8" class="external-link">#8</a>.</li>
+<li>
+<code><a href="../reference/dockerfiles.html">dock_from_desc()</a></code> and <code><a href="../reference/dock_from_renv.html">dock_from_renv()</a></code> gain a <code>github_pat</code> parameter (default <code>"none"</code>) controlling how a GitHub PAT is provided to <code><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">remotes::install_github()</a></code> / <code><a href="https://remotes.r-lib.org/reference/install_local.html" class="external-link">remotes::install_local()</a></code> / <code>renv::restore()</code> for private dependency repositories. Set to <code>"build_arg"</code> to emit <code>ARG GITHUB_PAT</code> + <code>ENV</code> propagation (passed via <code>--build-arg GITHUB_PAT=$GITHUB_PAT</code>), or <code>"secret"</code> to use BuildKit secret mounts (the PAT is never persisted in image metadata; recommended for published images). Closes <a href="https://github.com/ThinkR-open/dockerfiler/issues/18" class="external-link">#18</a>.</li>
 </ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.2.6" id="dockerfiler-026">dockerfiler 0.2.6<a class="anchor" aria-label="anchor" href="#dockerfiler-026"></a></h2>

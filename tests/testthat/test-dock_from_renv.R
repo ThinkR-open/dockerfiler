@@ -534,5 +534,29 @@ test_that(".patch_rprofile_for_ppm returns invisibly when no Rprofile.site tee l
   expect_identical(dock$Dockerfile, before)
 })
 
+test_that(".patch_rprofile_for_ppm returns invisibly when more than one Rprofile.site tee line is present", {
+  # The other half of the `length(rps_idx) != 1L` guard: when a dock
+  # already carries two RUN lines that match the Rprofile.site tee
+  # pattern (which would happen if a caller injected an extra
+  # configuration RUN before the patch), the function must refuse to
+  # rewrite either of them.
+  dock <- Dockerfile$new(FROM = "plop")
+  dock$RUN(
+    "echo \"options(repos = c(CRAN = 'https://packagemanager.posit.co/cran/latest'), download.file.method = 'libcurl', Ncpus = 4)\" | tee /usr/local/lib/R/etc/Rprofile.site | tee /usr/lib/R/etc/Rprofile.site"
+  )
+  dock$RUN(
+    "echo \"options(repos = c(CRAN = 'https://packagemanager.posit.co/cran/latest'), download.file.method = 'libcurl', Ncpus = 4)\" | tee /usr/local/lib/R/etc/Rprofile.site | tee /usr/lib/R/etc/Rprofile.site"
+  )
+  before <- dock$Dockerfile
+
+  res <- dockerfiler:::.patch_rprofile_for_ppm(
+    dock,
+    repos = c(CRAN = "https://packagemanager.posit.co/cran/latest")
+  )
+
+  expect_null(res)
+  expect_identical(dock$Dockerfile, before)
+})
+
 unlink(dir_build, recursive = TRUE)
 

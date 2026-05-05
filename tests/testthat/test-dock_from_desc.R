@@ -335,7 +335,13 @@ withr::with_dir(
       skip_if(is_rdevel, "skip on R-devel")
       # Synthesize a remotes::package_deps() return so we exercise the
       # `Remotes:` (GitHub) branch without hitting the network or
-      # requiring a non-CRAN package to be installed.
+      # requiring a non-CRAN package to be installed. Note: the
+      # install_github emission iterates over `remotes_deps$remote`
+      # filtered by `!is_cran` (mock-controlled), not over
+      # `packages_not_on_cran` (which here ends up containing the
+      # DESCRIPTION's real Imports because of the `length(x > 0)`
+      # branch always entering). The emission path is therefore driven
+      # entirely by the mock's `$remote` list-column.
       fake_pd <- data.frame(
         package = c("cli", "fakepkg"),
         is_cran = c(TRUE, FALSE),

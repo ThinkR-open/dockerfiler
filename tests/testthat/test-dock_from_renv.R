@@ -397,13 +397,13 @@ test_that("dock_from_renv emits a secret mount on restore() when github_pat = 's
   expect_false(grepl('ENV "GITHUB_PAT"', df, fixed = TRUE))
   expect_match(
     df,
-    "--mount=type=secret,id=github_pat,env=GITHUB_PAT",
+    "--mount=type=secret,id=github_pat GITHUB_PAT=$(cat /run/secrets/github_pat)",
     fixed = TRUE
   )
   # The renv cache mount must coexist with the secret mount on the same RUN.
   expect_match(
     df,
-    "--mount=type=cache,id=renv-cache,target=/root/.cache/R/renv --mount=type=secret,id=github_pat,env=GITHUB_PAT R -e 'renv::restore()'",
+    "--mount=type=cache,id=renv-cache,target=/root/.cache/R/renv --mount=type=secret,id=github_pat GITHUB_PAT=$(cat /run/secrets/github_pat) R -e 'renv::restore()'",
     fixed = TRUE
   )
 })

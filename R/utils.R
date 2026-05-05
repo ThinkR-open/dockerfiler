@@ -54,12 +54,19 @@ cat_info <- function(...) {
 #'
 #' Returns a string to prepend to a RUN command body. Empty string for
 #' modes `"none"` and `"build_arg"` (the latter relies on the ENV set
-#' by [.github_pat_setup()]); the `--mount=type=secret,...,env=GITHUB_PAT`
-#' fragment for mode `"secret"`.
+#' by [.github_pat_setup()]); a `--mount=type=secret,...` fragment plus
+#' a shell `GITHUB_PAT=$(cat ...)` prefix for mode `"secret"`.
+#'
+#' The file-read pattern (`cat /run/secrets/github_pat`) is preferred
+#' over the `--mount=type=secret,...,env=GITHUB_PAT` shortcut because
+#' the latter requires Dockerfile frontend `1.6+` (introduced in 2023)
+#' and otherwise needs an explicit `# syntax=docker/dockerfile:1.6`
+#' header. The file-read pattern works on every BuildKit version that
+#' supports `--mount=type=secret` at all.
 #' @noRd
 .github_pat_run_prefix <- function(mode) {
   if (identical(mode, "secret")) {
-    "--mount=type=secret,id=github_pat,env=GITHUB_PAT "
+    "--mount=type=secret,id=github_pat GITHUB_PAT=$(cat /run/secrets/github_pat) "
   } else {
     ""
   }

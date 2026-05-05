@@ -146,10 +146,13 @@ withr::with_dir(
       # No top-level ARG / ENV in secret mode.
       expect_false(grepl("ARG GITHUB_PAT", df, fixed = TRUE))
       expect_false(grepl('ENV "GITHUB_PAT"', df, fixed = TRUE))
-      # The install_local RUN must carry the secret-mount fragment.
+      # The install_local RUN must carry the secret-mount fragment plus
+      # a `cat /run/secrets/...` shell prefix that exposes the PAT as
+      # an env var to the inner R command (compatible with all BuildKit
+      # versions, unlike the `env=GITHUB_PAT` shortcut on the mount).
       expect_match(
         df,
-        "--mount=type=secret,id=github_pat,env=GITHUB_PAT",
+        "--mount=type=secret,id=github_pat GITHUB_PAT=$(cat /run/secrets/github_pat)",
         fixed = TRUE
       )
     })

@@ -210,10 +210,17 @@ socle_install_version <- "remotes::install_version\\(\"renv\", version = \""
   installs_latest <- is.null(renv_version) ||
     (identical(renv_version, "missing") && lf == the_lockfile)
   if (installs_latest) {
-    # When using the latest renv, `remotes` must not be installed at all.
+    # When using the latest renv, `remotes` must not be installed at
+    # all. Tighter regex than `grepl("remotes", ...)` so we don't
+    # false-positive on incidental occurrences of the substring (e.g.
+    # a host name) elsewhere in the Dockerfile.
     expect_false(
       any(grepl("install\\.packages\\([^)]*remotes", out$Dockerfile)),
       info = paste(lf, " & ", renv_version, " => no remotes install")
+    )
+    expect_false(
+      any(grepl("remotes::install_version", out$Dockerfile)),
+      info = paste(lf, " & ", renv_version, " => no remotes::install_version")
     )
   }
 

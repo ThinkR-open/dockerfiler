@@ -56,6 +56,13 @@
   function arguments, so the branch was unreachable; the success path
   always ran when `build()` returned. The branch is removed; failures
   of `pkgbuild::build()` propagate normally via `stop()`. Closes #98.
+- Small polish bundle (no behavioural changes for end users): fix two
+  `length(x > 0)` typos in `dock_from_desc()` (intent was
+  `length(x) > 0`); drop a duplicate `@export` tag in `dockerignore.R`;
+  use the new `dock$ARG(name, default = ...)` form internally instead
+  of inlining the `=`; tighten a previously brittle regression test
+  that checked for any occurrence of `"remotes"` in the generated
+  Dockerfile.
 
 
 # dockerfiler 0.2.6
@@ -70,9 +77,10 @@
   instead of the lockfile's repo URL; and the RUN is prefixed with
   `. /etc/os-release && ` when the line uses `$VERSION_CODENAME`.
   User-pinned codenames and snapshot-date URLs (e.g. `cran/2024-01-15`)
-  are preserved as-is. The user's PPM scheme and host (including
-  `packagemanager.rstudio.com` and internal mirrors) are preserved on
-  rewrite. Multi-entry `repos` vectors and non-PPM repos are left
+  are preserved as-is. The user's PPM scheme and host (so a
+  `packagemanager.rstudio.com` URL stays on rstudio.com) are preserved
+  on rewrite. Non-PPM repos (including internal mirrors not on the
+  official PPM hosts) and multi-entry `repos` vectors are left
   untouched.
 - `dock_from_renv()` no longer installs `remotes` when `renv_version = NULL`,
   since `remotes` was only needed for the `install_version()` path.

@@ -1,3 +1,21 @@
+# dockerfiler 0.2.6
+
+- `dock_from_renv()` now auto-configures the generated Dockerfile to fetch
+  Linux binaries from Posit Package Manager when `repos` is a single
+  CRAN-keyed PPM URL. Four things happen: the PPM URL is rewritten to
+  include `__linux__/$VERSION_CODENAME/` (resolved at image build time
+  from `/etc/os-release`) when it was `cran` or `cran/latest`;
+  `HTTPUserAgent` is set to the strict format PPM requires;
+  `renv.config.repos.override` is set so that `renv::restore()` uses PPM
+  instead of the lockfile's repo URL; and the RUN is prefixed with
+  `. /etc/os-release && ` when the line uses `$VERSION_CODENAME`.
+  User-pinned codenames and snapshot-date URLs (e.g. `cran/2024-01-15`)
+  are preserved as-is. The user's PPM scheme and host (including
+  `packagemanager.rstudio.com` and internal mirrors) are preserved on
+  rewrite. Multi-entry `repos` vectors and non-PPM repos are left
+  untouched.
+
+
 # dockerfiler 0.2.5
 
 - feat: allow multistage dockerfile creation

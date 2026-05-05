@@ -224,6 +224,7 @@ dock_from_renv <- function(
       repos_as_character
     )
   )
+  .patch_rprofile_for_ppm(dock, repos)
 
 
   if (!is.null(renv_version)){
@@ -242,5 +243,112 @@ dock_from_renv <- function(
   dock$COPY(basename(lockfile), "renv.lock")
   dock$RUN("--mount=type=cache,id=renv-cache,target=/root/.cache/R/renv R -e 'renv::restore()'")
   dock
+}
+
+
+#' Patch the Rprofile.site line so PPM serves Linux binaries.
+#'
+#' Modifications applied conditionally to the `RUN ... tee Rprofile.site`
+#' line previously written by `dock_from_renv()`:
+#'  1. CRAN URL rewritten to the `__linux__/$VERSION_CODENAME/` PPM variant
+#'     (codename resolved from /etc/os-release at image build time). Skipped
+#'     if the user already pinned a codename or a snapshot date.
+#'  2. `HTTPUserAgent` added in the strict format required by PPM
+#'     (`R (<version> <platform> <arch> <os>)`). Without it, PPM falls back
+#'     to source even with a `__linux__/` URL.
+#'  3. `renv.config.repos.override` set to the same PPM URL, so that
+#'     `renv::restore()` uses PPM instead of the repo URL recorded in the
+#'     lockfile (renv prefers lockfile repos by default; without this
+#'     override, fixes 1 and 2 are bypassed during `restore()`).
+#'  4. The `RUN` is prefixed with `. /etc/os-release && ` when (and only
+#'     when) `$VERSION_CODENAME` ends up in the line.
+#'
+#' Only fires when `repos` is a single-entry vector named `CRAN` whose URL
+#' is on PPM. Multi-entry vectors and other shapes are intentionally left
+#' untouched -- rebuilding a multi-key `repos = c(...)` block robustly is
+#' out of scope.
+#' @noRd
+.patch_rprofile_for_ppm <- function(dock, repos) {
+  ppm_pattern <- "^https?://packagemanager\\.(posit|rstudio)\\.(co|com)/"
+  if (length(repos) != 1L || !identical(names(repos), "CRAN")) {
+    return(invisible(NULL))
+  }
+  user_url <- repos[["CRAN"]]
+  if (!grepl(ppm_pattern, user_url)) {
+    return(invisible(NULL))
+  }
+
+  rps_idx <- grep("tee /usr/local/lib/R/etc/Rprofile\\.site", dock$Dockerfile)
+  if (length(rps_idx) != 1L) return(invisible(NULL))
+
+  patched <- dock$Dockerfile[rps_idx]
+
+  # Strip a single trailing slash so `cran/latest/` matches `cran/latest`.
+  user_url_norm <- sub("/$", "", user_url)
+  # Preserve the user's scheme + host (so a `packagemanager.rstudio.com`
+  # URL or an internal mirror is not silently rewritten to posit.co).
+  user_host_prefix <- sub("/cran(/.*)?$", "", user_url_norm)
+
+  # Only rewrite when the URL is the bare `cran` or `cran/latest` form.
+  # Anything else (already-pinned codename, snapshot date, custom path)
+  # is left alone so we never silently clobber the user's intent.
+  url_suffix <- sub("^.*/cran/?", "", user_url_norm)
+  rewrite_url <- url_suffix == "" || url_suffix == "latest"
+  if (rewrite_url) {
+    rewritten_url <- sprintf(
+      "%s/cran/__linux__/$VERSION_CODENAME/latest",
+      user_host_prefix
+    )
+    patched <- sub(
+      "repos = c\\(CRAN = '[^']*'\\)",
+      sprintf("repos = c(CRAN = '%s')", rewritten_url),
+      patched
+    )
+    override_url <- rewritten_url
+  } else {
+    override_url <- user_url
+  }
+
+  # Force renv::restore() to use the configured PPM URL instead of the repos
+  # recorded in the lockfile (cf. ?renv::config -- option declared as
+  # "primarily useful for deployment / continuous integration"). Without
+  # this, the URL rewrite above is bypassed during restore().
+  if (!grepl("renv\\.config\\.repos\\.override", patched)) {
+    repos_override <- sprintf(
+      ", renv.config.repos.override = c(CRAN = '%s')",
+      override_url
+    )
+    patched <- sub(
+      "(renv\\.config\\.pak\\.enabled = (TRUE|FALSE))",
+      paste0("\\1", repos_override),
+      patched
+    )
+  }
+
+  # The quadruple backslashes produce a literal `\$` in the Dockerfile RUN,
+  # so the shell does not expand $platform / $arch / $os and R sees them as
+  # R.Version()$platform when sourcing Rprofile.site.
+  user_agent <- paste0(
+    ", HTTPUserAgent = sprintf('R (%s %s %s %s)',",
+    " getRversion(),",
+    " R.Version()\\\\$platform, R.Version()\\\\$arch, R.Version()\\\\$os)"
+  )
+  if (!grepl("HTTPUserAgent", patched)) {
+    patched <- sub(
+      "(, Ncpus = [0-9]+)\\)",
+      paste0("\\1", user_agent, ")"),
+      patched
+    )
+  }
+
+  # Only prefix `. /etc/os-release && ` when the line actually references
+  # $VERSION_CODENAME -- otherwise the prefix is dead weight.
+  if (grepl("\\$VERSION_CODENAME", patched) &&
+      !grepl("/etc/os-release", patched)) {
+    patched <- sub("^RUN ", "RUN . /etc/os-release && ", patched)
+  }
+
+  dock$Dockerfile[rps_idx] <- patched
+  invisible(NULL)
 }
 

@@ -198,5 +198,158 @@ socle_install_version <- "remotes::install_version\\(\"renv\", version = \""
 
 })
 
+test_that("dock_from_renv injects PPM HTTPUserAgent, codename and renv override when repos is PPM", {
+  skip_if(is_rdevel, "skip on R-devel")
+  out <- dock_from_renv(
+    lockfile = the_lockfile,
+    FROM = "rocker/verse",
+    repos = c(CRAN = "https://packagemanager.posit.co/cran/latest"),
+    renv_version = "0.0.0"
+  )
+  df <- paste(out$Dockerfile, collapse = "\n")
+  expect_match(df, "__linux__/\\$VERSION_CODENAME/")
+  expect_match(df, "HTTPUserAgent = sprintf\\('R \\(")
+  expect_match(df, "\\. /etc/os-release && ")
+  expect_match(df, "renv\\.config\\.repos\\.override = c\\(CRAN = '")
+  # Lock the UA escape level: the Dockerfile must contain literal
+  # `R.Version()\$platform` so bash's `echo "..."` emits a `$` (which R
+  # then evaluates correctly in Rprofile.site).
+  expect_match(df, "R.Version()\\$platform", fixed = TRUE)
+  expect_match(df, "R.Version()\\$arch", fixed = TRUE)
+  expect_match(df, "R.Version()\\$os", fixed = TRUE)
+})
+
+test_that("dock_from_renv leaves non-PPM repos untouched", {
+  skip_if(is_rdevel, "skip on R-devel")
+  out <- dock_from_renv(
+    lockfile = the_lockfile,
+    FROM = "rocker/verse",
+    repos = c(CRAN = "https://cran.rstudio.com/"),
+    renv_version = "0.0.0"
+  )
+  df <- paste(out$Dockerfile, collapse = "\n")
+  expect_false(any(grepl("__linux__", out$Dockerfile)))
+  expect_false(any(grepl("HTTPUserAgent", out$Dockerfile)))
+  expect_false(any(grepl("/etc/os-release", out$Dockerfile)))
+  expect_false(any(grepl("renv\\.config\\.repos\\.override", out$Dockerfile)))
+})
+
+test_that("dock_from_renv preserves user-pinned PPM codename", {
+  skip_if(is_rdevel, "skip on R-devel")
+  out <- dock_from_renv(
+    lockfile = the_lockfile,
+    FROM = "rocker/verse",
+    repos = c(CRAN = "https://packagemanager.posit.co/cran/__linux__/jammy/latest"),
+    renv_version = "0.0.0"
+  )
+  df <- paste(out$Dockerfile, collapse = "\n")
+  expect_match(df, "__linux__/jammy/", fixed = TRUE)
+  expect_false(any(grepl("\\$VERSION_CODENAME", out$Dockerfile)))
+  expect_match(df, "HTTPUserAgent = sprintf")
+  # The override must reference the user-pinned URL, not the codename URL.
+  expect_match(
+    df,
+    "renv.config.repos.override = c(CRAN = 'https://packagemanager.posit.co/cran/__linux__/jammy/latest')",
+    fixed = TRUE
+  )
+})
+
+test_that("dock_from_renv preserves a PPM snapshot-date URL", {
+  skip_if(is_rdevel, "skip on R-devel")
+  snapshot_url <- "https://packagemanager.posit.co/cran/2024-01-15"
+  out <- dock_from_renv(
+    lockfile = the_lockfile,
+    FROM = "rocker/verse",
+    repos = c(CRAN = snapshot_url),
+    renv_version = "0.0.0"
+  )
+  df <- paste(out$Dockerfile, collapse = "\n")
+  # The snapshot date must survive (no clobbering to /latest).
+  expect_match(df, "cran/2024-01-15", fixed = TRUE)
+  expect_false(any(grepl("\\$VERSION_CODENAME", out$Dockerfile)))
+  expect_false(any(grepl("/etc/os-release", out$Dockerfile)))
+  # The override must reference the user URL, not the codename URL.
+  expect_match(
+    df,
+    sprintf(
+      "renv.config.repos.override = c(CRAN = '%s')",
+      snapshot_url
+    ),
+    fixed = TRUE
+  )
+  # User-Agent is still useful with PPM regardless of URL form.
+  expect_match(df, "HTTPUserAgent = sprintf")
+})
+
+test_that("dock_from_renv leaves multi-entry repos vectors untouched", {
+  skip_if(is_rdevel, "skip on R-devel")
+  # The PPM patch is intentionally limited to a single CRAN-keyed PPM URL;
+  # multi-entry vectors fall through unmodified (back-compat / no surprises).
+  out <- dock_from_renv(
+    lockfile = the_lockfile,
+    FROM = "rocker/verse",
+    repos = c(
+      RSPM = "https://packagemanager.posit.co/cran/latest",
+      CRAN = "https://cran.rstudio.com/"
+    ),
+    renv_version = "0.0.0"
+  )
+  expect_false(any(grepl("__linux__", out$Dockerfile)))
+  expect_false(any(grepl("HTTPUserAgent", out$Dockerfile)))
+  expect_false(any(grepl("/etc/os-release", out$Dockerfile)))
+  expect_false(any(grepl("renv\\.config\\.repos\\.override", out$Dockerfile)))
+})
+
+test_that(".patch_rprofile_for_ppm is idempotent", {
+  skip_if(is_rdevel, "skip on R-devel")
+  out <- dock_from_renv(
+    lockfile = the_lockfile,
+    FROM = "rocker/verse",
+    repos = c(CRAN = "https://packagemanager.posit.co/cran/latest"),
+    renv_version = "0.0.0"
+  )
+  before <- out$Dockerfile
+  # Re-applying the helper must be a no-op: each mutation is gated by
+  # the absence of its target token.
+  dockerfiler:::.patch_rprofile_for_ppm(
+    out,
+    repos = c(CRAN = "https://packagemanager.posit.co/cran/latest")
+  )
+  expect_identical(out$Dockerfile, before)
+})
+
+test_that("dock_from_renv handles a trailing slash on cran/latest/", {
+  skip_if(is_rdevel, "skip on R-devel")
+  out <- dock_from_renv(
+    lockfile = the_lockfile,
+    FROM = "rocker/verse",
+    repos = c(CRAN = "https://packagemanager.posit.co/cran/latest/"),
+    renv_version = "0.0.0"
+  )
+  df <- paste(out$Dockerfile, collapse = "\n")
+  # Trailing slash must not block the codename rewrite.
+  expect_match(df, "__linux__/\\$VERSION_CODENAME/")
+  expect_match(df, "HTTPUserAgent = sprintf")
+})
+
+test_that("dock_from_renv preserves the user's PPM host on rewrite", {
+  skip_if(is_rdevel, "skip on R-devel")
+  # rstudio.com (the legacy alias) must not be silently rewritten to
+  # posit.co; the user's scheme + host is preserved.
+  out <- dock_from_renv(
+    lockfile = the_lockfile,
+    FROM = "rocker/verse",
+    repos = c(CRAN = "https://packagemanager.rstudio.com/cran/latest"),
+    renv_version = "0.0.0"
+  )
+  df <- paste(out$Dockerfile, collapse = "\n")
+  expect_match(
+    df,
+    "packagemanager.rstudio.com/cran/__linux__/$VERSION_CODENAME/latest",
+    fixed = TRUE
+  )
+  expect_false(grepl("packagemanager.posit.co", df, fixed = TRUE))
+})
+
 unlink(dir_build, recursive = TRUE)
 

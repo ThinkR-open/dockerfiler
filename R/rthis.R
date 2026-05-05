@@ -10,6 +10,6 @@
 #' r(install.packages("plumber", repo = "http://cran.irsn.fr/"))
 r <- function(code) {
   code <- paste(deparse(substitute(code)), collapse = " ")
-  code <- gsub(" [2,]", " ", code)
+  code <- gsub("[ ]{2,}", " ", code)
   glue("R -e '{code}'")
 }

@@ -47,8 +47,9 @@ reference any PAT), \code{"build_arg"} (emit \verb{ARG GITHUB_PAT} + \code{ENV}
 propagation; pass with \verb{--build-arg GITHUB_PAT=$GITHUB_PAT}; the
 PAT will be visible in the image metadata), or \code{"secret"}
 (BuildKit secret mount on each \code{install_github()} / \code{install_local()}
-RUN; the PAT is never persisted in the image; pass with
-\verb{docker build --secret id=github_pat,env=GITHUB_PAT ...}).}
+RUN; the PAT is never persisted in the image; requires BuildKit, so
+pass with
+\verb{DOCKER_BUILDKIT=1 docker build --secret id=github_pat,env=GITHUB_PAT ...}).}
 }
 \value{
 Dockerfile

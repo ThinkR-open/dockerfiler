@@ -70,8 +70,8 @@ any PAT), \code{"build_arg"} (emit \verb{ARG GITHUB_PAT} + \code{ENV} propagatio
 pass with \verb{--build-arg GITHUB_PAT=$GITHUB_PAT}; the PAT will be
 visible in the image metadata), or \code{"secret"} (BuildKit secret
 mount on the \code{renv::restore()} RUN; the PAT is never persisted in
-the image; pass with
-\verb{docker build --secret id=github_pat,env=GITHUB_PAT ...}).}
+the image; requires BuildKit, so pass with
+\verb{DOCKER_BUILDKIT=1 docker build --secret id=github_pat,env=GITHUB_PAT ...}).}
 }
 \value{
 A R6 object of class \code{Dockerfile}.

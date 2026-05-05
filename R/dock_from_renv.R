@@ -39,8 +39,8 @@ pkg_sysreqs_mem <- memoise::memoise(
 #'   pass with `--build-arg GITHUB_PAT=$GITHUB_PAT`; the PAT will be
 #'   visible in the image metadata), or `"secret"` (BuildKit secret
 #'   mount on the `renv::restore()` RUN; the PAT is never persisted in
-#'   the image; pass with
-#'   `docker build --secret id=github_pat,env=GITHUB_PAT ...`).
+#'   the image; requires BuildKit, so pass with
+#'   `DOCKER_BUILDKIT=1 docker build --secret id=github_pat,env=GITHUB_PAT ...`).
 #' @importFrom utils getFromNamespace
 #' @return A R6 object of class `Dockerfile`.
 #' @details

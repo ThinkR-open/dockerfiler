@@ -60,8 +60,9 @@ quote_not_na <- function(x){
 #'   propagation; pass with `--build-arg GITHUB_PAT=$GITHUB_PAT`; the
 #'   PAT will be visible in the image metadata), or `"secret"`
 #'   (BuildKit secret mount on each `install_github()` / `install_local()`
-#'   RUN; the PAT is never persisted in the image; pass with
-#'   `docker build --secret id=github_pat,env=GITHUB_PAT ...`).
+#'   RUN; the PAT is never persisted in the image; requires BuildKit, so
+#'   pass with
+#'   `DOCKER_BUILDKIT=1 docker build --secret id=github_pat,env=GITHUB_PAT ...`).
 #'
 #' @export
 #' @rdname dockerfiles

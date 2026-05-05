@@ -1,6 +1,5 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-
 <!-- badges: start -->
 
 [![R-CMD-check](https://github.com/ThinkR-open/dockerfiler/workflows/R-CMD-check/badge.svg)](https://github.com/ThinkR-open/dockerfiler/actions)
@@ -19,7 +18,7 @@ You’re reading the doc about version :
 
 ``` r
 desc::desc_get_version()
-#> [1] '0.2.5'
+#> [1] '0.2.6'
 ```
 
 ## Installation

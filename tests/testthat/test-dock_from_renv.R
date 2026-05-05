@@ -94,6 +94,10 @@ test_that("dock_from_renv works with full dependencies", {
   # skip_if_not(interactive())
   # Create Dockerfile
 skip_if(is_rdevel, "skip on R-devel")
+  # pak::pkg_sysreqs(sysreqs_platform = "ubuntu") returns no
+  # system_packages on macOS hosts, so the python3 sysreq line is
+  # never emitted and the assertion below cannot pass.
+  skip_on_os("mac")
   out <- dock_from_renv(
     dependencies = TRUE,
     lockfile = the_lockfile,

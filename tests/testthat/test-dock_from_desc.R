@@ -39,6 +39,11 @@ withr::with_dir(
     test_that("dock_from_desc works", {
 
       skip_if(is_rdevel, "skip on R-devel")
+      # pak::pkg_sysreqs(sysreqs_platform = "ubuntu") returns no
+      # system_packages on macOS hosts, so the apt-get install line is
+      # never emitted and the assertion below cannot pass. Tests
+      # exercising the same path are skipped together.
+      skip_on_os("mac")
 
       my_dock <- dock_from_desc(file.path(".", "DESCRIPTION__"))
 

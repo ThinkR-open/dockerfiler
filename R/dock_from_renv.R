@@ -32,6 +32,15 @@ pkg_sysreqs_mem <- memoise::memoise(
 #'   - `FALSE`: do not install any dependencies. (You might end up with a
 #'     non-working package, and/or the installation might fail.)
 #' @param sysreqs_platform System requirements platform.`ubuntu` by default. If `NULL`, then the  current platform is used. Can be : "ubuntu-22.04" if needed to fit with the `FROM` Operating System. Only debian or ubuntu based images are supported
+#' @param github_pat character. How to provide a GitHub PAT to
+#'   `renv::restore()` for private dependency repositories. One of
+#'   `"none"` (default; the generated Dockerfile does not reference
+#'   any PAT), `"build_arg"` (emit `ARG GITHUB_PAT` + `ENV` propagation;
+#'   pass with `--build-arg GITHUB_PAT=$GITHUB_PAT`; the PAT will be
+#'   visible in the image metadata), or `"secret"` (BuildKit secret
+#'   mount on the `renv::restore()` RUN; the PAT is never persisted in
+#'   the image; requires BuildKit, so pass with
+#'   `DOCKER_BUILDKIT=1 docker build --secret id=github_pat,env=GITHUB_PAT ...`).
 #' @importFrom utils getFromNamespace
 #' @return A R6 object of class `Dockerfile`.
 #' @details
@@ -69,8 +78,10 @@ dock_from_renv <- function(
   user = NULL,
   dependencies = NA,
   sysreqs_platform = "ubuntu",
-  renv_version
+  renv_version,
+  github_pat = c("none", "build_arg", "secret")
 ) {
+  github_pat <- match.arg(github_pat)
   try(dockerfiler::renv$initialize(),silent=TRUE)
   lock <- dockerfiler::renv$lockfile_read(file = lockfile) # using vendored renv
   # https://rstudio.github.io/renv/reference/vendor.html?q=vendor#null
@@ -84,6 +95,7 @@ dock_from_renv <- function(
     ),
     AS = AS
   )
+  .github_pat_setup(dock, github_pat)
   if (!is.null(user)) {
     dock$USER(user)
   }
@@ -243,7 +255,14 @@ dock_from_renv <- function(
   }
 
   dock$COPY(basename(lockfile), "renv.lock")
-  dock$RUN("--mount=type=cache,id=renv-cache,target=/root/.cache/R/renv R -e 'renv::restore()'")
+  dock$RUN(
+    paste0(
+      "--mount=type=cache,id=renv-cache,target=/root/.cache/R/renv ",
+      .github_pat_run_prefix(github_pat),
+      "R -e 'renv::restore()'"
+    )
+  )
+  .github_pat_announce(github_pat)
   dock
 }
 

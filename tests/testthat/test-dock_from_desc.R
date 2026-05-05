@@ -114,6 +114,48 @@ withr::with_dir(
 
 
     })
+
+    test_that("dock_from_desc emits no GITHUB_PAT plumbing by default", {
+      skip_if(is_rdevel, "skip on R-devel")
+      my_dock <- dock_from_desc(file.path(".", "DESCRIPTION__"))
+      df <- paste(my_dock$Dockerfile, collapse = "\n")
+      expect_false(grepl("GITHUB_PAT", df))
+      expect_false(grepl("--mount=type=secret", df, fixed = TRUE))
+    })
+
+    test_that("dock_from_desc emits ARG/ENV GITHUB_PAT when github_pat = 'build_arg'", {
+      skip_if(is_rdevel, "skip on R-devel")
+      my_dock <- dock_from_desc(
+        file.path(".", "DESCRIPTION__"),
+        github_pat = "build_arg"
+      )
+      df <- paste(my_dock$Dockerfile, collapse = "\n")
+      expect_match(df, "ARG GITHUB_PAT", fixed = TRUE)
+      expect_match(df, 'ENV "GITHUB_PAT"="${GITHUB_PAT}"', fixed = TRUE)
+      # No secret mount fragment in build_arg mode.
+      expect_false(grepl("--mount=type=secret", df, fixed = TRUE))
+    })
+
+    test_that("dock_from_desc emits secret mounts when github_pat = 'secret'", {
+      skip_if(is_rdevel, "skip on R-devel")
+      my_dock <- dock_from_desc(
+        file.path(".", "DESCRIPTION__"),
+        github_pat = "secret"
+      )
+      df <- paste(my_dock$Dockerfile, collapse = "\n")
+      # No top-level ARG / ENV in secret mode.
+      expect_false(grepl("ARG GITHUB_PAT", df, fixed = TRUE))
+      expect_false(grepl('ENV "GITHUB_PAT"', df, fixed = TRUE))
+      # The install_local RUN must carry the secret-mount fragment plus
+      # a `cat /run/secrets/...` shell prefix that exposes the PAT as
+      # an env var to the inner R command (compatible with all BuildKit
+      # versions, unlike the `env=GITHUB_PAT` shortcut on the mount).
+      expect_match(
+        df,
+        "--mount=type=secret,id=github_pat GITHUB_PAT=$(cat /run/secrets/github_pat)",
+        fixed = TRUE
+      )
+    })
   }
 )
 

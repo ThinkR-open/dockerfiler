@@ -3,6 +3,14 @@
 - `dock$ARG()` and the internal `add_arg()` helper gain a `default`
   parameter to emit `ARG <name>=<default>` instead of `ARG <name>`.
   Closes #8.
+- `dock_from_desc()` and `dock_from_renv()` gain a `github_pat`
+  parameter (default `"none"`) controlling how a GitHub PAT is provided
+  to `remotes::install_github()` / `remotes::install_local()` /
+  `renv::restore()` for private dependency repositories. Set to
+  `"build_arg"` to emit `ARG GITHUB_PAT` + `ENV` propagation (passed
+  via `--build-arg GITHUB_PAT=$GITHUB_PAT`), or `"secret"` to use
+  BuildKit secret mounts (the PAT is never persisted in image
+  metadata; recommended for published images). Closes #18.
 
 
 # dockerfiler 0.2.6

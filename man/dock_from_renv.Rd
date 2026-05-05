@@ -60,9 +60,9 @@ non-working package, and/or the installation might fail.)
 
 \item{renv_version}{character. The renv version to use in the generated Dockerfile. By default, it is set to the version specified in the \code{renv.lock} file.
 If the \code{renv.lock} file does not specify a renv version,
-the version of renv bundled with dockerfiler,
-specifically 1.0.3, will be used.
-If you set it to \code{NULL}, the latest available version of renv will be used.}
+the latest available version of renv will be installed.
+Set it to \code{NULL} to force installing the latest renv even when the
+lockfile pins a specific version.}
 
 \item{github_pat}{character. How to provide a GitHub PAT to
 \code{renv::restore()} for private dependency repositories. One of

@@ -19,9 +19,9 @@ pkg_sysreqs_mem <- memoise::memoise(
 #'    Will be installed with apt-get install.
 #' @param renv_version character. The renv version to use in the generated Dockerfile. By default, it is set to the version specified in the `renv.lock` file.
 #'   If the `renv.lock` file does not specify a renv version,
-#'   the version of renv bundled with dockerfiler,
-#'   specifically `r dockerfiler::renv$initialize();toString(dockerfiler::renv$the$metadata$version)`, will be used.
-#'   If you set it to `NULL`, the latest available version of renv will be used.
+#'   the latest available version of renv will be installed.
+#'   Set it to `NULL` to force installing the latest renv even when the
+#'   lockfile pins a specific version.
 #' @param use_pak boolean. If `TRUE` use pak to deal with dependencies  during `renv::restore()`. FALSE by default
 #' @param user Name of the user to specify in the Dockerfile with the USER instruction. Default is `NULL`, in which case the user from the FROM image is used.
 #' @param dependencies What kinds of dependencies to install. Most commonly
@@ -88,9 +88,12 @@ dock_from_renv <- function(
   renv_paths_cache = "/root/.cache/R/renv"
 ) {
   github_pat <- match.arg(github_pat)
-  try(dockerfiler::renv$initialize(),silent=TRUE)
-  lock <- dockerfiler::renv$lockfile_read(file = lockfile) # using vendored renv
-  # https://rstudio.github.io/renv/reference/vendor.html?q=vendor#null
+  lock <- jsonlite::read_json(
+    lockfile,
+    simplifyVector = TRUE,
+    simplifyDataFrame = FALSE,
+    simplifyMatrix = FALSE
+  )
 
   # start the dockerfile
   R_major_minor <- lock$R$Version
@@ -110,15 +113,11 @@ dock_from_renv <- function(
   # get renv version
 
   if (missing(renv_version)) {
-    if (!is.null(lock$Packages$renv$Version)) {
-      renv_version <- lock$Packages$renv$Version
-    } else {
-      renv_version <-  dockerfiler::renv$the$metadata$version
-    }
+    renv_version <- lock$Packages$renv$Version
   }
 
   message("renv version = ",
-          ifelse(!is.null(renv_version),renv_version,"the must up to date in the repos")
+          ifelse(!is.null(renv_version), renv_version, "the most up to date version in the repos")
           )
 
 

@@ -1,28 +1,18 @@
-# dockerfiler (development version)
+# dockerfiler 0.3.0
 
-- fix: `r()` no longer silently rewrites user code. The previous
-  implementation called `gsub(" [2,]", " ", code)` (a typo for
-  `{2,}`) which deleted any digit `2` or comma preceded by a space:
-  `r(c(1, 2, 3))` returned `R -e 'c(1, , 3)'`. The replacement
-  approach (`gsub("[ ]{2,}", " ", code)`) still collapsed runs of
-  spaces inside string literals (`r(cat("a  b"))` would emit
-  `R -e 'cat("a b")'`). The fix uses `trimws()` on each `deparse()`
-  line then `paste(collapse = " ")`: only the line-wrap indentation
-  added by `deparse()` is removed, internal whitespace is preserved.
-  Closes #95.
-- fix: `r()` now wraps the deparsed R expression with
-  `shQuote(., type = "sh")` instead of inlining it inside a hand-rolled
-  single-quoted shell string. Apostrophes inside string literals no
-  longer break the emitted command: `r(message("don't"))` used to emit
-  `R -e 'message("don't")'`, which the shell refuses to parse
-  (unterminated quoted string). The new wrapping is shell-safe by
-  construction.
-- fix: `dock_from_desc(build_from_source = FALSE)` no longer carries
-  a dead-code branch (`if (missing(out))`) on the locally-assigned
-  result of `pkgbuild::build()`. `missing()` only reports unsupplied
-  function arguments, so the branch was unreachable; the success path
-  always ran when `build()` returned. The branch is removed; failures
-  of `pkgbuild::build()` propagate normally via `stop()`. Closes #98.
+## Breaking changes
+
+- The vendored copy of `{renv}` (~30,000 lines under `inst/vendor/`)
+  is removed. Lockfiles are now parsed with `jsonlite::read_json()`
+  (already in Imports). The exported `dockerfiler::renv` symbol is
+  removed: it was a public-API surface only because the vendor pattern
+  required it. The fallback `renv_version` value, when both the user
+  argument is missing and the lockfile does not pin renv, is now
+  `NULL` (install the latest renv from the configured repos), aligned
+  with the existing `renv_version = NULL` behaviour. Closes #94.
+
+## New features
+
 - `dock$ARG()` and the internal `add_arg()` helper gain a `default`
   parameter to emit `ARG <name>=<default>` instead of `ARG <name>`.
   Closes #8.
@@ -40,6 +30,32 @@
   cache location at image build time with
   `--build-arg RENV_PATHS_CACHE=...` without regenerating the
   Dockerfile.
+
+## Bug fixes
+
+- `r()` no longer silently rewrites user code. The previous
+  implementation called `gsub(" [2,]", " ", code)` (a typo for
+  `{2,}`) which deleted any digit `2` or comma preceded by a space:
+  `r(c(1, 2, 3))` returned `R -e 'c(1, , 3)'`. The replacement
+  approach (`gsub("[ ]{2,}", " ", code)`) still collapsed runs of
+  spaces inside string literals (`r(cat("a  b"))` would emit
+  `R -e 'cat("a b")'`). The fix uses `trimws()` on each `deparse()`
+  line then `paste(collapse = " ")`: only the line-wrap indentation
+  added by `deparse()` is removed, internal whitespace is preserved.
+  Closes #95.
+- `r()` now wraps the deparsed R expression with
+  `shQuote(., type = "sh")` instead of inlining it inside a hand-rolled
+  single-quoted shell string. Apostrophes inside string literals no
+  longer break the emitted command: `r(message("don't"))` used to emit
+  `R -e 'message("don't")'`, which the shell refuses to parse
+  (unterminated quoted string). The new wrapping is shell-safe by
+  construction.
+- `dock_from_desc(build_from_source = FALSE)` no longer carries
+  a dead-code branch (`if (missing(out))`) on the locally-assigned
+  result of `pkgbuild::build()`. `missing()` only reports unsupplied
+  function arguments, so the branch was unreachable; the success path
+  always ran when `build()` returned. The branch is removed; failures
+  of `pkgbuild::build()` propagate normally via `stop()`. Closes #98.
 
 
 # dockerfiler 0.2.6

@@ -211,6 +211,12 @@ test_that("dock_from_renv injects PPM HTTPUserAgent, codename and renv override 
   expect_match(df, "HTTPUserAgent = sprintf\\('R \\(")
   expect_match(df, "\\. /etc/os-release && ")
   expect_match(df, "renv\\.config\\.repos\\.override = c\\(CRAN = '")
+  # Lock the UA escape level: the Dockerfile must contain literal
+  # `R.Version()\$platform` so bash's `echo "..."` emits a `$` (which R
+  # then evaluates correctly in Rprofile.site).
+  expect_match(df, "R.Version()\\$platform", fixed = TRUE)
+  expect_match(df, "R.Version()\\$arch", fixed = TRUE)
+  expect_match(df, "R.Version()\\$os", fixed = TRUE)
 })
 
 test_that("dock_from_renv leaves non-PPM repos untouched", {
@@ -310,6 +316,39 @@ test_that(".patch_rprofile_for_ppm is idempotent", {
     repos = c(CRAN = "https://packagemanager.posit.co/cran/latest")
   )
   expect_identical(out$Dockerfile, before)
+})
+
+test_that("dock_from_renv handles a trailing slash on cran/latest/", {
+  skip_if(is_rdevel, "skip on R-devel")
+  out <- dock_from_renv(
+    lockfile = the_lockfile,
+    FROM = "rocker/verse",
+    repos = c(CRAN = "https://packagemanager.posit.co/cran/latest/"),
+    renv_version = "0.0.0"
+  )
+  df <- paste(out$Dockerfile, collapse = "\n")
+  # Trailing slash must not block the codename rewrite.
+  expect_match(df, "__linux__/\\$VERSION_CODENAME/")
+  expect_match(df, "HTTPUserAgent = sprintf")
+})
+
+test_that("dock_from_renv preserves the user's PPM host on rewrite", {
+  skip_if(is_rdevel, "skip on R-devel")
+  # rstudio.com (the legacy alias) must not be silently rewritten to
+  # posit.co; the user's scheme + host is preserved.
+  out <- dock_from_renv(
+    lockfile = the_lockfile,
+    FROM = "rocker/verse",
+    repos = c(CRAN = "https://packagemanager.rstudio.com/cran/latest"),
+    renv_version = "0.0.0"
+  )
+  df <- paste(out$Dockerfile, collapse = "\n")
+  expect_match(
+    df,
+    "packagemanager.rstudio.com/cran/__linux__/$VERSION_CODENAME/latest",
+    fixed = TRUE
+  )
+  expect_false(grepl("packagemanager.posit.co", df, fixed = TRUE))
 })
 
 unlink(dir_build, recursive = TRUE)

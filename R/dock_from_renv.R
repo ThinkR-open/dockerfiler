@@ -282,20 +282,29 @@ dock_from_renv <- function(
   if (length(rps_idx) != 1L) return(invisible(NULL))
 
   patched <- dock$Dockerfile[rps_idx]
-  ppm_codename_url <- "https://packagemanager.posit.co/cran/__linux__/$VERSION_CODENAME/latest"
+
+  # Strip a single trailing slash so `cran/latest/` matches `cran/latest`.
+  user_url_norm <- sub("/$", "", user_url)
+  # Preserve the user's scheme + host (so a `packagemanager.rstudio.com`
+  # URL or an internal mirror is not silently rewritten to posit.co).
+  user_host_prefix <- sub("/cran(/.*)?$", "", user_url_norm)
 
   # Only rewrite when the URL is the bare `cran` or `cran/latest` form.
   # Anything else (already-pinned codename, snapshot date, custom path)
   # is left alone so we never silently clobber the user's intent.
-  url_suffix <- sub("^.*/cran/?", "", user_url)
+  url_suffix <- sub("^.*/cran/?", "", user_url_norm)
   rewrite_url <- url_suffix == "" || url_suffix == "latest"
   if (rewrite_url) {
+    rewritten_url <- sprintf(
+      "%s/cran/__linux__/$VERSION_CODENAME/latest",
+      user_host_prefix
+    )
     patched <- sub(
       "repos = c\\(CRAN = '[^']*'\\)",
-      sprintf("repos = c(CRAN = '%s')", ppm_codename_url),
+      sprintf("repos = c(CRAN = '%s')", rewritten_url),
       patched
     )
-    override_url <- ppm_codename_url
+    override_url <- rewritten_url
   } else {
     override_url <- user_url
   }

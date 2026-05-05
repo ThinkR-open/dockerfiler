@@ -1,4 +1,4 @@
-# dockerfiler (development version)
+# dockerfiler 0.2.6
 
 - `dock_from_renv()` now auto-configures the generated Dockerfile to fetch
   Linux binaries from Posit Package Manager when `repos` is a single
@@ -10,8 +10,10 @@
   instead of the lockfile's repo URL; and the RUN is prefixed with
   `. /etc/os-release && ` when the line uses `$VERSION_CODENAME`.
   User-pinned codenames and snapshot-date URLs (e.g. `cran/2024-01-15`)
-  are preserved as-is. Multi-entry `repos` vectors and non-PPM repos are
-  left untouched.
+  are preserved as-is. The user's PPM scheme and host (including
+  `packagemanager.rstudio.com` and internal mirrors) are preserved on
+  rewrite. Multi-entry `repos` vectors and non-PPM repos are left
+  untouched.
 
 
 # dockerfiler 0.2.5

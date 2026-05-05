@@ -61,6 +61,11 @@
     </div>
 
     <div class="section level2">
+<h2 class="page-header" data-toc-text="development version" id="dockerfiler-development-version">dockerfiler (development version)<a class="anchor" aria-label="anchor" href="#dockerfiler-development-version"></a></h2>
+<ul><li>
+<code>dock$ARG()</code> and the internal <code>add_arg()</code> helper gain a <code>default</code> parameter to emit <code>ARG &lt;name&gt;=&lt;default&gt;</code> instead of <code>ARG &lt;name&gt;</code>. Closes <a href="https://github.com/ThinkR-open/dockerfiler/issues/8" class="external-link">#8</a>.</li>
+</ul></div>
+    <div class="section level2">
 <h2 class="page-header" data-toc-text="0.2.6" id="dockerfiler-026">dockerfiler 0.2.6<a class="anchor" aria-label="anchor" href="#dockerfiler-026"></a></h2>
 <ul><li>
 <code><a href="../reference/dock_from_renv.html">dock_from_renv()</a></code> now auto-configures the generated Dockerfile to fetch Linux binaries from Posit Package Manager when <code>repos</code> is a single CRAN-keyed PPM URL. Four things happen: the PPM URL is rewritten to include <code>__linux__/$VERSION_CODENAME/</code> (resolved at image build time from <code>/etc/os-release</code>) when it was <code>cran</code> or <code>cran/latest</code>; <code>HTTPUserAgent</code> is set to the strict format PPM requires; <code>renv.config.repos.override</code> is set so that <code>renv::restore()</code> uses PPM instead of the lockfile’s repo URL; and the RUN is prefixed with <code>. /etc/os-release &amp;&amp;</code> when the line uses <code>$VERSION_CODENAME</code>. User-pinned codenames and snapshot-date URLs (e.g. <code>cran/2024-01-15</code>) are preserved as-is. The user’s PPM scheme and host (including <code>packagemanager.rstudio.com</code> and internal mirrors) are preserved on rewrite. Multi-entry <code>repos</code> vectors and non-PPM repos are left untouched.</li>

@@ -23,6 +23,14 @@
   function arguments, so the branch was unreachable; the success path
   always ran when `build()` returned. The branch is removed; failures
   of `pkgbuild::build()` propagate normally via `stop()`. Closes #98.
+- The vendored copy of `{renv}` (~30,000 lines under `inst/vendor/`)
+  is removed. Lockfiles are now parsed with `jsonlite::read_json()`
+  (already in Imports). The exported `dockerfiler::renv` symbol is
+  removed: it was a public-API surface only because the vendor pattern
+  required it. The fallback `renv_version` value, when both the user
+  argument is missing and the lockfile does not pin renv, is now
+  `NULL` (install the latest renv from the configured repos), aligned
+  with the existing `renv_version = NULL` behaviour. Closes #94.
 - `dock$ARG()` and the internal `add_arg()` helper gain a `default`
   parameter to emit `ARG <name>=<default>` instead of `ARG <name>`.
   Closes #8.

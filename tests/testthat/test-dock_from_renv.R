@@ -16,14 +16,14 @@ custom_packages <- c(
   "testthat",
   "knitr"
 )
-try(dockerfiler::renv$initialize(),silent=TRUE)
-if ( !testthat:::on_cran()){
-dockerfiler::renv$snapshot(
-  packages = custom_packages,
-  lockfile = the_lockfile,
-  prompt = FALSE
-) } else {
-    file.copy(from = system.file("renv.lock",package = "dockerfiler"),to = the_lockfile)
+if (!testthat:::on_cran() && requireNamespace("renv", quietly = TRUE)) {
+  renv::snapshot(
+    packages = custom_packages,
+    lockfile = the_lockfile,
+    prompt = FALSE
+  )
+} else {
+  file.copy(from = system.file("renv.lock", package = "dockerfiler"), to = the_lockfile)
 }
 
 # Modify R version for tests
@@ -179,10 +179,9 @@ socle_install_version <- "remotes::install_version\\(\"renv\", version = \""
   } else if (lf == the_lockfile1.0.0 & renv_version == "banana") {
     test_string <- paste0(socle_install_version,"banana","\"\\)")
   } else if (lf == the_lockfile & renv_version == "missing") {
-    test_string <-
-      paste0(
-        socle_install_version,dockerfiler::renv$the$metadata$version,"\"\\)"
-      )
+    # When the lockfile does not pin renv, we install the latest from
+    # the configured repos (same behaviour as renv_version = NULL).
+    test_string <- 'install.packages\\(\"renv\"\\)'
   } else if (lf == the_lockfile1.0.0 & renv_version == "missing") {
     test_string <-paste0(socle_install_version,"1.0.0","\"\\)")
   }
@@ -190,11 +189,13 @@ socle_install_version <- "remotes::install_version\\(\"renv\", version = \""
   expect_true( any(   grepl(test_string , out$Dockerfile)    ),
                info = paste(lf," & ",renv_version))
 
-  if (is.null(renv_version)) {
+  installs_latest <- is.null(renv_version) ||
+    (identical(renv_version, "missing") && lf == the_lockfile)
+  if (installs_latest) {
     # When using the latest renv, `remotes` must not be installed at all.
     expect_false(
-      any(grepl("remotes", out$Dockerfile)),
-      info = paste(lf, " & NULL renv_version => no remotes")
+      any(grepl("install\\.packages\\([^)]*remotes", out$Dockerfile)),
+      info = paste(lf, " & ", renv_version, " => no remotes install")
     )
   }
 

@@ -98,7 +98,7 @@ that the proper package version and source is used when installed.
 }
 \examples{
 \dontrun{
-dock <- dock_from_renv("renv.lock", distro = "xenial")
+dock <- dock_from_renv("renv.lock")
 dock$write("Dockerfile")
 }
 }

@@ -67,7 +67,7 @@ pkg_sysreqs_mem <- memoise::memoise(
 #' @export
 #' @examples
 #' \dontrun{
-#' dock <- dock_from_renv("renv.lock", distro = "xenial")
+#' dock <- dock_from_renv("renv.lock")
 #' dock$write("Dockerfile")
 #' }
 dock_from_renv <- function(

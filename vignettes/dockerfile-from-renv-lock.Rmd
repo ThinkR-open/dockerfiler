@@ -38,7 +38,7 @@ library(dockerfiler)
   
 ```{r example-dock_from_renv}
 #' \dontrun{
-#' dock <- dock_from_renv("renv.lock", distro = "xenial")
+#' dock <- dock_from_renv("renv.lock")
 #' dock$write("Dockerfile")
 #' }
 ```

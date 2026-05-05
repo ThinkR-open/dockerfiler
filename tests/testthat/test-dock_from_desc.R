@@ -156,6 +156,26 @@ withr::with_dir(
         fixed = TRUE
       )
     })
+
+    test_that("dock_from_desc(build_from_source = FALSE) copies a prebuilt tar.gz", {
+      skip_if(is_rdevel, "skip on R-devel")
+      fake_tar <- "fakepkg_0.0.0.tar.gz"
+      file.create(fake_tar)
+      on.exit(unlink(fake_tar), add = TRUE)
+      my_dock <- testthat::with_mocked_bindings(
+        code = dock_from_desc(
+          file.path(".", "DESCRIPTION__"),
+          build_from_source = FALSE,
+          update_tar_gz = FALSE
+        ),
+        get_sysreqs = function(...) character(0)
+      )
+      df <- paste(my_dock$Dockerfile, collapse = "\n")
+      expect_match(df, "tar.gz", fixed = TRUE)
+      expect_match(df, "remotes::install_local", fixed = TRUE)
+      expect_match(df, "rm /app.tar.gz", fixed = TRUE)
+      expect_false(grepl("mkdir /build_zone", df, fixed = TRUE))
+    })
   }
 )
 

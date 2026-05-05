@@ -292,18 +292,14 @@ dock_from_desc <- function(
           dest_path = ".",
           vignettes = FALSE
         )
-        if (missing(out)) {
-          cat_red_bullet("Error during tar.gz building")
-        } else {
-          use_build_ignore(files = out)
-          cat_green_tick(
-            sprintf(
-              " %s_%s.tar.gz created.",
-              read.dcf(path)[1],
-              read.dcf(path)[1, ][["Version"]]
-            )
+        use_build_ignore(files = out)
+        cat_green_tick(
+          sprintf(
+            " %s_%s.tar.gz created.",
+            read.dcf(path)[1],
+            read.dcf(path)[1, ][["Version"]]
           )
-        }
+        )
       } else {
         stop("please install {pkgbuild}")
       }

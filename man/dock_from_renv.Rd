@@ -14,12 +14,12 @@ dock_from_renv(
   expand = FALSE,
   extra_sysreqs = NULL,
   use_pak = FALSE,
-  user = NULL,
+  user = "rstudio",
   dependencies = NA,
   sysreqs_platform = "ubuntu",
   renv_version,
   github_pat = c("none", "build_arg", "secret"),
-  renv_paths_cache = "/root/.cache/R/renv"
+  renv_paths_cache = NULL
 )
 }
 \arguments{
@@ -44,7 +44,37 @@ Will be installed with apt-get install.}
 
 \item{use_pak}{boolean. If \code{TRUE} use pak to deal with dependencies  during \code{renv::restore()}. FALSE by default}
 
-\item{user}{Name of the user to specify in the Dockerfile with the USER instruction. Default is \code{NULL}, in which case the user from the FROM image is used.}
+\item{user}{Name of the user the runtime container drops privilege
+to before the \code{renv::restore()} step (and therefore at runtime).
+Default is \code{"rstudio"} so the generated image runs as a non-root
+user out of the box, which is the recommended security posture.
+
+The Dockerfile is emitted in two halves: every step that needs
+root (apt-get, R install commands, \code{chown} of the renv cache)
+runs first; then a \verb{USER <user>} directive drops privilege; then
+the \code{renv::restore()} cache-mount RUN happens.
+
+To make this work regardless of the FROM image, the package
+emits a defensive \verb{RUN id -u <user> >/dev/null 2>&1 || useradd -m -d /home/<user> -s /bin/bash <user>} early. On
+rocker/* images the \code{useradd} is a no-op (the user already
+exists); on \code{r-base}, \verb{ubuntu:*}, \verb{debian:*} it creates the user
+with the standard home directory.
+
+Pass \code{user = NULL} to opt out: no \code{USER} directive is emitted
+and the container runs as root (the previous behaviour).
+Pass any other string to use that user instead of \code{rstudio}.
+Custom homes (e.g. \verb{/srv/myapp}) require also passing an
+explicit \code{renv_paths_cache}.
+
+debian/ubuntu images only (\code{useradd} is the standard form);
+for alpine-based images you must pass \code{user = NULL} and handle
+user creation yourself with the alpine-native \code{adduser}.
+
+The argument is validated at codegen time against
+\verb{^[a-zA-Z_][a-zA-Z0-9_-]\{0,31\}$} (POSIX-style username, max 32
+chars, no shell metacharacters). Other values raise an error
+to prevent metacharacter injection into the generated \code{RUN}
+commands.}
 
 \item{dependencies}{What kinds of dependencies to install. Most commonly
 one of the following values:
@@ -82,11 +112,25 @@ mount on the \code{renv::restore()} RUN; the PAT is never persisted in
 the image; requires BuildKit, so pass with
 \verb{DOCKER_BUILDKIT=1 docker build --secret id=github_pat,env=GITHUB_PAT ...}).}
 
-\item{renv_paths_cache}{character. Path used as the default of the
-\code{RENV_PATHS_CACHE} build-arg, propagated as an \code{ENV} variable, and
-used as the cache mount target for \code{renv::restore()}. Lets users
-override the renv cache location at image build time via
-\verb{--build-arg RENV_PATHS_CACHE=...}.}
+\item{renv_paths_cache}{character or \code{NULL}. Path used as the
+default of the \code{RENV_PATHS_CACHE} build-arg, propagated as an
+\code{ENV} variable, and used as the cache mount target for
+\code{renv::restore()}. Lets users override the renv cache location
+at image build time via \verb{--build-arg RENV_PATHS_CACHE=...}.
+
+When \code{NULL} (the default), the cache path is derived from
+\code{user}: \verb{/root/.cache/R/renv} when \code{user = NULL}, and
+\verb{/home/<user>/.cache/R/renv} when \code{user} is a non-root username.
+Pass an explicit string to override the convention (e.g. for
+custom-home users like \code{user = "myapp"} with home at
+\verb{/srv/myapp}, pass \code{renv_paths_cache = "/srv/myapp/.cache/R/renv"}).
+
+In all cases (\code{user = NULL} excepted), the generated Dockerfile
+emits a single \verb{RUN mkdir -p "$\{RENV_PATHS_CACHE\}" && chown -R <user>:<user> "$\{RENV_PATHS_CACHE\}"}
+step right before the \verb{USER <user>} directive so the cache mount
+target is writable from the un-privileged user. The cache path
+is double-quoted at shell expansion time so a build-arg
+override containing whitespace cannot break the command.}
 }
 \value{
 A R6 object of class \code{Dockerfile}.

@@ -10,6 +10,19 @@
   argument is missing and the lockfile does not pin renv, is now
   `NULL` (install the latest renv from the configured repos), aligned
   with the existing `renv_version = NULL` behaviour. Closes #94.
+- `dock_from_renv()` now defaults to running the runtime container as
+  the `rstudio` user (previously root). The generated Dockerfile gains
+  a defensive `RUN id -u rstudio || useradd -m -d /home/rstudio -s /bin/bash rstudio`
+  early so the user is created if the FROM image does not already
+  ship one (no-op on rocker/* images, real `useradd` on `r-base`,
+  `ubuntu:*`, `debian:*`). The renv cache is auto-derived to
+  `/home/<user>/.cache/R/renv` and chowned to `<user>` before the
+  `USER` directive drops privilege; the `USER` directive itself is
+  emitted right before the `renv::restore()` cache-mount RUN, so
+  every step that needs root (apt-get, R installs) still runs as
+  root. Pass `user = NULL` to opt out and keep the previous root
+  behaviour. debian/ubuntu only; for alpine-based images you must
+  pass `user = NULL` and create the user yourself. Closes #100.
 
 ## New features
 

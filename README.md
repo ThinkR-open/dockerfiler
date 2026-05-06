@@ -36,7 +36,7 @@ Or from CRAN with :
 install.packages("dockerfiler")
 ```
 
-## Basic worflow
+## Basic workflow
 
 By default, Dockerfiles are created with `FROM "rocker/r-base"`.
 
@@ -59,7 +59,7 @@ Wrap your raw R Code inside the `r()` function to turn it into a bash
 command with `R -e`.
 
 ``` r
-my_dock$RUN(r(install.packages("attempt", repo = "http://cran.irsn.fr/")))
+my_dock$RUN(r(install.packages("attempt", repos = "http://cran.irsn.fr/")))
 ```
 
 Classical Docker stuffs:
@@ -197,7 +197,6 @@ renv::snapshot(
 ``` r
 my_dock <- dock_from_renv(
   lockfile = the_lockfile,
-  distro = "focal",
   FROM = "rocker/verse"
 )
 my_dock

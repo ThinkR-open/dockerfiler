@@ -1,0 +1,45 @@
+url: https://thinkr-open.github.io/dockerfiler/
+
+template:
+  bootstrap: 5
+
+reference:
+- title: "Dockerfile builders"
+  desc: >
+    High-level entry points that produce a `Dockerfile` object,
+    either from a project descriptor (DESCRIPTION, renv.lock) or
+    by parsing an existing Dockerfile. Most users start here.
+  contents:
+  - dock_from_desc
+  - dock_from_renv
+  - parse_dockerfile
+
+- title: "Dockerfile R6 class"
+  desc: >
+    Low-level imperative API for building a `Dockerfile` directive
+    by directive. The high-level builders above are thin wrappers
+    over this class.
+  contents:
+  - Dockerfile
+
+- title: "R-to-shell helper"
+  desc: >
+    Wrap an R expression into the shell-safe `R -e '...'` invocation
+    used inside a `RUN` directive.
+  contents:
+  - r
+
+- title: "System requirements"
+  desc: >
+    Resolve and compact Debian/Ubuntu system dependencies for the
+    R packages your Dockerfile installs. Usually called internally
+    by the builders; exposed for advanced use.
+  contents:
+  - get_sysreqs
+  - compact_sysreqs
+
+- title: "Project setup"
+  desc: >
+    Helpers for the surrounding project (not the Dockerfile itself).
+  contents:
+  - docker_ignore_add

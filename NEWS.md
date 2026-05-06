@@ -37,10 +37,13 @@
   via `--build-arg GITHUB_PAT=$GITHUB_PAT`), or `"secret"` to use
   BuildKit secret mounts (the PAT is never persisted in image
   metadata; recommended for published images). Closes #18.
-- `dock_from_renv()` gains a `renv_paths_cache` parameter (default
-  `/root/.cache/R/renv`) used as the build-arg default, the propagated
-  `ENV` value and the cache mount target. Users can override the renv
-  cache location at image build time with
+- `dock_from_renv()` gains a `renv_paths_cache` parameter that
+  controls the `RENV_PATHS_CACHE` build-arg default, the propagated
+  `ENV` value, and the cache mount target. When `NULL` (the
+  default), the path is auto-derived from `user`:
+  `/root/.cache/R/renv` for `user = NULL`, and
+  `/home/<user>/.cache/R/renv` otherwise. Users can override the
+  renv cache location at image build time with
   `--build-arg RENV_PATHS_CACHE=...` without regenerating the
   Dockerfile.
 - `dock_from_desc()` gains a `strict_install` parameter (default

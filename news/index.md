@@ -53,11 +53,14 @@
   recommended for published images). Closes
   [\#18](https://github.com/ThinkR-open/dockerfiler/issues/18).
 - [`dock_from_renv()`](https://thinkr-open.github.io/dockerfiler/reference/dock_from_renv.md)
-  gains a `renv_paths_cache` parameter (default `/root/.cache/R/renv`)
-  used as the build-arg default, the propagated `ENV` value and the
-  cache mount target. Users can override the renv cache location at
-  image build time with `--build-arg RENV_PATHS_CACHE=...` without
-  regenerating the Dockerfile.
+  gains a `renv_paths_cache` parameter that controls the
+  `RENV_PATHS_CACHE` build-arg default, the propagated `ENV` value, and
+  the cache mount target. When `NULL` (the default), the path is
+  auto-derived from `user`: `/root/.cache/R/renv` for `user = NULL`, and
+  `/home/<user>/.cache/R/renv` otherwise. Users can override the renv
+  cache location at image build time with
+  `--build-arg RENV_PATHS_CACHE=...` without regenerating the
+  Dockerfile.
 - [`dock_from_desc()`](https://thinkr-open.github.io/dockerfiler/reference/dockerfiles.md)
   gains a `strict_install` parameter (default `TRUE`). When `TRUE`,
   every install RUN in the generated Dockerfile is prefixed with

@@ -15,7 +15,8 @@ dock_from_desc(
   update_tar_gz = TRUE,
   build_from_source = TRUE,
   extra_sysreqs = NULL,
-  github_pat = c("none", "build_arg", "secret")
+  github_pat = c("none", "build_arg", "secret"),
+  strict_install = TRUE
 )
 ```
 
@@ -75,6 +76,18 @@ dock_from_desc(
   `install_github()` / `install_local()` RUN; the PAT is never persisted
   in the image; requires BuildKit, so pass with
   `DOCKER_BUILDKIT=1 docker build --secret id=github_pat,env=GITHUB_PAT ...`).
+
+- strict_install:
+
+  boolean. When `TRUE` (the default), every install RUN in the generated
+  Dockerfile is prefixed with `options(warn = 2);` so that any R warning
+  during install (missing CRAN package, partial download, archived
+  package, 404 on a remote) becomes a hard error and aborts the docker
+  build. Set to `FALSE` if your build environment routinely emits benign
+  warnings (locale defaulting, NTP time-verification, ABI-version
+  notices) that you do not want to fail the build. Must be a single
+  scalar logical; `NA`, character, numeric, `NULL` and length-2+ vectors
+  are rejected with an error.
 
 ## Value
 

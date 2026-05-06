@@ -50,12 +50,12 @@
 <span>  expand <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  extra_sysreqs <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  use_pak <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  user <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  user <span class="op">=</span> <span class="st">"rstudio"</span>,</span>
 <span>  dependencies <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  sysreqs_platform <span class="op">=</span> <span class="st">"ubuntu"</span>,</span>
 <span>  <span class="va">renv_version</span>,</span>
 <span>  github_pat <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"none"</span>, <span class="st">"build_arg"</span>, <span class="st">"secret"</span><span class="op">)</span>,</span>
-<span>  renv_paths_cache <span class="op">=</span> <span class="st">"/root/.cache/R/renv"</span></span>
+<span>  renv_paths_cache <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -102,7 +102,32 @@ Will be installed with apt-get install.</p></dd>
 
 
 <dt id="arg-user">user<a class="anchor" aria-label="anchor" href="#arg-user"></a></dt>
-<dd><p>Name of the user to specify in the Dockerfile with the USER instruction. Default is <code>NULL</code>, in which case the user from the FROM image is used.</p></dd>
+<dd><p>Name of the user the runtime container drops privilege
+to before the <code><a href="https://rstudio.github.io/renv/reference/restore.html" class="external-link">renv::restore()</a></code> step (and therefore at runtime).
+Default is <code>"rstudio"</code> so the generated image runs as a non-root
+user out of the box, which is the recommended security posture.</p>
+<p>The Dockerfile is emitted in two halves: every step that needs
+root (apt-get, R install commands, <code>chown</code> of the renv cache)
+runs first; then a <code>USER &lt;user&gt;</code> directive drops privilege; then
+the <code><a href="https://rstudio.github.io/renv/reference/restore.html" class="external-link">renv::restore()</a></code> cache-mount RUN happens.</p>
+<p>To make this work regardless of the FROM image, the package
+emits a defensive <code>RUN id -u &lt;user&gt; &gt;/dev/null 2&gt;&amp;1 || useradd -m -d /home/&lt;user&gt; -s /bin/bash &lt;user&gt;</code> early. On
+rocker/* images the <code>useradd</code> is a no-op (the user already
+exists); on <code>r-base</code>, <code>ubuntu:*</code>, <code>debian:*</code> it creates the user
+with the standard home directory.</p>
+<p>Pass <code>user = NULL</code> to opt out: no <code>USER</code> directive is emitted
+and the container runs as root (the previous behaviour).
+Pass any other string to use that user instead of <code>rstudio</code>.
+Custom homes (e.g. <code>/srv/myapp</code>) require also passing an
+explicit <code>renv_paths_cache</code>.</p>
+<p>debian/ubuntu images only (<code>useradd</code> is the standard form);
+for alpine-based images you must pass <code>user = NULL</code> and handle
+user creation yourself with the alpine-native <code>adduser</code>.</p>
+<p>The argument is validated at codegen time against
+<code>^[a-zA-Z_][a-zA-Z0-9_-]{0,31}$</code> (POSIX-style username, max 32
+chars, no shell metacharacters). Other values raise an error
+to prevent metacharacter injection into the generated <code>RUN</code>
+commands.</p></dd>
 
 
 <dt id="arg-dependencies">dependencies<a class="anchor" aria-label="anchor" href="#arg-dependencies"></a></dt>
@@ -146,11 +171,23 @@ the image; requires BuildKit, so pass with
 
 
 <dt id="arg-renv-paths-cache">renv_paths_cache<a class="anchor" aria-label="anchor" href="#arg-renv-paths-cache"></a></dt>
-<dd><p>character. Path used as the default of the
-<code>RENV_PATHS_CACHE</code> build-arg, propagated as an <code>ENV</code> variable, and
-used as the cache mount target for <code><a href="https://rstudio.github.io/renv/reference/restore.html" class="external-link">renv::restore()</a></code>. Lets users
-override the renv cache location at image build time via
-<code>--build-arg RENV_PATHS_CACHE=...</code>.</p></dd>
+<dd><p>character or <code>NULL</code>. Path used as the
+default of the <code>RENV_PATHS_CACHE</code> build-arg, propagated as an
+<code>ENV</code> variable, and used as the cache mount target for
+<code><a href="https://rstudio.github.io/renv/reference/restore.html" class="external-link">renv::restore()</a></code>. Lets users override the renv cache location
+at image build time via <code>--build-arg RENV_PATHS_CACHE=...</code>.</p>
+<p>When <code>NULL</code> (the default), the cache path is derived from
+<code>user</code>: <code>/root/.cache/R/renv</code> when <code>user = NULL</code>, and
+<code>/home/&lt;user&gt;/.cache/R/renv</code> when <code>user</code> is a non-root username.
+Pass an explicit string to override the convention (e.g. for
+custom-home users like <code>user = "myapp"</code> with home at
+<code>/srv/myapp</code>, pass <code>renv_paths_cache = "/srv/myapp/.cache/R/renv"</code>).</p>
+<p>In all cases (<code>user = NULL</code> excepted), the generated Dockerfile
+emits a single <code>RUN mkdir -p "${RENV_PATHS_CACHE}" &amp;&amp; chown -R &lt;user&gt;:&lt;user&gt; "${RENV_PATHS_CACHE}"</code>
+step right before the <code>USER &lt;user&gt;</code> directive so the cache mount
+target is writable from the un-privileged user. The cache path
+is double-quoted at shell expansion time so a build-arg
+override containing whitespace cannot break the command.</p></dd>
 
 </dl></div>
     <div class="section level2">

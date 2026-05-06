@@ -50,7 +50,8 @@
 <span>  update_tar_gz <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  build_from_source <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  extra_sysreqs <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  github_pat <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"none"</span>, <span class="st">"build_arg"</span>, <span class="st">"secret"</span><span class="op">)</span></span>
+<span>  github_pat <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"none"</span>, <span class="st">"build_arg"</span>, <span class="st">"secret"</span><span class="op">)</span>,</span>
+<span>  strict_install <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -109,6 +110,19 @@ PAT will be visible in the image metadata), or <code>"secret"</code>
 RUN; the PAT is never persisted in the image; requires BuildKit, so
 pass with
 <code>DOCKER_BUILDKIT=1 docker build --secret id=github_pat,env=GITHUB_PAT ...</code>).</p></dd>
+
+
+<dt id="arg-strict-install">strict_install<a class="anchor" aria-label="anchor" href="#arg-strict-install"></a></dt>
+<dd><p>boolean. When <code>TRUE</code> (the default), every
+install RUN in the generated Dockerfile is prefixed with
+<code>options(warn = 2);</code> so that any R warning during install
+(missing CRAN package, partial download, archived package,
+404 on a remote) becomes a hard error and aborts the docker
+build. Set to <code>FALSE</code> if your build environment routinely emits
+benign warnings (locale defaulting, NTP time-verification,
+ABI-version notices) that you do not want to fail the build.
+Must be a single scalar logical; <code>NA</code>, character, numeric,
+<code>NULL</code> and length-2+ vectors are rejected with an error.</p></dd>
 
 </dl></div>
     <div class="section level2">

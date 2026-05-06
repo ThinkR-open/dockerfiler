@@ -14,6 +14,22 @@
   (install the latest renv from the configured repos), aligned with the
   existing `renv_version = NULL` behaviour. Closes
   [\#94](https://github.com/ThinkR-open/dockerfiler/issues/94).
+- [`dock_from_renv()`](https://thinkr-open.github.io/dockerfiler/reference/dock_from_renv.md)
+  now defaults to running the runtime container as the `rstudio` user
+  (previously root). The generated Dockerfile gains a defensive
+  `RUN id -u rstudio || useradd -m -d /home/rstudio -s /bin/bash rstudio`
+  early so the user is created if the FROM image does not already ship
+  one (no-op on rocker/\* images, real `useradd` on `r-base`,
+  `ubuntu:*`, `debian:*`). The renv cache is auto-derived to
+  `/home/<user>/.cache/R/renv` and chowned to `<user>` before the `USER`
+  directive drops privilege; the `USER` directive itself is emitted
+  right before the
+  [`renv::restore()`](https://rstudio.github.io/renv/reference/restore.html)
+  cache-mount RUN, so every step that needs root (apt-get, R installs)
+  still runs as root. Pass `user = NULL` to opt out and keep the
+  previous root behaviour. debian/ubuntu only; for alpine-based images
+  you must pass `user = NULL` and create the user yourself. Closes
+  [\#100](https://github.com/ThinkR-open/dockerfiler/issues/100).
 
 ### New features
 
@@ -42,6 +58,18 @@
   cache mount target. Users can override the renv cache location at
   image build time with `--build-arg RENV_PATHS_CACHE=...` without
   regenerating the Dockerfile.
+- [`dock_from_desc()`](https://thinkr-open.github.io/dockerfiler/reference/dockerfiles.md)
+  gains a `strict_install` parameter (default `TRUE`). When `TRUE`,
+  every install RUN in the generated Dockerfile is prefixed with
+  `options(warn = 2);` so any R warning during install (missing CRAN
+  package, partial download, archived package, 404 on a remote) becomes
+  a hard error and aborts the docker build. This is a behaviour change
+  for users regenerating their Dockerfile: install RUNs now refuse to
+  silently swallow warnings. Pass `strict_install = FALSE` if your build
+  environment routinely emits benign warnings (locale defaulting, NTP
+  time-verification, ABI-version notices) that you do not want to fail
+  the build. Closes
+  [\#9](https://github.com/ThinkR-open/dockerfiler/issues/9).
 
 ### Bug fixes
 

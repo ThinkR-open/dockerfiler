@@ -21,3 +21,6 @@ tests/testthat/.dockerignore
 ^revdep$
 ^doc$
 ^Meta$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$

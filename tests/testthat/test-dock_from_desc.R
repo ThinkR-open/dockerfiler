@@ -120,6 +120,93 @@ withr::with_dir(
 
     })
 
+    test_that("dock_from_desc(strict_install = TRUE) prepends options(warn = 2) to every install RUN", {
+      skip_if(is_rdevel, "skip on R-devel")
+      out <- dock_from_desc(
+        file.path(".", "DESCRIPTION__"),
+        sysreqs = FALSE,
+        strict_install = TRUE
+      )
+      install_lines <- grep(
+        "(R|Rscript) -e '.*install",
+        out$Dockerfile,
+        value = TRUE
+      )
+      expect_gt(length(install_lines), 0L)
+      for (line in install_lines) {
+        expect_match(
+          line,
+          "options\\(warn = 2\\);",
+          info = sprintf(
+            "install RUN must carry options(warn = 2): %s",
+            line
+          )
+        )
+      }
+    })
+
+    test_that("dock_from_desc(strict_install = FALSE) does not prepend options(warn = 2)", {
+      skip_if(is_rdevel, "skip on R-devel")
+      out <- dock_from_desc(
+        file.path(".", "DESCRIPTION__"),
+        sysreqs = FALSE,
+        strict_install = FALSE
+      )
+      df <- paste(out$Dockerfile, collapse = "\n")
+      expect_false(grepl("options\\(warn = 2\\)", df))
+    })
+
+    test_that("dock_from_desc default is strict_install = TRUE so install warnings fail the build", {
+      fmls <- formals(dock_from_desc)
+      expect_true("strict_install" %in% names(fmls))
+      expect_true(fmls$strict_install)
+    })
+
+    test_that("dock_from_desc rejects non-scalar / NA / non-logical strict_install", {
+      skip_if(is_rdevel, "skip on R-devel")
+
+      expect_error(
+        dock_from_desc(
+          file.path(".", "DESCRIPTION__"),
+          sysreqs = FALSE,
+          strict_install = NA
+        ),
+        "single `TRUE` or `FALSE`"
+      )
+      expect_error(
+        dock_from_desc(
+          file.path(".", "DESCRIPTION__"),
+          sysreqs = FALSE,
+          strict_install = c(TRUE, FALSE)
+        ),
+        "single `TRUE` or `FALSE`"
+      )
+      expect_error(
+        dock_from_desc(
+          file.path(".", "DESCRIPTION__"),
+          sysreqs = FALSE,
+          strict_install = "TRUE"
+        ),
+        "single `TRUE` or `FALSE`"
+      )
+      expect_error(
+        dock_from_desc(
+          file.path(".", "DESCRIPTION__"),
+          sysreqs = FALSE,
+          strict_install = 1
+        ),
+        "single `TRUE` or `FALSE`"
+      )
+      expect_error(
+        dock_from_desc(
+          file.path(".", "DESCRIPTION__"),
+          sysreqs = FALSE,
+          strict_install = NULL
+        ),
+        "single `TRUE` or `FALSE`"
+      )
+    })
+
     test_that("dock_from_desc emits no GITHUB_PAT plumbing by default", {
       skip_if(is_rdevel, "skip on R-devel")
       my_dock <- dock_from_desc(file.path(".", "DESCRIPTION__"))

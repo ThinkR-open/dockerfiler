@@ -63,6 +63,16 @@ quote_not_na <- function(x){
 #'   RUN; the PAT is never persisted in the image; requires BuildKit, so
 #'   pass with
 #'   `DOCKER_BUILDKIT=1 docker build --secret id=github_pat,env=GITHUB_PAT ...`).
+#' @param strict_install boolean. When `TRUE` (the default), every
+#'   install RUN in the generated Dockerfile is prefixed with
+#'   `options(warn = 2);` so that any R warning during install
+#'   (missing CRAN package, partial download, archived package,
+#'   404 on a remote) becomes a hard error and aborts the docker
+#'   build. Set to `FALSE` if your build environment routinely emits
+#'   benign warnings (locale defaulting, NTP time-verification,
+#'   ABI-version notices) that you do not want to fail the build.
+#'   Must be a single scalar logical; `NA`, character, numeric,
+#'   `NULL` and length-2+ vectors are rejected with an error.
 #'
 #' @export
 #' @rdname dockerfiles
@@ -89,9 +99,20 @@ dock_from_desc <- function(
   update_tar_gz = TRUE,
   build_from_source = TRUE,
   extra_sysreqs = NULL,
-  github_pat = c("none", "build_arg", "secret")
+  github_pat = c("none", "build_arg", "secret"),
+  strict_install = TRUE
 ) {
   github_pat <- match.arg(github_pat)
+  if (
+    !is.logical(strict_install) ||
+      length(strict_install) != 1L ||
+      is.na(strict_install)
+  ) {
+    stop(
+      "`strict_install` must be a single `TRUE` or `FALSE`, got: ",
+      deparse(strict_install)
+    )
+  }
   path <- fs::path_abs(path)
 
   packages <- desc_get_deps(path)$package
@@ -207,17 +228,28 @@ dock_from_desc <- function(
 
 
 
-  dock$RUN("R -e 'install.packages(\"remotes\")'")
+  strict_prefix <- .r_strict_prefix(strict_install)
+
+  dock$RUN(
+    sprintf(
+      "R -e '%sinstall.packages(\"remotes\")'",
+      strict_prefix
+    )
+  )
 
   if (length(packages_on_cran) > 0) {
     ping <- mapply(
-      function(dock, ver, nm) {
-        res <- dock$RUN(sprintf("Rscript -e 'remotes::install_version(\"%s\",upgrade=\"never\", version = %s)'",
-                                nm, ver))
+      function(dock, ver, nm, strict_prefix) {
+        res <- dock$RUN(sprintf(
+          "Rscript -e '%sremotes::install_version(\"%s\",upgrade=\"never\", version = %s)'",
+          strict_prefix,
+          nm,
+          ver
+        ))
       },
       ver = quote_not_na(packages_on_cran),
       nm = names(packages_on_cran),
-      MoreArgs = list(dock = dock)
+      MoreArgs = list(dock = dock, strict_prefix = strict_prefix)
     )
   }
 
@@ -243,17 +275,18 @@ dock_from_desc <- function(
 
 
     pong <- mapply(
-      function(dock, ver, nm) {
+      function(dock, ver, strict_prefix) {
         res <- dock$RUN(
           sprintf(
-            "%sRscript -e 'remotes::install_github(\"%s\")'",
+            "%sRscript -e '%sremotes::install_github(\"%s\")'",
             .github_pat_run_prefix(github_pat),
+            strict_prefix,
             ver
           )
         )
       },
       ver = nn,
-      MoreArgs = list(dock = dock)
+      MoreArgs = list(dock = dock, strict_prefix = strict_prefix)
     )
   }
 
@@ -313,7 +346,9 @@ dock_from_desc <- function(
     dock$RUN(
       paste0(
         .github_pat_run_prefix(github_pat),
-        "R -e 'remotes::install_local(\"/app.tar.gz\",upgrade=\"never\")'"
+        "R -e '",
+        strict_prefix,
+        "remotes::install_local(\"/app.tar.gz\",upgrade=\"never\")'"
       )
     )
     dock$RUN("rm /app.tar.gz")
@@ -324,7 +359,9 @@ dock_from_desc <- function(
     dock$RUN(
       paste0(
         .github_pat_run_prefix(github_pat),
-        "R -e 'remotes::install_local(upgrade=\"never\")'"
+        "R -e '",
+        strict_prefix,
+        "remotes::install_local(upgrade=\"never\")'"
       )
     )
     dock$RUN("rm -rf /build_zone")

@@ -24,6 +24,20 @@
   behaviour. debian/ubuntu only; for alpine-based images you must
   pass `user = NULL` and create the user yourself. Closes #100.
 
+## Security
+
+- `dock_from_desc()` and `dock_from_renv()` now validate every
+  user-supplied parameter that flows into a Dockerfile shell context
+  (`FROM`, `AS`, `repos` values and names, `extra_sysreqs`,
+  `renv_version`, `renv_paths_cache`, `lockfile` basename, `use_pak`,
+  `strict_install`, plus `r_version` read from the lockfile). Inputs
+  that contain shell metacharacters, newlines, or do not match the
+  documented format raise an explicit error at function entry,
+  rather than silently producing a malformed Dockerfile or one that
+  executes attacker-controlled commands at `docker build` time.
+  This closes the post-#106 audit follow-up for all five sites
+  surfaced by Copilot review.
+
 ## New features
 
 - `dock$ARG()` and the internal `add_arg()` helper gain a `default`

@@ -207,6 +207,66 @@ withr::with_dir(
       )
     })
 
+    test_that("dock_from_desc rejects shell-metacharacter / unsafe values across user-supplied params", {
+      skip_if(is_rdevel, "skip on R-devel")
+
+      # extra_sysreqs: each element must be a Debian package name. A
+      # value with `;` would inject into the apt-get RUN.
+      expect_error(
+        dock_from_desc(
+          file.path(".", "DESCRIPTION__"),
+          sysreqs = FALSE,
+          extra_sysreqs = "libfoo; rm -rf /"
+        ),
+        "extra_sysreqs"
+      )
+
+      # repos: each URL must look like a real http(s) URL. A value with
+      # `'` or `"` breaks the R / shell nested quoting in the
+      # `echo "options(repos = ...)" > Rprofile.site` RUN.
+      expect_error(
+        dock_from_desc(
+          file.path(".", "DESCRIPTION__"),
+          sysreqs = FALSE,
+          repos = c(CRAN = "https://evil'); cat /etc/passwd; #")
+        ),
+        "repos"
+      )
+
+      # FROM: a Docker image reference. Newlines or shell metacharacters
+      # would break the FROM directive or change the image being pulled.
+      expect_error(
+        dock_from_desc(
+          file.path(".", "DESCRIPTION__"),
+          sysreqs = FALSE,
+          FROM = "rocker/r-ver:4.0\nRUN evil"
+        ),
+        "FROM"
+      )
+
+      # AS: docker build-stage name. Newlines or shell metacharacters
+      # would break the `FROM <X> AS <Y>` directive.
+      expect_error(
+        dock_from_desc(
+          file.path(".", "DESCRIPTION__"),
+          sysreqs = FALSE,
+          AS = "stage1\nRUN evil"
+        ),
+        "`AS`"
+      )
+
+      # names(repos): backticks in names would inject command
+      # substitution into the `echo "options(repos=...)"` RUN.
+      expect_error(
+        dock_from_desc(
+          file.path(".", "DESCRIPTION__"),
+          sysreqs = FALSE,
+          repos = c(`CRAN; system('evil')` = "https://cran.rstudio.com/")
+        ),
+        "names\\(repos\\)"
+      )
+    })
+
     test_that("dock_from_desc emits no GITHUB_PAT plumbing by default", {
       skip_if(is_rdevel, "skip on R-devel")
       my_dock <- dock_from_desc(file.path(".", "DESCRIPTION__"))

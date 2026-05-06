@@ -22,13 +22,23 @@ dock_from_desc(
 \item{path}{path to the DESCRIPTION file to use as an input.}
 
 \item{FROM}{The FROM of the Dockerfile. Default is
-FROM rocker/r-ver:\code{R.Version()$major}.\code{R.Version()$minor}.}
+\code{paste0("rocker/r-ver:", R.Version()$major, ".", R.Version()$minor)}.
+Validated as a Docker image reference (alphanumerics, dot, slash,
+dash, underscore, optional \verb{:tag} and / or \verb{@sha256:<hex>}); other
+values raise an error to prevent shell-metacharacter injection
+into the generated FROM directive.}
 
-\item{AS}{The AS of the Dockerfile. Default it NULL.}
+\item{AS}{The AS of the Dockerfile. Default it NULL. When non-NULL,
+validated as a simple build-stage name (\verb{^[a-zA-Z0-9][a-zA-Z0-9._-]*$}).}
 
 \item{sysreqs}{boolean. If TRUE, the Dockerfile will contain sysreq installation.}
 
-\item{repos}{character. The URL(s) of the repositories to use for \code{options("repos")}.}
+\item{repos}{character. The URL(s) of the repositories to use for
+\code{options("repos")}. Each value must look like an http(s) URL (no
+quotes, spaces or newlines); each name (when set) must be a simple
+identifier (\verb{^[A-Za-z][A-Za-z0-9._-]*$}). Other values raise an
+error to prevent injection into the generated \verb{echo "options(...)"}
+shell command.}
 
 \item{expand}{boolean. If \code{TRUE} each system requirement will have its own \code{RUN} line.}
 
@@ -39,7 +49,9 @@ an updated tar.gz is created.}
 the Dockerfile directly mount the source folder.}
 
 \item{extra_sysreqs}{character vector. Extra debian system requirements.
-Will be installed with apt-get install.}
+Will be installed with apt-get install. Each entry must be a Debian
+package name (\verb{^[a-z0-9][a-z0-9.+-]+$}); other values raise an error
+to prevent injection into the generated apt-get RUN.}
 
 \item{github_pat}{character. How to provide a GitHub PAT to
 \code{remotes::install_github()} for private dependency repositories.

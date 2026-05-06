@@ -8,15 +8,32 @@ pkg_sysreqs_mem <- memoise::memoise(
 
 #' Create a Dockerfile from an `renv.lock` file
 #'
-#' @param lockfile Path to an `renv.lock` file to use as an input..
-#' @param FROM Docker image to start FROM Default is FROM rocker/r-base
-#' @param AS The AS of the Dockerfile. Default it `NULL`.
+#' @param lockfile Path to an `renv.lock` file to use as an input.
+#'   The `basename(lockfile)` must be located at the docker build
+#'   context root at `docker build` time, because the generated
+#'   Dockerfile emits `COPY <basename(lockfile)> renv.lock`. Validated
+#'   as a single string whose basename contains only alphanumerics,
+#'   dots, underscores or hyphens (no spaces or shell metacharacters).
+#' @param FROM Docker image to start FROM. Default is `"rocker/r-base"`.
+#'   Validated as a Docker image reference (alphanumerics, dot, slash,
+#'   dash, underscore, optional `:tag` and / or `@sha256:<hex>`); other
+#'   values raise an error to prevent shell-metacharacter injection
+#'   into the generated FROM directive.
+#' @param AS The AS of the Dockerfile. Default is `NULL`. When non-NULL,
+#'   validated as a simple build-stage name (`^[a-zA-Z0-9][a-zA-Z0-9._-]*$`).
 #' @param distro - deprecated - only debian/ubuntu based images are supported
 #' @param sysreqs boolean. If `TRUE`, the Dockerfile will contain sysreq installation.
 #' @param expand boolean. If `TRUE` each system requirement will have its own `RUN` line.
-#' @param repos character. The URL(s) of the repositories to use for `options("repos")`.
+#' @param repos character. The URL(s) of the repositories to use for
+#'   `options("repos")`. Each value must look like an http(s) URL
+#'   (no quotes, spaces or newlines); each name (when set) must be a
+#'   simple identifier (`^[A-Za-z][A-Za-z0-9._-]*$`). Other values raise
+#'   an error to prevent injection into the generated `echo "options(...)"`
+#'   shell command.
 #' @param extra_sysreqs character vector. Extra debian system requirements.
-#'    Will be installed with apt-get install.
+#'   Will be installed with apt-get install. Each entry must be a Debian
+#'   package name (`^[a-z0-9][a-z0-9.+-]+$`); other values raise an error
+#'   to prevent injection into the generated apt-get RUN.
 #' @param renv_version character or `NULL`. The renv version to install.
 #'   The argument has three distinct modes, deliberately encoded with
 #'   the missing-vs-`NULL` distinction:
@@ -28,7 +45,12 @@ pkg_sysreqs_mem <- memoise::memoise(
 #'     version.
 #'   - a character string such as `"1.0.0"`: install that specific
 #'     version regardless of what the lockfile says.
-#' @param use_pak boolean. If `TRUE` use pak to deal with dependencies  during `renv::restore()`. FALSE by default
+#'
+#'   When supplied as a string, validated as a version-like token
+#'   (`^[0-9]+(\.[0-9]+){0,3}([-.][a-zA-Z0-9]+)?$`).
+#' @param use_pak boolean. If `TRUE` use pak to deal with dependencies
+#'   during `renv::restore()`. FALSE by default. Must be a single
+#'   `TRUE` or `FALSE` (no `NA`, no vector).
 #' @param user Name of the user the runtime container drops privilege
 #'   to before the `renv::restore()` step (and therefore at runtime).
 #'   Default is `"rstudio"` so the generated image runs as a non-root
@@ -139,6 +161,16 @@ dock_from_renv <- function(
   renv_paths_cache = NULL
 ) {
   github_pat <- match.arg(github_pat)
+  .validate_lockfile(lockfile)
+  .validate_FROM(FROM)
+  .validate_AS(AS)
+  .validate_repos(repos)
+  .validate_extra_sysreqs(extra_sysreqs)
+  .validate_scalar_logical(use_pak, "use_pak")
+  if (!missing(renv_version)) {
+    .validate_renv_version(renv_version)
+  }
+  .validate_renv_paths_cache(renv_paths_cache)
   if (!is.null(user)) {
     # `user` is interpolated into shell commands (id, useradd, chown, USER).
     # Reject anything that is not a strict POSIX username so a caller passing
@@ -173,6 +205,7 @@ dock_from_renv <- function(
 
   # start the dockerfile
   R_major_minor <- lock$R$Version
+  .validate_r_version(R_major_minor)
   dock <- Dockerfile$new(
     FROM = gen_base_image(
       r_version = R_major_minor,

@@ -26,7 +26,7 @@ You can install dockerfiler from GitHub with:
 
 ```{r gh-installation, eval = FALSE}
 # install.packages("remotes")
-remotes::install_github("colinfay/dockerfiler")
+remotes::install_github("ThinkR-open/dockerfiler")
 ```
 
 Or from CRAN with : 

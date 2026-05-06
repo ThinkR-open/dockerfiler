@@ -28,7 +28,12 @@ dock_from_renv(
 
 - lockfile:
 
-  Path to an `renv.lock` file to use as an input..
+  Path to an `renv.lock` file to use as an input. The
+  `basename(lockfile)` must be located at the docker build context root
+  at `docker build` time, because the generated Dockerfile emits
+  `COPY <basename(lockfile)> renv.lock`. Validated as a single string
+  whose basename contains only alphanumerics, dots, underscores or
+  hyphens (no spaces or shell metacharacters).
 
 - distro:
 
@@ -36,11 +41,16 @@ dock_from_renv(
 
 - FROM:
 
-  Docker image to start FROM Default is FROM rocker/r-base
+  Docker image to start FROM. Default is `"rocker/r-base"`. Validated as
+  a Docker image reference (alphanumerics, dot, slash, dash, underscore,
+  optional `:tag` and / or `@sha256:<hex>`); other values raise an error
+  to prevent shell-metacharacter injection into the generated FROM
+  directive.
 
 - AS:
 
-  The AS of the Dockerfile. Default it `NULL`.
+  The AS of the Dockerfile. Default is `NULL`. When non-NULL, validated
+  as a simple build-stage name (`^[a-zA-Z0-9][a-zA-Z0-9._-]*$`).
 
 - sysreqs:
 
@@ -49,7 +59,11 @@ dock_from_renv(
 - repos:
 
   character. The URL(s) of the repositories to use for
-  `options("repos")`.
+  `options("repos")`. Each value must look like an http(s) URL (no
+  quotes, spaces or newlines); each name (when set) must be a simple
+  identifier (`^[A-Za-z][A-Za-z0-9._-]*$`). Other values raise an error
+  to prevent injection into the generated `echo "options(...)"` shell
+  command.
 
 - expand:
 
@@ -59,13 +73,16 @@ dock_from_renv(
 - extra_sysreqs:
 
   character vector. Extra debian system requirements. Will be installed
-  with apt-get install.
+  with apt-get install. Each entry must be a Debian package name
+  (`^[a-z0-9][a-z0-9.+-]+$`); other values raise an error to prevent
+  injection into the generated apt-get RUN.
 
 - use_pak:
 
   boolean. If `TRUE` use pak to deal with dependencies during
   [`renv::restore()`](https://rstudio.github.io/renv/reference/restore.html).
-  FALSE by default
+  FALSE by default. Must be a single `TRUE` or `FALSE` (no `NA`, no
+  vector).
 
 - user:
 
@@ -137,6 +154,9 @@ dock_from_renv(
 
   - a character string such as `"1.0.0"`: install that specific version
     regardless of what the lockfile says.
+
+  When supplied as a string, validated as a version-like token
+  (`^[0-9]+(\.[0-9]+){0,3}([-.][a-zA-Z0-9]+)?$`).
 
 - github_pat:
 

@@ -28,12 +28,17 @@ dock_from_desc(
 
 - FROM:
 
-  The FROM of the Dockerfile. Default is FROM
-  rocker/r-ver:`R.Version()$major`.`R.Version()$minor`.
+  The FROM of the Dockerfile. Default is
+  `paste0("rocker/r-ver:", R.Version()$major, ".", R.Version()$minor)`.
+  Validated as a Docker image reference (alphanumerics, dot, slash,
+  dash, underscore, optional `:tag` and / or `@sha256:<hex>`); other
+  values raise an error to prevent shell-metacharacter injection into
+  the generated FROM directive.
 
 - AS:
 
-  The AS of the Dockerfile. Default it NULL.
+  The AS of the Dockerfile. Default it NULL. When non-NULL, validated as
+  a simple build-stage name (`^[a-zA-Z0-9][a-zA-Z0-9._-]*$`).
 
 - sysreqs:
 
@@ -42,7 +47,11 @@ dock_from_desc(
 - repos:
 
   character. The URL(s) of the repositories to use for
-  `options("repos")`.
+  `options("repos")`. Each value must look like an http(s) URL (no
+  quotes, spaces or newlines); each name (when set) must be a simple
+  identifier (`^[A-Za-z][A-Za-z0-9._-]*$`). Other values raise an error
+  to prevent injection into the generated `echo "options(...)"` shell
+  command.
 
 - expand:
 
@@ -62,7 +71,9 @@ dock_from_desc(
 - extra_sysreqs:
 
   character vector. Extra debian system requirements. Will be installed
-  with apt-get install.
+  with apt-get install. Each entry must be a Debian package name
+  (`^[a-z0-9][a-z0-9.+-]+$`); other values raise an error to prevent
+  injection into the generated apt-get RUN.
 
 - github_pat:
 

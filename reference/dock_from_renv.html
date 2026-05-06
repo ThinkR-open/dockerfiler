@@ -64,7 +64,12 @@
 
 
 <dl><dt id="arg-lockfile">lockfile<a class="anchor" aria-label="anchor" href="#arg-lockfile"></a></dt>
-<dd><p>Path to an <code>renv.lock</code> file to use as an input..</p></dd>
+<dd><p>Path to an <code>renv.lock</code> file to use as an input.
+The <code>basename(lockfile)</code> must be located at the docker build
+context root at <code>docker build</code> time, because the generated
+Dockerfile emits <code>COPY &lt;basename(lockfile)&gt; renv.lock</code>. Validated
+as a single string whose basename contains only alphanumerics,
+dots, underscores or hyphens (no spaces or shell metacharacters).</p></dd>
 
 
 <dt id="arg-distro">distro<a class="anchor" aria-label="anchor" href="#arg-distro"></a></dt>
@@ -73,11 +78,16 @@
 
 
 <dt id="arg-from">FROM<a class="anchor" aria-label="anchor" href="#arg-from"></a></dt>
-<dd><p>Docker image to start FROM Default is FROM rocker/r-base</p></dd>
+<dd><p>Docker image to start FROM. Default is <code>"rocker/r-base"</code>.
+Validated as a Docker image reference (alphanumerics, dot, slash,
+dash, underscore, optional <code>:tag</code> and / or <code>@sha256:&lt;hex&gt;</code>); other
+values raise an error to prevent shell-metacharacter injection
+into the generated FROM directive.</p></dd>
 
 
 <dt id="arg-as">AS<a class="anchor" aria-label="anchor" href="#arg-as"></a></dt>
-<dd><p>The AS of the Dockerfile. Default it <code>NULL</code>.</p></dd>
+<dd><p>The AS of the Dockerfile. Default is <code>NULL</code>. When non-NULL,
+validated as a simple build-stage name (<code>^[a-zA-Z0-9][a-zA-Z0-9._-]*$</code>).</p></dd>
 
 
 <dt id="arg-sysreqs">sysreqs<a class="anchor" aria-label="anchor" href="#arg-sysreqs"></a></dt>
@@ -85,7 +95,12 @@
 
 
 <dt id="arg-repos">repos<a class="anchor" aria-label="anchor" href="#arg-repos"></a></dt>
-<dd><p>character. The URL(s) of the repositories to use for <code>options("repos")</code>.</p></dd>
+<dd><p>character. The URL(s) of the repositories to use for
+<code>options("repos")</code>. Each value must look like an http(s) URL
+(no quotes, spaces or newlines); each name (when set) must be a
+simple identifier (<code>^[A-Za-z][A-Za-z0-9._-]*$</code>). Other values raise
+an error to prevent injection into the generated <code>echo "options(...)"</code>
+shell command.</p></dd>
 
 
 <dt id="arg-expand">expand<a class="anchor" aria-label="anchor" href="#arg-expand"></a></dt>
@@ -94,11 +109,15 @@
 
 <dt id="arg-extra-sysreqs">extra_sysreqs<a class="anchor" aria-label="anchor" href="#arg-extra-sysreqs"></a></dt>
 <dd><p>character vector. Extra debian system requirements.
-Will be installed with apt-get install.</p></dd>
+Will be installed with apt-get install. Each entry must be a Debian
+package name (<code>^[a-z0-9][a-z0-9.+-]+$</code>); other values raise an error
+to prevent injection into the generated apt-get RUN.</p></dd>
 
 
 <dt id="arg-use-pak">use_pak<a class="anchor" aria-label="anchor" href="#arg-use-pak"></a></dt>
-<dd><p>boolean. If <code>TRUE</code> use pak to deal with dependencies  during <code><a href="https://rstudio.github.io/renv/reference/restore.html" class="external-link">renv::restore()</a></code>. FALSE by default</p></dd>
+<dd><p>boolean. If <code>TRUE</code> use pak to deal with dependencies
+during <code><a href="https://rstudio.github.io/renv/reference/restore.html" class="external-link">renv::restore()</a></code>. FALSE by default. Must be a single
+<code>TRUE</code> or <code>FALSE</code> (no <code>NA</code>, no vector).</p></dd>
 
 
 <dt id="arg-user">user<a class="anchor" aria-label="anchor" href="#arg-user"></a></dt>
@@ -155,7 +174,8 @@ configured repos, even when the lockfile pins a specific
 version.</p></li>
 <li><p>a character string such as <code>"1.0.0"</code>: install that specific
 version regardless of what the lockfile says.</p></li>
-</ul></dd>
+</ul><p>When supplied as a string, validated as a version-like token
+(<code>^[0-9]+(\.[0-9]+){0,3}([-.][a-zA-Z0-9]+)?$</code>).</p></dd>
 
 
 <dt id="arg-github-pat">github_pat<a class="anchor" aria-label="anchor" href="#arg-github-pat"></a></dt>

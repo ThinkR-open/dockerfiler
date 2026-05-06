@@ -65,11 +65,16 @@
 
 <dt id="arg-from">FROM<a class="anchor" aria-label="anchor" href="#arg-from"></a></dt>
 <dd><p>The FROM of the Dockerfile. Default is
-FROM rocker/r-ver:<code>R.Version()$major</code>.<code>R.Version()$minor</code>.</p></dd>
+<code>paste0("rocker/r-ver:", R.Version()$major, ".", R.Version()$minor)</code>.
+Validated as a Docker image reference (alphanumerics, dot, slash,
+dash, underscore, optional <code>:tag</code> and / or <code>@sha256:&lt;hex&gt;</code>); other
+values raise an error to prevent shell-metacharacter injection
+into the generated FROM directive.</p></dd>
 
 
 <dt id="arg-as">AS<a class="anchor" aria-label="anchor" href="#arg-as"></a></dt>
-<dd><p>The AS of the Dockerfile. Default it NULL.</p></dd>
+<dd><p>The AS of the Dockerfile. Default it NULL. When non-NULL,
+validated as a simple build-stage name (<code>^[a-zA-Z0-9][a-zA-Z0-9._-]*$</code>).</p></dd>
 
 
 <dt id="arg-sysreqs">sysreqs<a class="anchor" aria-label="anchor" href="#arg-sysreqs"></a></dt>
@@ -77,7 +82,12 @@ FROM rocker/r-ver:<code>R.Version()$major</code>.<code>R.Version()$minor</code>.
 
 
 <dt id="arg-repos">repos<a class="anchor" aria-label="anchor" href="#arg-repos"></a></dt>
-<dd><p>character. The URL(s) of the repositories to use for <code>options("repos")</code>.</p></dd>
+<dd><p>character. The URL(s) of the repositories to use for
+<code>options("repos")</code>. Each value must look like an http(s) URL (no
+quotes, spaces or newlines); each name (when set) must be a simple
+identifier (<code>^[A-Za-z][A-Za-z0-9._-]*$</code>). Other values raise an
+error to prevent injection into the generated <code>echo "options(...)"</code>
+shell command.</p></dd>
 
 
 <dt id="arg-expand">expand<a class="anchor" aria-label="anchor" href="#arg-expand"></a></dt>
@@ -96,7 +106,9 @@ the Dockerfile directly mount the source folder.</p></dd>
 
 <dt id="arg-extra-sysreqs">extra_sysreqs<a class="anchor" aria-label="anchor" href="#arg-extra-sysreqs"></a></dt>
 <dd><p>character vector. Extra debian system requirements.
-Will be installed with apt-get install.</p></dd>
+Will be installed with apt-get install. Each entry must be a Debian
+package name (<code>^[a-z0-9][a-z0-9.+-]+$</code>); other values raise an error
+to prevent injection into the generated apt-get RUN.</p></dd>
 
 
 <dt id="arg-github-pat">github_pat<a class="anchor" aria-label="anchor" href="#arg-github-pat"></a></dt>

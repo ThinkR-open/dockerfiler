@@ -17,7 +17,7 @@ compact_sysreqs <- function(pkg_installs,
                             install_cmd = "apt-get install -y",
                             clean_cmd ="rm -rf /var/lib/apt/lists/*"){
 
-  # on va extraire tout ce qui commence par pkg_installs
+  # extract everything that starts with the install command
   pkg_ <-  pkg_installs[lapply(pkg_installs,length)!=0]
   apt <-  grepl(pattern = paste0("^",install_cmd),x = pkg_)
 

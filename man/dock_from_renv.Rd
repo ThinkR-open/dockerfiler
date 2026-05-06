@@ -58,11 +58,19 @@ non-working package, and/or the installation might fail.)
 
 \item{sysreqs_platform}{System requirements platform.\code{ubuntu} by default. If \code{NULL}, then the  current platform is used. Can be : "ubuntu-22.04" if needed to fit with the \code{FROM} Operating System. Only debian or ubuntu based images are supported}
 
-\item{renv_version}{character. The renv version to use in the generated Dockerfile. By default, it is set to the version specified in the \code{renv.lock} file.
-If the \code{renv.lock} file does not specify a renv version,
-the latest available version of renv will be installed.
-Set it to \code{NULL} to force installing the latest renv even when the
-lockfile pins a specific version.}
+\item{renv_version}{character or \code{NULL}. The renv version to install.
+The argument has three distinct modes, deliberately encoded with
+the missing-vs-\code{NULL} distinction:
+\itemize{
+\item \strong{not supplied (default)}: read the renv version from the
+\code{renv.lock} file. If the lockfile does not pin renv either,
+the latest available version is installed.
+\item \code{NULL} (explicit): always install the latest renv from the
+configured repos, even when the lockfile pins a specific
+version.
+\item a character string such as \code{"1.0.0"}: install that specific
+version regardless of what the lockfile says.
+}}
 
 \item{github_pat}{character. How to provide a GitHub PAT to
 \code{renv::restore()} for private dependency repositories. One of
@@ -98,7 +106,7 @@ that the proper package version and source is used when installed.
 }
 \examples{
 \dontrun{
-dock <- dock_from_renv("renv.lock", distro = "xenial")
+dock <- dock_from_renv("renv.lock")
 dock$write("Dockerfile")
 }
 }

@@ -29,8 +29,7 @@ get_sysreqs <- function(
       )
     )
   )
-  raw_output <- pak::pkg_sysreqs(pkg = all_deps,sysreqs_platform = "debian")
-  unlist(raw_output$packages$system_packages)
+  raw_output <- pak::pkg_sysreqs(pkg = all_deps, sysreqs_platform = "debian")
   out <- unlist(raw_output$packages$system_packages)
   sort(unique(out[!is.na(out)]))
 }

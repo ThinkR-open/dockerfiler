@@ -72,6 +72,24 @@ cat_info <- function(...) {
   }
 }
 
+#' Strict-install prefix for an R / Rscript invocation in a Dockerfile RUN.
+#'
+#' When `strict_install = TRUE`, returns `"options(warn = 2); "` so
+#' that warnings emitted during the install (e.g. a missing CRAN
+#' package, a 404 on a remote, a partial install) become hard
+#' errors and the docker build aborts. Otherwise an empty string,
+#' which preserves the legacy behavior where install warnings did
+#' not fail the build.
+#' @noRd
+.r_strict_prefix <- function(strict_install) {
+  # Caller must pass a single TRUE / FALSE; `dock_from_desc()` validates.
+  if (strict_install) {
+    "options(warn = 2); "
+  } else {
+    ""
+  }
+}
+
 #' Emit a one-shot reminder describing how the PAT must be supplied at
 #' `docker build` time. No-op when mode is `"none"`.
 #' @noRd

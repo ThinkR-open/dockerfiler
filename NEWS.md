@@ -30,6 +30,17 @@
   cache location at image build time with
   `--build-arg RENV_PATHS_CACHE=...` without regenerating the
   Dockerfile.
+- `dock_from_desc()` gains a `strict_install` parameter (default
+  `TRUE`). When `TRUE`, every install RUN in the generated Dockerfile
+  is prefixed with `options(warn = 2);` so any R warning during
+  install (missing CRAN package, partial download, archived package,
+  404 on a remote) becomes a hard error and aborts the docker build.
+  This is a behaviour change for users regenerating their Dockerfile:
+  install RUNs now refuse to silently swallow warnings. Pass
+  `strict_install = FALSE` if your build environment routinely
+  emits benign warnings (locale defaulting, NTP time-verification,
+  ABI-version notices) that you do not want to fail the build.
+  Closes #9.
 
 ## Bug fixes
 

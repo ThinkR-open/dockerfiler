@@ -45,18 +45,6 @@
 <li>
   <a href="reference/index.html">Reference</a>
 </li>
-<li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-    Articles
-
-    <span class="caret"></span>
-  </a>
-  <ul class="dropdown-menu" role="menu">
-<li>
-      <a href="articles/dockerfile-from-renv-lock.html">Dockerfile from renv.lock</a>
-    </li>
-  </ul>
-</li>
 <li>
   <a href="news/index.html">Changelog</a>
 </li>
@@ -107,7 +95,7 @@
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"dockerfiler"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="basic-worflow">Basic worflow<a class="anchor" aria-label="anchor" href="#basic-worflow"></a>
+<h2 id="basic-workflow">Basic workflow<a class="anchor" aria-label="anchor" href="#basic-workflow"></a>
 </h2>
 <p>By default, Dockerfiles are created with <code>FROM "rocker/r-base"</code>.</p>
 <p>You can set another FROM in <code>new()</code></p>
@@ -121,7 +109,7 @@
 <code class="sourceCode R"><span><span class="va">my_dock</span><span class="op">$</span><span class="fu">COMMENT</span><span class="op">(</span><span class="st">"Install required R package."</span><span class="op">)</span></span></code></pre></div>
 <p>Wrap your raw R Code inside the <code><a href="reference/r.html">r()</a></code> function to turn it into a bash command with <code>R -e</code>.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">my_dock</span><span class="op">$</span><span class="fu">RUN</span><span class="op">(</span><span class="fu"><a href="reference/r.html">r</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"attempt"</span>, repo <span class="op">=</span> <span class="st">"http://cran.irsn.fr/"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">my_dock</span><span class="op">$</span><span class="fu">RUN</span><span class="op">(</span><span class="fu"><a href="reference/r.html">r</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"attempt"</span>, repos <span class="op">=</span> <span class="st">"http://cran.irsn.fr/"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>Classical Docker stuffs:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">my_dock</span><span class="op">$</span><span class="fu">COMMENT</span><span class="op">(</span><span class="st">"Copy Plumber API and main script to container."</span><span class="op">)</span></span>
@@ -230,7 +218,6 @@
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">my_dock</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/dock_from_renv.html">dock_from_renv</a></span><span class="op">(</span></span>
 <span>  lockfile <span class="op">=</span> <span class="va">the_lockfile</span>,</span>
-<span>  distro <span class="op">=</span> <span class="st">"focal"</span>,</span>
 <span>  FROM <span class="op">=</span> <span class="st">"rocker/verse"</span></span>
 <span><span class="op">)</span></span>
 <span><span class="va">my_dock</span></span></code></pre></div>

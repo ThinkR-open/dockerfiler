@@ -90,6 +90,240 @@ cat_info <- function(...) {
   }
 }
 
+#' Validate user-supplied strings that flow into a Dockerfile shell context.
+#'
+#' These helpers reject inputs that, if interpolated raw, would either
+#' break the generated Dockerfile / shell command or allow injection of
+#' arbitrary commands at `docker build` time. Each helper raises an
+#' error with a clear message naming the offending parameter. `NULL` is
+#' accepted where it has a documented meaning (e.g. `renv_paths_cache`,
+#' `renv_version`, `extra_sysreqs`, `repos`).
+#' @noRd
+.validate_FROM <- function(x) {
+  if (!is.character(x) || length(x) != 1L || is.na(x)) {
+    stop(
+      "`FROM` must be a single string, got: ",
+      deparse(x)
+    )
+  }
+  # Docker reference grammar permits `<host>[:<port>]/<image>[:<tag>][@sha256:<hex>]`.
+  # The host segment may itself contain `:` (port). To keep the regex simple
+  # and unambiguous, accept any number of `<segment>` separated by `/` where
+  # each segment is alphanumerics + `._-`, optionally followed by `:digits`
+  # for the port; then the final segment may carry the `:tag` or `@sha256:`
+  # suffix. Shell metacharacters (`$`, `` ` ``, `\\`, quotes, newlines,
+  # spaces) remain forbidden by the alphabet alone.
+  if (
+    !grepl(
+      paste0(
+        "^",
+        "[a-zA-Z0-9][a-zA-Z0-9._-]*(:[0-9]+)?",
+        "(/[a-zA-Z0-9][a-zA-Z0-9._-]*)*",
+        "(:[a-zA-Z0-9._-]+)?",
+        "(@sha256:[a-fA-F0-9]+)?",
+        "$"
+      ),
+      x
+    )
+  ) {
+    stop(
+      "`FROM` must be a valid Docker image reference ",
+      "(`<host>[:<port>]/<image>[:<tag>][@sha256:<hex>]`; alphanumerics ",
+      "plus `._-` per segment; no newlines or shell metacharacters), got: ",
+      deparse(x)
+    )
+  }
+  invisible()
+}
+
+#' @noRd
+.validate_r_version <- function(x) {
+  if (!is.character(x) || length(x) != 1L || is.na(x)) {
+    stop(
+      "`r_version` (read from the lockfile) must be a single string, got: ",
+      deparse(x)
+    )
+  }
+  if (!grepl("^[0-9]+\\.[0-9]+(\\.[0-9]+)?$", x)) {
+    stop(
+      "`r_version` (read from the lockfile) must look like a numeric ",
+      "R version such as \"4.5\" or \"4.5.0\", got: ",
+      deparse(x)
+    )
+  }
+  invisible()
+}
+
+#' @noRd
+.validate_repos <- function(x) {
+  if (is.null(x)) {
+    return(invisible())
+  }
+  if (!is.character(x)) {
+    stop(
+      "`repos` must be a character vector, got: ",
+      deparse(x)
+    )
+  }
+  # The validated value lands inside double-quoted shell context
+  # (`echo "options(repos = ...)"`). Inside `"..."`, the shell still
+  # interprets `$`, `\``, `\\` and `!` (bash history). Reject these
+  # explicitly so the validator doubles as an escape primitive for the
+  # known wrapper. Parens are also rejected because some shells expand
+  # them in alias contexts; the URL grammar tolerates `%28`/`%29`.
+  bad <- is.na(x) | !grepl(
+    "^https?://[A-Za-z0-9._~:/?#@&*+,;=%-]+$",
+    x
+  )
+  if (any(bad)) {
+    stop(
+      "`repos` entries must be http(s) URLs containing only ",
+      "URL-safe characters (no quotes, parentheses, dollar, ",
+      "backtick, backslash, spaces or newlines); invalid: ",
+      paste(vapply(x[bad], deparse, character(1)), collapse = ", ")
+    )
+  }
+  # Names are emitted via `dput(repos)`, which wraps R-syntax-unsafe
+  # names in backticks. Backticks inside a Dockerfile RUN's outer
+  # double-quoted shell context trigger command substitution. Tight
+  # regex on names to keep them simple identifiers.
+  nms <- names(x)
+  if (!is.null(nms)) {
+    bad_nms <- is.na(nms) | !grepl("^[A-Za-z][A-Za-z0-9._-]*$", nms)
+    if (any(bad_nms)) {
+      stop(
+        "`names(repos)` must be simple identifiers ",
+        "(`^[A-Za-z][A-Za-z0-9._-]*$`); invalid: ",
+        paste(vapply(nms[bad_nms], deparse, character(1)), collapse = ", ")
+      )
+    }
+  }
+  invisible()
+}
+
+#' @noRd
+.validate_AS <- function(x) {
+  if (is.null(x)) {
+    return(invisible())
+  }
+  if (!is.character(x) || length(x) != 1L || is.na(x)) {
+    stop(
+      "`AS` must be a single string or NULL, got: ",
+      deparse(x)
+    )
+  }
+  if (!grepl("^[a-zA-Z0-9][a-zA-Z0-9._-]*$", x)) {
+    stop(
+      "`AS` must be a simple build-stage name ",
+      "(`^[a-zA-Z0-9][a-zA-Z0-9._-]*$`), got: ",
+      deparse(x)
+    )
+  }
+  invisible()
+}
+
+#' @noRd
+.validate_scalar_logical <- function(x, name) {
+  if (
+    !is.logical(x) ||
+      length(x) != 1L ||
+      is.na(x)
+  ) {
+    stop(
+      sprintf("`%s` must be a single `TRUE` or `FALSE`, got: ", name),
+      deparse(x)
+    )
+  }
+  invisible()
+}
+
+#' @noRd
+.validate_extra_sysreqs <- function(x) {
+  if (is.null(x)) {
+    return(invisible())
+  }
+  if (!is.character(x)) {
+    stop(
+      "`extra_sysreqs` must be a character vector, got: ",
+      deparse(x)
+    )
+  }
+  bad <- is.na(x) | !grepl("^[a-z0-9][a-z0-9.+-]+$", x)
+  if (any(bad)) {
+    stop(
+      "`extra_sysreqs` entries must be Debian package names ",
+      "matching `^[a-z0-9][a-z0-9.+-]+$`; invalid: ",
+      paste(vapply(x[bad], deparse, character(1)), collapse = ", ")
+    )
+  }
+  invisible()
+}
+
+#' @noRd
+.validate_renv_version <- function(x) {
+  if (is.null(x)) {
+    return(invisible())
+  }
+  if (!is.character(x) || length(x) != 1L || is.na(x)) {
+    stop(
+      "`renv_version` must be a single string or NULL, got: ",
+      deparse(x)
+    )
+  }
+  if (!grepl("^[0-9]+(\\.[0-9]+){0,3}([-.][a-zA-Z0-9]+)?$", x)) {
+    stop(
+      "`renv_version` must look like a version string such as ",
+      "\"1.0.0\" or \"0.16.0-beta\", got: ",
+      deparse(x)
+    )
+  }
+  invisible()
+}
+
+#' @noRd
+.validate_lockfile <- function(x) {
+  if (!is.character(x) || length(x) != 1L || is.na(x)) {
+    stop(
+      "`lockfile` must be a single path string, got: ",
+      deparse(x)
+    )
+  }
+  bn <- basename(x)
+  if (!grepl("^[A-Za-z0-9._-]+$", bn)) {
+    stop(
+      "`lockfile` basename must contain only alphanumerics, dots, ",
+      "underscores or hyphens (no spaces or shell metacharacters); ",
+      "the COPY directive in the generated Dockerfile would otherwise ",
+      "be malformed. Got basename: ",
+      deparse(bn)
+    )
+  }
+  invisible()
+}
+
+#' @noRd
+.validate_renv_paths_cache <- function(x) {
+  if (is.null(x)) {
+    return(invisible())
+  }
+  if (!is.character(x) || length(x) != 1L || is.na(x)) {
+    stop(
+      "`renv_paths_cache` must be a single path string or NULL, got: ",
+      deparse(x)
+    )
+  }
+  if (!grepl("^/[A-Za-z0-9._/-]*$", x)) {
+    stop(
+      "`renv_paths_cache` must be an absolute path containing only ",
+      "alphanumerics, dots, slashes, underscores or hyphens ",
+      "(`^/[A-Za-z0-9._/-]*$`); shell metacharacters or newlines ",
+      "would break the ARG directive. Got: ",
+      deparse(x)
+    )
+  }
+  invisible()
+}
+
 #' Emit a one-shot reminder describing how the PAT must be supplied at
 #' `docker build` time. No-op when mode is `"none"`.
 #' @noRd

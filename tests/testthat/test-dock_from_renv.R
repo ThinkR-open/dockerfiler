@@ -148,6 +148,34 @@ test_that("gen_base_image works", {
   expect_equal(out, "rocker/verse:4.0")
 })
 
+test_that("gen_base_image preserves an already-pinned tag instead of appending r_version", {
+  # Without the guard, `gen_base_image(FROM = "rocker/r-base:4.5", r_version = "4.1.2")`
+  # returned "rocker/r-base:4.5:4.1.2" -- an invalid image reference.
+  expect_equal(
+    dockerfiler:::gen_base_image(
+      r_version = "4.1.2",
+      FROM = "rocker/r-base:4.5"
+    ),
+    "rocker/r-base:4.5"
+  )
+  # Same protection for sha256 digests.
+  expect_equal(
+    dockerfiler:::gen_base_image(
+      r_version = "4.1.2",
+      FROM = "rocker/r-base@sha256:abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789"
+    ),
+    "rocker/r-base@sha256:abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789"
+  )
+  # Untagged FROM still gets the r_version appended.
+  expect_equal(
+    dockerfiler:::gen_base_image(
+      r_version = "4.1.2",
+      FROM = "rocker/r-base"
+    ),
+    "rocker/r-base:4.1.2"
+  )
+})
+
 test_that("gen_base_image warns when the deprecated `distro` is supplied", {
   expect_warning(
     out <- dockerfiler:::gen_base_image(
@@ -173,7 +201,7 @@ test_that("dock_from_renv works with specific renv", {
 the_lockfile1.0.0 <- system.file("renv_with_1.0.0.lock",package = "dockerfiler")
 
 for (lf in list(the_lockfile,the_lockfile1.0.0)){
-for (renv_version in list(NULL,"banana","missing")){
+for (renv_version in list(NULL,"1.2.3","missing")){
 
 
   if (!is.null(renv_version) && renv_version == "missing") {
@@ -192,10 +220,10 @@ socle_install_version <- "remotes::install_version\\(\"renv\", version = \""
     test_string <- 'install.packages\\(\"renv\"\\)'
   } else if (lf == the_lockfile1.0.0 & is.null(renv_version)) {
     test_string <- 'install.packages\\(\"renv\"\\)'
-  } else if (lf == the_lockfile &  renv_version == "banana") {
-    test_string <-  paste0(socle_install_version,"banana"  ,"\"\\)")
-  } else if (lf == the_lockfile1.0.0 & renv_version == "banana") {
-    test_string <- paste0(socle_install_version,"banana","\"\\)")
+  } else if (lf == the_lockfile &  renv_version == "1.2.3") {
+    test_string <-  paste0(socle_install_version,"1.2.3"  ,"\"\\)")
+  } else if (lf == the_lockfile1.0.0 & renv_version == "1.2.3") {
+    test_string <- paste0(socle_install_version,"1.2.3","\"\\)")
   } else if (lf == the_lockfile & renv_version == "missing") {
     # When the lockfile does not pin renv, we install the latest from
     # the configured repos (same behaviour as renv_version = NULL).
@@ -800,6 +828,207 @@ test_that("dock_from_renv with user = 'kevin' parameterises the useradd, cache a
   # context (cran.rstudio.com in the default repos URL is fine and
   # excluded explicitly).
   expect_false(any(grepl("\\brstudio\\b(?!\\.com)", out$Dockerfile, perl = TRUE)))
+})
+
+test_that("dock_from_renv rejects shell-active metacharacters in repos URL even though the URL grammar tolerates them", {
+  # `.validate_repos` doubles as the escape primitive for the
+  # double-quoted shell `echo "options(repos = ...)"` wrapper. Inside
+  # `"..."`, the shell still interprets `$`, backtick, backslash and
+  # `!`. A repos URL with `$(...)` would expand to a command at
+  # `docker build` time even though the URL itself is otherwise
+  # well-formed.
+  skip_if(is_rdevel, "skip on R-devel")
+  expect_error(
+    dock_from_renv(
+      lockfile = the_lockfile,
+      FROM = "rocker/verse",
+      user = NULL,
+      repos = c(CRAN = "https://evil$(id).example.com"),
+      renv_version = "0.0.0"
+    ),
+    "repos"
+  )
+})
+
+test_that("dock_from_renv accepts a private-registry FROM with host:port/image", {
+  # The Docker reference grammar permits `<host>:<port>/<image>`.
+  # The validator must not reject this common private-registry form.
+  skip_if(is_rdevel, "skip on R-devel")
+  expect_silent(
+    dockerfiler:::.validate_FROM("localhost:5000/myimage")
+  )
+  expect_silent(
+    dockerfiler:::.validate_FROM("registry.example.com:443/org/img:1.2")
+  )
+  expect_silent(
+    dockerfiler:::.validate_FROM("rocker/r-base:4.5")
+  )
+  expect_silent(
+    dockerfiler:::.validate_FROM(
+      "rocker/r-base@sha256:abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789"
+    )
+  )
+})
+
+test_that("dock_from_renv rejects shell-metacharacter / unsafe values across user-supplied params", {
+  skip_if(is_rdevel, "skip on R-devel")
+
+  # use_pak: scalar logical. A non-logical value would be interpolated raw
+  # into `echo "options(renv.config.pak.enabled = %s, ...)"`, breaking
+  # the outer shell quoting and allowing command substitution at build
+  # time.
+  expect_error(
+    dock_from_renv(
+      lockfile = the_lockfile,
+      FROM = "rocker/verse",
+      user = NULL,
+      use_pak = 'TRUE) ; system("evil") ; #',
+      renv_version = "0.0.0"
+    ),
+    "use_pak"
+  )
+
+  # names(repos): must be simple identifiers. `dput()` would otherwise
+  # wrap shell-unsafe names in backticks, which inside the outer
+  # double-quoted `echo "..."` triggers command substitution.
+  expect_error(
+    dock_from_renv(
+      lockfile = the_lockfile,
+      FROM = "rocker/verse",
+      user = NULL,
+      repos = c(`CRAN; system('evil')` = "https://cran.rstudio.com/"),
+      renv_version = "0.0.0"
+    ),
+    "names\\(repos\\)"
+  )
+
+  # AS: docker build-stage name. Newlines or shell metacharacters
+  # would break the `FROM <X> AS <Y>` directive.
+  expect_error(
+    dock_from_renv(
+      lockfile = the_lockfile,
+      FROM = "rocker/verse",
+      AS = "stage1\nRUN evil",
+      user = NULL,
+      renv_version = "0.0.0"
+    ),
+    "`AS`"
+  )
+
+  # extra_sysreqs: each element must be a Debian package name.
+  expect_error(
+    dock_from_renv(
+      lockfile = the_lockfile,
+      FROM = "rocker/verse",
+      user = NULL,
+      extra_sysreqs = "libfoo; rm -rf /",
+      renv_version = "0.0.0"
+    ),
+    "extra_sysreqs"
+  )
+
+  # NA in vector inputs must not crash the validator with
+  # "missing value where TRUE/FALSE needed"; treat as invalid and
+  # raise the same clear message as other malformed entries.
+  expect_error(
+    dock_from_renv(
+      lockfile = the_lockfile,
+      FROM = "rocker/verse",
+      user = NULL,
+      extra_sysreqs = c("libcurl", NA_character_),
+      renv_version = "0.0.0"
+    ),
+    "extra_sysreqs"
+  )
+  expect_error(
+    dock_from_renv(
+      lockfile = the_lockfile,
+      FROM = "rocker/verse",
+      user = NULL,
+      repos = c(CRAN = NA_character_),
+      renv_version = "0.0.0"
+    ),
+    "repos"
+  )
+  expect_error(
+    dock_from_renv(
+      lockfile = the_lockfile,
+      FROM = "rocker/verse",
+      user = NULL,
+      repos = setNames(
+        "https://cran.rstudio.com/",
+        NA_character_
+      ),
+      renv_version = "0.0.0"
+    ),
+    "names\\(repos\\)"
+  )
+
+  # repos: each URL must look like a real http(s) URL.
+  expect_error(
+    dock_from_renv(
+      lockfile = the_lockfile,
+      FROM = "rocker/verse",
+      user = NULL,
+      repos = c(CRAN = "https://evil'); cat /etc/passwd; #"),
+      renv_version = "0.0.0"
+    ),
+    "repos"
+  )
+
+  # renv_version: must look like a version string. Anything else would
+  # be interpolated raw into `R -e 'install_version("renv", version =
+  # "<x>")'` and could break the inner quoting.
+  expect_error(
+    dock_from_renv(
+      lockfile = the_lockfile,
+      FROM = "rocker/verse",
+      user = NULL,
+      renv_version = '"); system("evil"); #'
+    ),
+    "renv_version"
+  )
+
+  # FROM: docker image reference.
+  expect_error(
+    dock_from_renv(
+      lockfile = the_lockfile,
+      FROM = "rocker/verse\nRUN evil",
+      user = NULL,
+      renv_version = "0.0.0"
+    ),
+    "FROM"
+  )
+
+  # renv_paths_cache: absolute path, no shell metacharacters or newlines.
+  expect_error(
+    dock_from_renv(
+      lockfile = the_lockfile,
+      FROM = "rocker/verse",
+      user = NULL,
+      renv_paths_cache = "/foo\nRUN evil",
+      renv_version = "0.0.0"
+    ),
+    "renv_paths_cache"
+  )
+})
+
+test_that("dock_from_renv rejects a lockfile path whose basename contains shell metacharacters", {
+  skip_if(is_rdevel, "skip on R-devel")
+  # Spaces in the basename would break the COPY directive
+  # (`COPY foo bar.lock renv.lock` parses as src=foo, dst=bar.lock).
+  bad <- tempfile(pattern = "lock with space ")
+  file.copy(the_lockfile, bad)
+  on.exit(unlink(bad), add = TRUE)
+  expect_error(
+    dock_from_renv(
+      lockfile = bad,
+      FROM = "rocker/verse",
+      user = NULL,
+      renv_version = "0.0.0"
+    ),
+    "lockfile"
+  )
 })
 
 unlink(dir_build, recursive = TRUE)

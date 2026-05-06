@@ -23,26 +23,45 @@ dock_from_renv(
 )
 }
 \arguments{
-\item{lockfile}{Path to an \code{renv.lock} file to use as an input..}
+\item{lockfile}{Path to an \code{renv.lock} file to use as an input.
+The \code{basename(lockfile)} must be located at the docker build
+context root at \verb{docker build} time, because the generated
+Dockerfile emits \verb{COPY <basename(lockfile)> renv.lock}. Validated
+as a single string whose basename contains only alphanumerics,
+dots, underscores or hyphens (no spaces or shell metacharacters).}
 
 \item{distro}{\itemize{
 \item deprecated - only debian/ubuntu based images are supported
 }}
 
-\item{FROM}{Docker image to start FROM Default is FROM rocker/r-base}
+\item{FROM}{Docker image to start FROM. Default is \code{"rocker/r-base"}.
+Validated as a Docker image reference (alphanumerics, dot, slash,
+dash, underscore, optional \verb{:tag} and / or \verb{@sha256:<hex>}); other
+values raise an error to prevent shell-metacharacter injection
+into the generated FROM directive.}
 
-\item{AS}{The AS of the Dockerfile. Default it \code{NULL}.}
+\item{AS}{The AS of the Dockerfile. Default is \code{NULL}. When non-NULL,
+validated as a simple build-stage name (\verb{^[a-zA-Z0-9][a-zA-Z0-9._-]*$}).}
 
 \item{sysreqs}{boolean. If \code{TRUE}, the Dockerfile will contain sysreq installation.}
 
-\item{repos}{character. The URL(s) of the repositories to use for \code{options("repos")}.}
+\item{repos}{character. The URL(s) of the repositories to use for
+\code{options("repos")}. Each value must look like an http(s) URL
+(no quotes, spaces or newlines); each name (when set) must be a
+simple identifier (\verb{^[A-Za-z][A-Za-z0-9._-]*$}). Other values raise
+an error to prevent injection into the generated \verb{echo "options(...)"}
+shell command.}
 
 \item{expand}{boolean. If \code{TRUE} each system requirement will have its own \code{RUN} line.}
 
 \item{extra_sysreqs}{character vector. Extra debian system requirements.
-Will be installed with apt-get install.}
+Will be installed with apt-get install. Each entry must be a Debian
+package name (\verb{^[a-z0-9][a-z0-9.+-]+$}); other values raise an error
+to prevent injection into the generated apt-get RUN.}
 
-\item{use_pak}{boolean. If \code{TRUE} use pak to deal with dependencies  during \code{renv::restore()}. FALSE by default}
+\item{use_pak}{boolean. If \code{TRUE} use pak to deal with dependencies
+during \code{renv::restore()}. FALSE by default. Must be a single
+\code{TRUE} or \code{FALSE} (no \code{NA}, no vector).}
 
 \item{user}{Name of the user the runtime container drops privilege
 to before the \code{renv::restore()} step (and therefore at runtime).
@@ -100,7 +119,10 @@ configured repos, even when the lockfile pins a specific
 version.
 \item a character string such as \code{"1.0.0"}: install that specific
 version regardless of what the lockfile says.
-}}
+}
+
+When supplied as a string, validated as a version-like token
+(\verb{^[0-9]+(\\.[0-9]+)\{0,3\}([-.][a-zA-Z0-9]+)?$}).}
 
 \item{github_pat}{character. How to provide a GitHub PAT to
 \code{renv::restore()} for private dependency repositories. One of

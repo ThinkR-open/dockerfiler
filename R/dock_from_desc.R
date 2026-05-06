@@ -42,17 +42,29 @@ quote_not_na <- function(x){
 #
 #' @param path path to the DESCRIPTION file to use as an input.
 #' @param FROM The FROM of the Dockerfile. Default is
-#'     FROM rocker/r-ver:`R.Version()$major`.`R.Version()$minor`.
-#' @param AS The AS of the Dockerfile. Default it NULL.
+#'   `paste0("rocker/r-ver:", R.Version()$major, ".", R.Version()$minor)`.
+#'   Validated as a Docker image reference (alphanumerics, dot, slash,
+#'   dash, underscore, optional `:tag` and / or `@sha256:<hex>`); other
+#'   values raise an error to prevent shell-metacharacter injection
+#'   into the generated FROM directive.
+#' @param AS The AS of the Dockerfile. Default it NULL. When non-NULL,
+#'   validated as a simple build-stage name (`^[a-zA-Z0-9][a-zA-Z0-9._-]*$`).
 #' @param sysreqs boolean. If TRUE, the Dockerfile will contain sysreq installation.
-#' @param repos character. The URL(s) of the repositories to use for `options("repos")`.
+#' @param repos character. The URL(s) of the repositories to use for
+#'   `options("repos")`. Each value must look like an http(s) URL (no
+#'   quotes, spaces or newlines); each name (when set) must be a simple
+#'   identifier (`^[A-Za-z][A-Za-z0-9._-]*$`). Other values raise an
+#'   error to prevent injection into the generated `echo "options(...)"`
+#'   shell command.
 #' @param expand boolean. If `TRUE` each system requirement will have its own `RUN` line.
 #' @param build_from_source boolean. If `TRUE` no tar.gz is created and
 #'     the Dockerfile directly mount the source folder.
 #' @param update_tar_gz boolean. If `TRUE` and `build_from_source` is also `TRUE`,
 #'     an updated tar.gz is created.
 #' @param extra_sysreqs character vector. Extra debian system requirements.
-#'    Will be installed with apt-get install.
+#'   Will be installed with apt-get install. Each entry must be a Debian
+#'   package name (`^[a-z0-9][a-z0-9.+-]+$`); other values raise an error
+#'   to prevent injection into the generated apt-get RUN.
 #' @param github_pat character. How to provide a GitHub PAT to
 #'   `remotes::install_github()` for private dependency repositories.
 #'   One of `"none"` (default; the generated Dockerfile does not
@@ -103,16 +115,11 @@ dock_from_desc <- function(
   strict_install = TRUE
 ) {
   github_pat <- match.arg(github_pat)
-  if (
-    !is.logical(strict_install) ||
-      length(strict_install) != 1L ||
-      is.na(strict_install)
-  ) {
-    stop(
-      "`strict_install` must be a single `TRUE` or `FALSE`, got: ",
-      deparse(strict_install)
-    )
-  }
+  .validate_scalar_logical(strict_install, "strict_install")
+  .validate_FROM(FROM)
+  .validate_AS(AS)
+  .validate_repos(repos)
+  .validate_extra_sysreqs(extra_sysreqs)
   path <- fs::path_abs(path)
 
   packages <- desc_get_deps(path)$package

@@ -15,6 +15,13 @@ if (!is.null(distro)){
   warning("the `distro` parameter is not used anymore, only debian/ubuntu based images are supported")
 }
 
-    glue::glue("{FROM}:{r_version}")
+# If the caller already pinned a tag (`:something`) or digest
+# (`@sha256:...`), do not append `:r_version` on top of it -- that
+# would yield an invalid image reference like `repo:tag:r_version`.
+if (grepl("(:[^/]+|@sha256:[a-fA-F0-9]+)$", FROM)) {
+  glue::glue("{FROM}")
+} else {
+  glue::glue("{FROM}:{r_version}")
+}
 
 }

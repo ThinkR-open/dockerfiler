@@ -45,6 +45,10 @@ test_that("dock_from_renv works", {
     out <- dock_from_renv(
       lockfile = the_lockfile,
       FROM = "rocker/verse",
+      # Use a non-PPM repos so this fixture-comparison test keeps
+      # locking the basic Dockerfile shape; the PPM rewrite has its
+      # own dedicated tests.
+      repos = c(CRAN = "https://cran.rstudio.com/"),
       renv_version = "0.0.0"
     )
   },
@@ -146,6 +150,124 @@ test_that("gen_base_image works", {
     FROM = "rocker/verse"
   )
   expect_equal(out, "rocker/verse:4.0")
+})
+
+test_that("dock_from_renv default FROM is rocker/r-ver, default repos is p3m.dev/cran/latest", {
+  fmls <- formals(dock_from_renv)
+  expect_equal(fmls$FROM, "rocker/r-ver")
+  # `formals()` returns the unevaluated default; capture as string.
+  expect_equal(
+    deparse(fmls$repos),
+    'c(CRAN = "https://p3m.dev/cran/latest")'
+  )
+})
+
+test_that("dock_from_renv defaults produce a multi-arch FROM auto-tagged from the lockfile R version", {
+  skip_if(is_rdevel, "skip on R-devel")
+  out <- dock_from_renv(
+    lockfile = the_lockfile,
+    user = NULL,
+    renv_version = "0.0.0"
+  )
+  # Default FROM = rocker/r-ver is untagged; gen_base_image appends
+  # the lockfile's R version (4.1.2 in the test setup).
+  expect_true("FROM rocker/r-ver:4.1.2" %in% out$Dockerfile)
+})
+
+test_that("dock_from_renv defaults trigger the PPM rewrite (codename + UA + override)", {
+  skip_if(is_rdevel, "skip on R-devel")
+  out <- dock_from_renv(
+    lockfile = the_lockfile,
+    user = NULL,
+    renv_version = "0.0.0"
+  )
+  df <- paste(out$Dockerfile, collapse = "\n")
+  # The default p3m.dev URL must be rewritten to the
+  # `__linux__/$VERSION_CODENAME/` shape so the build pulls Linux
+  # binaries.
+  expect_match(df, "https://p3m\\.dev/cran/__linux__/\\$VERSION_CODENAME/latest")
+  # The HTTPUserAgent line must be emitted (PPM serves source if it
+  # is missing even with a `__linux__/` URL).
+  expect_match(df, "HTTPUserAgent = sprintf\\('R \\(")
+  # The renv config repos override must point at the rewritten URL.
+  expect_match(df, "renv\\.config\\.repos\\.override = c\\(CRAN = '")
+  # The /etc/os-release source must be prefixed on the RUN that uses
+  # $VERSION_CODENAME.
+  expect_match(df, "\\. /etc/os-release && ")
+})
+
+test_that(".patch_rprofile_for_ppm rejects PPM host typos that the (posit|rstudio).(co|com) Cartesian product would have admitted", {
+  # `posit.com` and `rstudio.co` are typos -- not real Posit-managed
+  # hosts. Without the explicit enumeration, an alternation
+  # `(posit|rstudio).(co|com)` matches both and rewrites the URL to a
+  # codename form against a host that does not resolve. Lock the
+  # explicit host whitelist by exercising both typos.
+  skip_if(is_rdevel, "skip on R-devel")
+  for (typo_url in c(
+    "https://packagemanager.posit.com/cran/latest",
+    "https://packagemanager.rstudio.co/cran/latest"
+  )) {
+    out <- dock_from_renv(
+      lockfile = the_lockfile,
+      user = NULL,
+      repos = setNames(typo_url, "CRAN"),
+      renv_version = "0.0.0"
+    )
+    df <- paste(out$Dockerfile, collapse = "\n")
+    expect_false(
+      grepl("__linux__", df, fixed = TRUE),
+      info = sprintf(
+        "PPM rewrite incorrectly fired on typo host %s",
+        typo_url
+      )
+    )
+  }
+})
+
+test_that(".validate_r_version accepts R-devel, release-candidate and Patched lockfile shapes", {
+  # renv records these forms in real lockfiles. The post-#109
+  # validator originally rejected them, blocking the user from
+  # `dock_from_renv()` whenever the new `FROM = "rocker/r-ver"`
+  # default routed through the auto-tag path.
+  expect_silent(dockerfiler:::.validate_r_version("4.5"))
+  expect_silent(dockerfiler:::.validate_r_version("4.5.0"))
+  expect_silent(dockerfiler:::.validate_r_version("4.5.0-RC"))
+  expect_silent(dockerfiler:::.validate_r_version("r-devel"))
+  expect_silent(dockerfiler:::.validate_r_version("3.6.0 Patched"))
+  # Still reject obvious garbage / shell metacharacters.
+  expect_error(
+    dockerfiler:::.validate_r_version("4.5; rm -rf /"),
+    "r_version"
+  )
+  expect_error(
+    dockerfiler:::.validate_r_version(""),
+    "r_version"
+  )
+})
+
+test_that(".patch_rprofile_for_ppm matches all three current PPM host shapes", {
+  for (host in c(
+    "packagemanager.rstudio.com",
+    "packagemanager.posit.co",
+    "p3m.dev"
+  )) {
+    skip_if(is_rdevel, "skip on R-devel")
+    out <- dock_from_renv(
+      lockfile = the_lockfile,
+      user = NULL,
+      repos = setNames(
+        sprintf("https://%s/cran/latest", host),
+        "CRAN"
+      ),
+      renv_version = "0.0.0"
+    )
+    df <- paste(out$Dockerfile, collapse = "\n")
+    expect_match(
+      df,
+      sprintf("https://%s/cran/__linux__/\\$VERSION_CODENAME/latest", host),
+      info = sprintf("PPM rewrite did not fire on host %s", host)
+    )
+  }
 })
 
 test_that("gen_base_image preserves an already-pinned tag instead of appending r_version", {

@@ -7,10 +7,10 @@
 dock_from_renv(
   lockfile = "renv.lock",
   distro = NULL,
-  FROM = "rocker/r-base",
+  FROM = "rocker/r-ver",
   AS = NULL,
   sysreqs = TRUE,
-  repos = c(CRAN = "https://cran.rstudio.com/"),
+  repos = c(CRAN = "https://p3m.dev/cran/latest"),
   expand = FALSE,
   extra_sysreqs = NULL,
   use_pak = FALSE,
@@ -34,11 +34,21 @@ dots, underscores or hyphens (no spaces or shell metacharacters).}
 \item deprecated - only debian/ubuntu based images are supported
 }}
 
-\item{FROM}{Docker image to start FROM. Default is \code{"rocker/r-base"}.
-Validated as a Docker image reference (alphanumerics, dot, slash,
-dash, underscore, optional \verb{:tag} and / or \verb{@sha256:<hex>}); other
-values raise an error to prevent shell-metacharacter injection
-into the generated FROM directive.}
+\item{FROM}{Docker image to start FROM. Default is \code{"rocker/r-ver"},
+which is multi-arch (linux/amd64 + linux/arm64) and gets the
+lockfile's R version appended at codegen time (e.g.
+\verb{rocker/r-ver:4.5.0}). Pass an already-tagged or
+already-digested reference (\verb{rocker/r-ver:4.4.1},
+\code{rocker/r-base@sha256:...}) to override the auto-tag; the user's
+tag is honoured verbatim, even if it differs from the lockfile's
+\code{R$Version}. R-devel and release-candidate users whose lockfile
+records \code{r-devel} or \verb{4.5.0-RC} may want to pass an explicit
+tag like \code{FROM = "rocker/r-ver:devel"} to control which base
+image is pulled.
+Validated as a Docker image reference
+(\verb{<host>[:<port>]/<image>[:<tag>][@sha256:<hex>]}); other values
+raise an error to prevent shell-metacharacter injection into the
+generated FROM directive.}
 
 \item{AS}{The AS of the Dockerfile. Default is \code{NULL}. When non-NULL,
 validated as a simple build-stage name (\verb{^[a-zA-Z0-9][a-zA-Z0-9._-]*$}).}
@@ -46,11 +56,18 @@ validated as a simple build-stage name (\verb{^[a-zA-Z0-9][a-zA-Z0-9._-]*$}).}
 \item{sysreqs}{boolean. If \code{TRUE}, the Dockerfile will contain sysreq installation.}
 
 \item{repos}{character. The URL(s) of the repositories to use for
-\code{options("repos")}. Each value must look like an http(s) URL
-(no quotes, spaces or newlines); each name (when set) must be a
-simple identifier (\verb{^[A-Za-z][A-Za-z0-9._-]*$}). Other values raise
-an error to prevent injection into the generated \verb{echo "options(...)"}
-shell command.}
+\code{options("repos")}. Default is
+\code{c(CRAN = "https://p3m.dev/cran/latest")} (Posit Public Package
+Manager). When the URL is recognized as a PPM host
+(\code{packagemanager.posit.co}, \code{packagemanager.rstudio.com}, or
+\code{p3m.dev}), the codegen rewrites it to the
+\verb{__linux__/$VERSION_CODENAME/} shape so the build pulls Linux
+binaries (5-10x faster than building from source). Each value
+must look like an http(s) URL (no quotes, spaces or newlines);
+each name (when set) must be a simple identifier
+(\verb{^[A-Za-z][A-Za-z0-9._-]*$}). Other values raise an error to
+prevent injection into the generated \verb{echo "options(...)"} shell
+command.}
 
 \item{expand}{boolean. If \code{TRUE} each system requirement will have its own \code{RUN} line.}
 

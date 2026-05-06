@@ -14,22 +14,39 @@ pkg_sysreqs_mem <- memoise::memoise(
 #'   Dockerfile emits `COPY <basename(lockfile)> renv.lock`. Validated
 #'   as a single string whose basename contains only alphanumerics,
 #'   dots, underscores or hyphens (no spaces or shell metacharacters).
-#' @param FROM Docker image to start FROM. Default is `"rocker/r-base"`.
-#'   Validated as a Docker image reference (alphanumerics, dot, slash,
-#'   dash, underscore, optional `:tag` and / or `@sha256:<hex>`); other
-#'   values raise an error to prevent shell-metacharacter injection
-#'   into the generated FROM directive.
+#' @param FROM Docker image to start FROM. Default is `"rocker/r-ver"`,
+#'   which is multi-arch (linux/amd64 + linux/arm64) and gets the
+#'   lockfile's R version appended at codegen time (e.g.
+#'   `rocker/r-ver:4.5.0`). Pass an already-tagged or
+#'   already-digested reference (`rocker/r-ver:4.4.1`,
+#'   `rocker/r-base@sha256:...`) to override the auto-tag; the user's
+#'   tag is honoured verbatim, even if it differs from the lockfile's
+#'   `R$Version`. R-devel and release-candidate users whose lockfile
+#'   records `r-devel` or `4.5.0-RC` may want to pass an explicit
+#'   tag like `FROM = "rocker/r-ver:devel"` to control which base
+#'   image is pulled.
+#'   Validated as a Docker image reference
+#'   (`<host>[:<port>]/<image>[:<tag>][@sha256:<hex>]`); other values
+#'   raise an error to prevent shell-metacharacter injection into the
+#'   generated FROM directive.
 #' @param AS The AS of the Dockerfile. Default is `NULL`. When non-NULL,
 #'   validated as a simple build-stage name (`^[a-zA-Z0-9][a-zA-Z0-9._-]*$`).
 #' @param distro - deprecated - only debian/ubuntu based images are supported
 #' @param sysreqs boolean. If `TRUE`, the Dockerfile will contain sysreq installation.
 #' @param expand boolean. If `TRUE` each system requirement will have its own `RUN` line.
 #' @param repos character. The URL(s) of the repositories to use for
-#'   `options("repos")`. Each value must look like an http(s) URL
-#'   (no quotes, spaces or newlines); each name (when set) must be a
-#'   simple identifier (`^[A-Za-z][A-Za-z0-9._-]*$`). Other values raise
-#'   an error to prevent injection into the generated `echo "options(...)"`
-#'   shell command.
+#'   `options("repos")`. Default is
+#'   `c(CRAN = "https://p3m.dev/cran/latest")` (Posit Public Package
+#'   Manager). When the URL is recognized as a PPM host
+#'   (`packagemanager.posit.co`, `packagemanager.rstudio.com`, or
+#'   `p3m.dev`), the codegen rewrites it to the
+#'   `__linux__/$VERSION_CODENAME/` shape so the build pulls Linux
+#'   binaries (5-10x faster than building from source). Each value
+#'   must look like an http(s) URL (no quotes, spaces or newlines);
+#'   each name (when set) must be a simple identifier
+#'   (`^[A-Za-z][A-Za-z0-9._-]*$`). Other values raise an error to
+#'   prevent injection into the generated `echo "options(...)"` shell
+#'   command.
 #' @param extra_sysreqs character vector. Extra debian system requirements.
 #'   Will be installed with apt-get install. Each entry must be a Debian
 #'   package name (`^[a-z0-9][a-z0-9.+-]+$`); other values raise an error
@@ -146,10 +163,10 @@ pkg_sysreqs_mem <- memoise::memoise(
 dock_from_renv <- function(
   lockfile = "renv.lock",
   distro = NULL,
-  FROM = "rocker/r-base",
+  FROM = "rocker/r-ver",
   AS = NULL,
   sysreqs = TRUE,
-  repos = c(CRAN = "https://cran.rstudio.com/"),
+  repos = c(CRAN = "https://p3m.dev/cran/latest"),
   expand = FALSE,
   extra_sysreqs = NULL,
   use_pak = FALSE,
@@ -430,7 +447,20 @@ dock_from_renv <- function(
 #' out of scope.
 #' @noRd
 .patch_rprofile_for_ppm <- function(dock, repos) {
-  ppm_pattern <- "^https?://packagemanager\\.(posit|rstudio)\\.(co|com)/"
+  # Match the three current PPM host shapes: the original
+  # `packagemanager.rstudio.com`, the rebranded `packagemanager.posit.co`,
+  # and the short `p3m.dev` (which Posit started promoting in 2024 as
+  # the recommended URL for binary mirrors). Enumerate explicitly to
+  # avoid the `(posit|rstudio).(co|com)` Cartesian-product trap that
+  # would also accept `posit.com` and `rstudio.co` (neither is a real
+  # Posit-managed host).
+  ppm_pattern <- paste0(
+    "^https?://(",
+    "packagemanager\\.posit\\.co|",
+    "packagemanager\\.rstudio\\.com|",
+    "p3m\\.dev",
+    ")/"
+  )
   if (length(repos) != 1L || !identical(names(repos), "CRAN")) {
     return(invisible(NULL))
   }
@@ -449,7 +479,7 @@ dock_from_renv <- function(
   # Preserve the user's scheme + host on rewrite (so a
   # `packagemanager.rstudio.com` URL stays on rstudio.com and is not
   # silently swapped to posit.co). The PPM detection regex above only
-  # matches the two official PPM hosts; non-PPM internal mirrors are
+  # matches the three Posit-managed PPM hosts; non-PPM internal mirrors are
   # not entered into this branch at all.
   user_host_prefix <- sub("/cran(/.*)?$", "", user_url_norm)
 

@@ -29,7 +29,38 @@ pkg_sysreqs_mem <- memoise::memoise(
 #'   - a character string such as `"1.0.0"`: install that specific
 #'     version regardless of what the lockfile says.
 #' @param use_pak boolean. If `TRUE` use pak to deal with dependencies  during `renv::restore()`. FALSE by default
-#' @param user Name of the user to specify in the Dockerfile with the USER instruction. Default is `NULL`, in which case the user from the FROM image is used.
+#' @param user Name of the user the runtime container drops privilege
+#'   to before the `renv::restore()` step (and therefore at runtime).
+#'   Default is `"rstudio"` so the generated image runs as a non-root
+#'   user out of the box, which is the recommended security posture.
+#'
+#'   The Dockerfile is emitted in two halves: every step that needs
+#'   root (apt-get, R install commands, `chown` of the renv cache)
+#'   runs first; then a `USER <user>` directive drops privilege; then
+#'   the `renv::restore()` cache-mount RUN happens.
+#'
+#'   To make this work regardless of the FROM image, the package
+#'   emits a defensive `RUN id -u <user> >/dev/null 2>&1 ||
+#'   useradd -m -d /home/<user> -s /bin/bash <user>` early. On
+#'   rocker/* images the `useradd` is a no-op (the user already
+#'   exists); on `r-base`, `ubuntu:*`, `debian:*` it creates the user
+#'   with the standard home directory.
+#'
+#'   Pass `user = NULL` to opt out: no `USER` directive is emitted
+#'   and the container runs as root (the previous behaviour).
+#'   Pass any other string to use that user instead of `rstudio`.
+#'   Custom homes (e.g. `/srv/myapp`) require also passing an
+#'   explicit `renv_paths_cache`.
+#'
+#'   debian/ubuntu images only (`useradd` is the standard form);
+#'   for alpine-based images you must pass `user = NULL` and handle
+#'   user creation yourself with the alpine-native `adduser`.
+#'
+#'   The argument is validated at codegen time against
+#'   `^[a-zA-Z_][a-zA-Z0-9_-]{0,31}$` (POSIX-style username, max 32
+#'   chars, no shell metacharacters). Other values raise an error
+#'   to prevent metacharacter injection into the generated `RUN`
+#'   commands.
 #' @param dependencies What kinds of dependencies to install. Most commonly
 #'   one of the following values:
 #'   - `NA`: only required (hard) dependencies,
@@ -47,11 +78,25 @@ pkg_sysreqs_mem <- memoise::memoise(
 #'   mount on the `renv::restore()` RUN; the PAT is never persisted in
 #'   the image; requires BuildKit, so pass with
 #'   `DOCKER_BUILDKIT=1 docker build --secret id=github_pat,env=GITHUB_PAT ...`).
-#' @param renv_paths_cache character. Path used as the default of the
-#'   `RENV_PATHS_CACHE` build-arg, propagated as an `ENV` variable, and
-#'   used as the cache mount target for `renv::restore()`. Lets users
-#'   override the renv cache location at image build time via
-#'   `--build-arg RENV_PATHS_CACHE=...`.
+#' @param renv_paths_cache character or `NULL`. Path used as the
+#'   default of the `RENV_PATHS_CACHE` build-arg, propagated as an
+#'   `ENV` variable, and used as the cache mount target for
+#'   `renv::restore()`. Lets users override the renv cache location
+#'   at image build time via `--build-arg RENV_PATHS_CACHE=...`.
+#'
+#'   When `NULL` (the default), the cache path is derived from
+#'   `user`: `/root/.cache/R/renv` when `user = NULL`, and
+#'   `/home/<user>/.cache/R/renv` when `user` is a non-root username.
+#'   Pass an explicit string to override the convention (e.g. for
+#'   custom-home users like `user = "myapp"` with home at
+#'   `/srv/myapp`, pass `renv_paths_cache = "/srv/myapp/.cache/R/renv"`).
+#'
+#'   In all cases (`user = NULL` excepted), the generated Dockerfile
+#'   emits a single `RUN mkdir -p "${RENV_PATHS_CACHE}" && chown -R <user>:<user> "${RENV_PATHS_CACHE}"`
+#'   step right before the `USER <user>` directive so the cache mount
+#'   target is writable from the un-privileged user. The cache path
+#'   is double-quoted at shell expansion time so a build-arg
+#'   override containing whitespace cannot break the command.
 #' @importFrom utils getFromNamespace
 #' @return A R6 object of class `Dockerfile`.
 #' @details
@@ -86,14 +131,39 @@ dock_from_renv <- function(
   expand = FALSE,
   extra_sysreqs = NULL,
   use_pak = FALSE,
-  user = NULL,
+  user = "rstudio",
   dependencies = NA,
   sysreqs_platform = "ubuntu",
   renv_version,
   github_pat = c("none", "build_arg", "secret"),
-  renv_paths_cache = "/root/.cache/R/renv"
+  renv_paths_cache = NULL
 ) {
   github_pat <- match.arg(github_pat)
+  if (!is.null(user)) {
+    # `user` is interpolated into shell commands (id, useradd, chown, USER).
+    # Reject anything that is not a strict POSIX username so a caller passing
+    # ``"; rm -rf /"`` or ``"bad user"`` cannot inject into / break the
+    # generated Dockerfile.
+    if (
+      !is.character(user) ||
+        length(user) != 1L ||
+        !grepl("^[a-zA-Z_][a-zA-Z0-9_-]{0,31}$", user)
+    ) {
+      stop(
+        "`user` must be a single string matching the POSIX username ",
+        "regex /^[a-zA-Z_][a-zA-Z0-9_-]{0,31}$/, ",
+        "got: ",
+        deparse(user)
+      )
+    }
+  }
+  if (is.null(renv_paths_cache)) {
+    renv_paths_cache <- if (is.null(user)) {
+      "/root/.cache/R/renv"
+    } else {
+      sprintf("/home/%s/.cache/R/renv", user)
+    }
+  }
   lock <- jsonlite::read_json(
     lockfile,
     simplifyVector = TRUE,
@@ -110,12 +180,21 @@ dock_from_renv <- function(
     ),
     AS = AS
   )
+  if (!is.null(user)) {
+    dock$RUN(
+      sprintf(
+        "id -u %s >/dev/null 2>&1 || useradd -m -d /home/%s -s /bin/bash %s",
+        user,
+        user,
+        user
+      )
+    )
+  }
   .github_pat_setup(dock, github_pat)
   dock$ARG("RENV_PATHS_CACHE", default = renv_paths_cache)
   dock$ENV(key = "RENV_PATHS_CACHE", value = "${RENV_PATHS_CACHE}")
-  if (!is.null(user)) {
-    dock$USER(user)
-  }
+  # USER (if any) is emitted later, after the apt-get / R install steps
+  # that need root and after the chown of RENV_PATHS_CACHE.
   # get renv version
 
   if (missing(renv_version)) {
@@ -268,6 +347,21 @@ dock_from_renv <- function(
   }
 
   dock$COPY(basename(lockfile), "renv.lock")
+  if (!is.null(user)) {
+    # Drop privilege right before the cache-mount renv::restore RUN.
+    # The mkdir + chown make the cache target writable by `user` even
+    # though the Docker BuildKit cache mount itself is created on-demand.
+    # Single RUN with `&&` keeps the image layer count down and the
+    # quoted `"${RENV_PATHS_CACHE}"` survives a build-arg with spaces.
+    dock$RUN(
+      sprintf(
+        'mkdir -p "${RENV_PATHS_CACHE}" && chown -R %s:%s "${RENV_PATHS_CACHE}"',
+        user,
+        user
+      )
+    )
+    dock$USER(user)
+  }
   dock$RUN(
     paste0(
       "--mount=type=cache,id=renv-cache,target=${RENV_PATHS_CACHE} ",

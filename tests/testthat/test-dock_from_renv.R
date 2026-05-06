@@ -437,13 +437,16 @@ test_that("dock_from_renv emits a secret mount on restore() when github_pat = 's
 
 test_that("dock_from_renv emits the RENV_PATHS_CACHE build-arg by default", {
   skip_if(is_rdevel, "skip on R-devel")
+  # Default user is "rstudio", so the default cache is auto-derived
+  # to /home/rstudio. The build-arg, env and cache-mount tokens are
+  # locked here regardless of which user the auto-derive picks.
   out <- dock_from_renv(
     lockfile = the_lockfile,
     FROM = "rocker/verse",
     renv_version = "0.0.0"
   )
   df <- paste(out$Dockerfile, collapse = "\n")
-  expect_match(df, "ARG RENV_PATHS_CACHE=/root/.cache/R/renv", fixed = TRUE)
+  expect_match(df, "ARG RENV_PATHS_CACHE=/home/rstudio/.cache/R/renv", fixed = TRUE)
   expect_match(df, 'ENV "RENV_PATHS_CACHE"="${RENV_PATHS_CACHE}"', fixed = TRUE)
   expect_match(
     df,
@@ -568,6 +571,235 @@ test_that(".patch_rprofile_for_ppm returns invisibly when more than one Rprofile
 
   expect_null(res)
   expect_identical(dock$Dockerfile, before)
+})
+
+test_that("dock_from_renv with user = NULL keeps the cache at /root and emits no chown / no USER / no useradd", {
+  skip_if(is_rdevel, "skip on R-devel")
+  out <- dock_from_renv(
+    lockfile = the_lockfile,
+    FROM = "rocker/verse",
+    user = NULL,
+    renv_version = "0.0.0"
+  )
+  df <- paste(out$Dockerfile, collapse = "\n")
+  expect_match(df, "ARG RENV_PATHS_CACHE=/root/\\.cache/R/renv")
+  expect_false(grepl("\\bUSER\\b", df))
+  expect_false(grepl("chown", df))
+  expect_false(grepl("useradd", df))
+})
+
+test_that("dock_from_renv with default user emits a defensive useradd at the top of the Dockerfile", {
+  skip_if(is_rdevel, "skip on R-devel")
+  out <- dock_from_renv(
+    lockfile = the_lockfile,
+    FROM = "rocker/verse",
+    renv_version = "0.0.0"
+  )
+  lines <- out$Dockerfile
+
+  # The defensive useradd must be early, well before any RUN that
+  # might touch the user. Allowing for the FROM line + a couple of
+  # ARG/ENV directives, the useradd should appear within the first
+  # few non-FROM lines.
+  useradd_idx <- grep(
+    "id -u rstudio.*useradd -m -d /home/rstudio -s /bin/bash rstudio",
+    lines
+  )
+  expect_length(useradd_idx, 1L)
+
+  # The useradd RUN must precede any chown / USER / install RUN.
+  install_idx <- grep("install\\.packages|install_version", lines)
+  user_idx <- grep("^USER ", lines)
+  if (length(install_idx) > 0L) {
+    expect_lt(useradd_idx, min(install_idx))
+  }
+  if (length(user_idx) > 0L) {
+    expect_lt(useradd_idx, min(user_idx))
+  }
+})
+
+test_that("dock_from_renv with user = 'rstudio' auto-derives the cache to /home/rstudio/", {
+  skip_if(is_rdevel, "skip on R-devel")
+  out <- dock_from_renv(
+    lockfile = the_lockfile,
+    FROM = "rocker/verse",
+    user = "rstudio",
+    renv_version = "0.0.0"
+  )
+  df <- paste(out$Dockerfile, collapse = "\n")
+  expect_match(df, "ARG RENV_PATHS_CACHE=/home/rstudio/\\.cache/R/renv")
+  expect_match(df, 'chown -R rstudio:rstudio "\\$\\{RENV_PATHS_CACHE\\}"')
+})
+
+test_that("dock_from_renv with user = 'rstudio' orders RUNs correctly: apt-get -> chown -> USER -> renv::restore", {
+  skip_if(is_rdevel, "skip on R-devel")
+  skip_on_os("mac")
+  out <- dock_from_renv(
+    lockfile = the_lockfile,
+    FROM = "rocker/verse",
+    user = "rstudio",
+    renv_version = "0.0.0"
+  )
+  lines <- out$Dockerfile
+
+  apt_idx <- grep("apt-get install", lines)
+  chown_idx <- grep("chown -R rstudio:rstudio", lines)
+  user_idx <- grep("^USER rstudio$", lines)
+  restore_idx <- grep("renv::restore", lines)
+
+  expect_gt(length(chown_idx), 0L)
+  expect_gt(length(user_idx), 0L)
+  expect_gt(length(restore_idx), 0L)
+
+  # apt-get must come BEFORE USER (apt-get requires root).
+  expect_true(all(apt_idx < user_idx[1]))
+
+  # chown must come BEFORE USER (chown requires root and must
+  # run before the privilege drop).
+  expect_true(all(chown_idx < user_idx[1]))
+
+  # USER must come BEFORE renv::restore (the cache mount target
+  # was chowned to <user>; the restore needs to write to it).
+  expect_true(all(user_idx < restore_idx))
+})
+
+test_that("dock_from_renv with user + explicit renv_paths_cache honors the explicit path and chowns it", {
+  skip_if(is_rdevel, "skip on R-devel")
+  out <- dock_from_renv(
+    lockfile = the_lockfile,
+    FROM = "rocker/verse",
+    user = "myapp",
+    renv_paths_cache = "/srv/myapp/cache",
+    renv_version = "0.0.0"
+  )
+  df <- paste(out$Dockerfile, collapse = "\n")
+  expect_match(df, "ARG RENV_PATHS_CACHE=/srv/myapp/cache")
+  expect_match(df, 'chown -R myapp:myapp "\\$\\{RENV_PATHS_CACHE\\}"')
+})
+
+test_that("dock_from_renv rejects shell-injection-prone user values", {
+  # `user` is interpolated into Dockerfile RUN commands (id, useradd,
+  # chown). Without validation, a caller could pass a string with shell
+  # metacharacters or whitespace and either break the generated
+  # Dockerfile or inject arbitrary commands at docker build time.
+  skip_if(is_rdevel, "skip on R-devel")
+
+  expect_error(
+    dock_from_renv(
+      lockfile = the_lockfile,
+      FROM = "rocker/verse",
+      user = "; rm -rf /",
+      renv_version = "0.0.0"
+    ),
+    "POSIX username"
+  )
+  expect_error(
+    dock_from_renv(
+      lockfile = the_lockfile,
+      FROM = "rocker/verse",
+      user = "bad user",
+      renv_version = "0.0.0"
+    ),
+    "POSIX username"
+  )
+  expect_error(
+    dock_from_renv(
+      lockfile = the_lockfile,
+      FROM = "rocker/verse",
+      user = "user$(echo pwned)",
+      renv_version = "0.0.0"
+    ),
+    "POSIX username"
+  )
+  expect_error(
+    dock_from_renv(
+      lockfile = the_lockfile,
+      FROM = "rocker/verse",
+      user = "1starts-with-digit",
+      renv_version = "0.0.0"
+    ),
+    "POSIX username"
+  )
+  # A colon would break the chown -R user:user round-trip if it ever
+  # got through the validation -- exercise it directly.
+  expect_error(
+    dock_from_renv(
+      lockfile = the_lockfile,
+      FROM = "rocker/verse",
+      user = "foo:bar",
+      renv_version = "0.0.0"
+    ),
+    "POSIX username"
+  )
+  # Non-character / wrong length must also fail with the same path.
+  expect_error(
+    dock_from_renv(
+      lockfile = the_lockfile,
+      FROM = "rocker/verse",
+      user = c("alice", "bob"),
+      renv_version = "0.0.0"
+    ),
+    "POSIX username"
+  )
+})
+
+test_that("dock_from_renv emits a single RUN combining mkdir and chown with a quoted cache path", {
+  # Two safety/hygiene properties locked here:
+  # 1. mkdir + chown must run as a single Dockerfile RUN (one image
+  #    layer) joined with `&&`.
+  # 2. The interpolated `${RENV_PATHS_CACHE}` must be double-quoted so a
+  #    build-arg containing whitespace or shell metacharacters cannot
+  #    break the command or inject (the env var is caller-overridable
+  #    via `--build-arg RENV_PATHS_CACHE=...`).
+  skip_if(is_rdevel, "skip on R-devel")
+  out <- dock_from_renv(
+    lockfile = the_lockfile,
+    FROM = "rocker/verse",
+    user = "rstudio",
+    renv_version = "0.0.0"
+  )
+  df <- paste(out$Dockerfile, collapse = "\n")
+
+  # Single combined RUN (one layer):
+  expect_match(
+    df,
+    'RUN mkdir -p "\\$\\{RENV_PATHS_CACHE\\}" && chown -R rstudio:rstudio "\\$\\{RENV_PATHS_CACHE\\}"'
+  )
+
+  # No leftover unquoted standalone mkdir / chown:
+  expect_false(grepl("RUN mkdir -p \\$\\{RENV_PATHS_CACHE\\}\\s*$", df))
+  expect_false(
+    grepl(
+      "^RUN chown -R [^:]+:[^ ]+ \\$\\{RENV_PATHS_CACHE\\}\\s*$",
+      df,
+      perl = TRUE
+    )
+  )
+})
+
+test_that("dock_from_renv with user = 'kevin' parameterises the useradd, cache and chown on 'kevin'", {
+  # Locks the invariant that the user-handling logic is fully
+  # parameterised on `user` and not hardcoded on "rstudio". Without
+  # this, a future refactor that accidentally hardcodes the username
+  # would silently regress for any non-rstudio caller.
+  skip_if(is_rdevel, "skip on R-devel")
+  out <- dock_from_renv(
+    lockfile = the_lockfile,
+    FROM = "rocker/verse",
+    user = "kevin",
+    renv_version = "0.0.0"
+  )
+  df <- paste(out$Dockerfile, collapse = "\n")
+  expect_match(df, "id -u kevin >/dev/null 2>&1 \\|\\| useradd -m -d /home/kevin -s /bin/bash kevin")
+  expect_match(df, "ARG RENV_PATHS_CACHE=/home/kevin/\\.cache/R/renv")
+  expect_match(df, 'chown -R kevin:kevin "\\$\\{RENV_PATHS_CACHE\\}"')
+  # The USER directive lives on its own line; check the line vector
+  # rather than the paste-collapsed single string.
+  expect_true("USER kevin" %in% out$Dockerfile)
+  # Negative invariant: no hardcoded "rstudio" leaked into a user-scope
+  # context (cran.rstudio.com in the default repos URL is fine and
+  # excluded explicitly).
+  expect_false(any(grepl("\\brstudio\\b(?!\\.com)", out$Dockerfile, perl = TRUE)))
 })
 
 unlink(dir_build, recursive = TRUE)

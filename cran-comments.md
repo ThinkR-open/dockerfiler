@@ -4,6 +4,10 @@
 0 errors | 0 warnings | 0 notes
 ```
 
+(local `R CMD check --as-cran` occasionally surfaces a single
+transient NOTE "unable to verify current time" caused by host
+clock skew on the build VM; the package itself is unaffected.)
+
 ## Test environments
 
 * local Ubuntu 24.04, R 4.5.x: `R CMD check --as-cran` clean.
@@ -12,16 +16,18 @@
   * macOS-latest (release)
   * windows-latest (release)
   * ubuntu-latest (release, devel, oldrel-1)
-* `devtools::check_win_devel()`: TODO (will be filled in after
-  the email confirmation arrives).
+* `devtools::check_win_devel()`: submitted in parallel with this
+  CRAN submission; the win-builder result will follow by email
+  and will be forwarded to CRAN if it surfaces anything new.
 
 ## Maintainer change
 
 This release changes the maintainer from Colin Fay
 (`contact@colinfay.me`) to Vincent Guyader
-(`vincent@thinkr.fr`). Both are listed as authors. Confirmation
-of the maintainer change has been coordinated between the two
-authors prior to submission.
+(`vincent@thinkr.fr`). Both remain listed as authors. The
+previous maintainer (Colin Fay) is aware of this submission and
+will confirm the maintainer change by replying to the automated
+email from CRAN's submission system.
 
 ## Major changes since 0.2.6
 

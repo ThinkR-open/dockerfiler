@@ -43,10 +43,10 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">dock_from_renv</span><span class="op">(</span></span>
 <span>  lockfile <span class="op">=</span> <span class="st">"renv.lock"</span>,</span>
 <span>  distro <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  FROM <span class="op">=</span> <span class="st">"rocker/r-base"</span>,</span>
+<span>  FROM <span class="op">=</span> <span class="st">"rocker/r-ver"</span>,</span>
 <span>  AS <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  sysreqs <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  repos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>CRAN <span class="op">=</span> <span class="st">"https://cran.rstudio.com/"</span><span class="op">)</span>,</span>
+<span>  repos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>CRAN <span class="op">=</span> <span class="st">"https://p3m.dev/cran/latest"</span><span class="op">)</span>,</span>
 <span>  expand <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  extra_sysreqs <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  use_pak <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -78,11 +78,21 @@ dots, underscores or hyphens (no spaces or shell metacharacters).</p></dd>
 
 
 <dt id="arg-from">FROM<a class="anchor" aria-label="anchor" href="#arg-from"></a></dt>
-<dd><p>Docker image to start FROM. Default is <code>"rocker/r-base"</code>.
-Validated as a Docker image reference (alphanumerics, dot, slash,
-dash, underscore, optional <code>:tag</code> and / or <code>@sha256:&lt;hex&gt;</code>); other
-values raise an error to prevent shell-metacharacter injection
-into the generated FROM directive.</p></dd>
+<dd><p>Docker image to start FROM. Default is <code>"rocker/r-ver"</code>,
+which is multi-arch (linux/amd64 + linux/arm64) and gets the
+lockfile's R version appended at codegen time (e.g.
+<code>rocker/r-ver:4.5.0</code>). Pass an already-tagged or
+already-digested reference (<code>rocker/r-ver:4.4.1</code>,
+<code>rocker/r-base@sha256:...</code>) to override the auto-tag; the user's
+tag is honoured verbatim, even if it differs from the lockfile's
+<code>R$Version</code>. R-devel and release-candidate users whose lockfile
+records <code>r-devel</code> or <code>4.5.0-RC</code> may want to pass an explicit
+tag like <code>FROM = "rocker/r-ver:devel"</code> to control which base
+image is pulled.
+Validated as a Docker image reference
+(<code>&lt;host&gt;[:&lt;port&gt;]/&lt;image&gt;[:&lt;tag&gt;][@sha256:&lt;hex&gt;]</code>); other values
+raise an error to prevent shell-metacharacter injection into the
+generated FROM directive.</p></dd>
 
 
 <dt id="arg-as">AS<a class="anchor" aria-label="anchor" href="#arg-as"></a></dt>
@@ -96,11 +106,18 @@ validated as a simple build-stage name (<code>^[a-zA-Z0-9][a-zA-Z0-9._-]*$</code
 
 <dt id="arg-repos">repos<a class="anchor" aria-label="anchor" href="#arg-repos"></a></dt>
 <dd><p>character. The URL(s) of the repositories to use for
-<code>options("repos")</code>. Each value must look like an http(s) URL
-(no quotes, spaces or newlines); each name (when set) must be a
-simple identifier (<code>^[A-Za-z][A-Za-z0-9._-]*$</code>). Other values raise
-an error to prevent injection into the generated <code>echo "options(...)"</code>
-shell command.</p></dd>
+<code>options("repos")</code>. Default is
+<code>c(CRAN = "https://p3m.dev/cran/latest")</code> (Posit Public Package
+Manager). When the URL is recognized as a PPM host
+(<code>packagemanager.posit.co</code>, <code>packagemanager.rstudio.com</code>, or
+<code>p3m.dev</code>), the codegen rewrites it to the
+<code>__linux__/$VERSION_CODENAME/</code> shape so the build pulls Linux
+binaries (5-10x faster than building from source). Each value
+must look like an http(s) URL (no quotes, spaces or newlines);
+each name (when set) must be a simple identifier
+(<code>^[A-Za-z][A-Za-z0-9._-]*$</code>). Other values raise an error to
+prevent injection into the generated <code>echo "options(...)"</code> shell
+command.</p></dd>
 
 
 <dt id="arg-expand">expand<a class="anchor" aria-label="anchor" href="#arg-expand"></a></dt>

@@ -30,6 +30,25 @@
   previous root behaviour. debian/ubuntu only; for alpine-based images
   you must pass `user = NULL` and create the user yourself. Closes
   [\#100](https://github.com/ThinkR-open/dockerfiler/issues/100).
+- [`dock_from_renv()`](https://thinkr-open.github.io/dockerfiler/reference/dock_from_renv.md)
+  default `FROM` flips from `"rocker/r-base"` (amd64-only) to
+  `"rocker/r-ver"` (multi-arch: linux/amd64 + linux/arm64), and the R
+  version from the `renv.lock` file is now appended at codegen time
+  (e.g. `rocker/r-ver:4.5.0`). Apple Silicon and ARM Linux hosts
+  (Ampere, AWS Graviton) now build natively without Rosetta. Pass the
+  legacy `FROM = "rocker/r-base"` to opt out. Closes
+  [\#47](https://github.com/ThinkR-open/dockerfiler/issues/47).
+- [`dock_from_renv()`](https://thinkr-open.github.io/dockerfiler/reference/dock_from_renv.md)
+  default `repos` flips from `"https://cran.rstudio.com/"` (source-only
+  CRAN mirror) to `"https://p3m.dev/cran/latest"` (Posit Public Package
+  Manager), with automatic rewrite to the `__linux__/$VERSION_CODENAME/`
+  shape at codegen time so the build pulls pre-compiled Linux binaries
+  instead of compiling from source. Build time on packages with C/C++
+  deps drops from minutes to seconds. The PPM rewrite logic now matches
+  all three Posit-managed PPM hosts: `packagemanager.posit.co`,
+  `packagemanager.rstudio.com`, and `p3m.dev`. Pass the legacy
+  `repos = c(CRAN = "https://cran.rstudio.com/")` to opt out. Closes
+  [\#57](https://github.com/ThinkR-open/dockerfiler/issues/57).
 
 ### Security
 

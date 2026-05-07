@@ -102,11 +102,27 @@ A focused 0.3.0 release. Headline bullets (full details in
 
 ## Reverse dependencies
 
-`{golem}` depends on `{dockerfiler}`. The breaking removal of
-`dockerfiler::renv` does not affect `{golem}` (golem calls
-`dock_from_*` exclusively, never the vendored renv symbols).
-`revdepcheck::revdep_check()` was run on the submission HEAD
-with no broken downstream packages.
+Three packages depend on `{dockerfiler}` (`{golem}`,
+`{AbSolution}`, `{shiny2docker}`). The breaking removal of the
+`dockerfiler::renv` symbol was verified by GitHub-wide code
+search to affect none of them: zero references to either
+`dockerfiler::renv` or `dockerfiler:::renv` exist anywhere
+outside `ThinkR-open/dockerfiler` itself and the
+`cran/dockerfiler` mirror of the previous CRAN version. The
+local `{golem}` checkout was additionally grepped explicitly:
+the only `dockerfiler` references are to the public API
+(`dock_from_renv`, `dock_from_desc`, `Dockerfile`,
+`get_sysreqs`), whose signatures are preserved across this
+release. The other 0.3.0 changes (default flip of `FROM` to
+`rocker/r-ver`, of `repos` to `p3m.dev/cran/latest`, and of
+`user` to `"rstudio"`) are behavioural-default changes and do
+not break downstream call sites.
+
+`revdepcheck::revdep_check()` was attempted but interrupted on
+the local host by long Bioconductor / heavy-stats dependency
+installs (ade4, Biobase, ape pulled in by `{AbSolution}`); the
+manual symbol-level verification above is offered in lieu of
+its summary table.
 
 ## Other notes
 

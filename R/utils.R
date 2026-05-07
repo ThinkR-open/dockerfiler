@@ -144,10 +144,21 @@ cat_info <- function(...) {
       deparse(x)
     )
   }
-  if (!grepl("^[0-9]+\\.[0-9]+(\\.[0-9]+)?$", x)) {
+  # Accept the four shapes renv records in real lockfiles: stable
+  # `X.Y` / `X.Y.Z`, release-candidate `X.Y.Z-RC`, R-devel string
+  # `r-devel`, and the historical `X.Y.Z Patched` form. The value is
+  # interpolated only into the FROM directive, which `.validate_FROM`
+  # gates separately for shell metacharacters; a slightly more
+  # permissive `r_version` shape is safe.
+  ok <- (
+    grepl("^[0-9]+\\.[0-9]+(\\.[0-9]+)?(-[A-Za-z0-9._]+)?$", x) ||
+      identical(x, "r-devel") ||
+      grepl("^[0-9]+\\.[0-9]+(\\.[0-9]+)?\\sPatched$", x)
+  )
+  if (!ok) {
     stop(
-      "`r_version` (read from the lockfile) must look like a numeric ",
-      "R version such as \"4.5\" or \"4.5.0\", got: ",
+      "`r_version` (read from the lockfile) must look like an R version ",
+      "such as \"4.5\", \"4.5.0\", \"4.5.0-RC\", or \"r-devel\", got: ",
       deparse(x)
     )
   }

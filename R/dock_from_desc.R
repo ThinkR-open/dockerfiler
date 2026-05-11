@@ -89,7 +89,7 @@ quote_not_na <- function(x){
 #' @export
 #' @rdname dockerfiles
 #'
-#' @importFrom utils installed.packages packageVersion
+#' @importFrom utils installed.packages packageVersion glob2rx
 #' @importFrom remotes dev_package_deps
 #' @importFrom desc desc_get_deps desc_get
 #' @importFrom usethis use_build_ignore
@@ -121,10 +121,23 @@ dock_from_desc <- function(
   .validate_repos(repos)
   .validate_extra_sysreqs(extra_sysreqs)
   path <- fs::path_abs(path)
+  # Package name read from the (possibly untrusted) DESCRIPTION. It is
+  # interpolated into the `COPY <pkg>_*.tar.gz /app.tar.gz` line and the
+  # tar.gz-cleanup glob below for `build_from_source = FALSE`; validate
+  # it up front so a crafted `Package:` field cannot inject an extra
+  # Dockerfile directive.
+  pkg_name <- read.dcf(path)[1L, "Package"]
+  .validate_pkg_name(pkg_name)
 
   packages <- desc_get_deps(path)$package
   packages <- packages[packages != "R"] # remove R
   packages <- packages[!packages %in% base_pkg_] # remove base and recommended
+  # The dependency-field names are interpolated into the generated
+  # `remotes::install_version("<name>", ...)` install RUNs (and queried
+  # for system requirements); validate them like the `Package:` field
+  # so a crafted Imports / Depends / Suggests / LinkingTo entry cannot
+  # inject an extra Dockerfile directive at `docker build` time.
+  .validate_pkg_names(packages)
 
   if (sysreqs) {
 
@@ -300,7 +313,11 @@ dock_from_desc <- function(
   if (!build_from_source) {
     if (update_tar_gz) {
       old_version <- list.files(
-        pattern = sprintf("%s_.+.tar.gz", read.dcf(path)[1]),
+        # `list.files(pattern =)` is a regex; build it from a glob so a
+        # dot in `pkg_name` (allowed by the CRAN package-name grammar,
+        # e.g. `R.utils`) is matched literally and a sibling tarball
+        # such as `RZutils_*.tar.gz` is not swept up.
+        pattern = glob2rx(sprintf("%s_*.tar.gz", pkg_name)),
         full.names = TRUE
       )
 
@@ -336,7 +353,7 @@ dock_from_desc <- function(
         cat_green_tick(
           sprintf(
             " %s_%s.tar.gz created.",
-            read.dcf(path)[1],
+            pkg_name,
             read.dcf(path)[1, ][["Version"]]
           )
         )
@@ -347,7 +364,7 @@ dock_from_desc <- function(
     # we use an already built tar.gz file
 
     dock$COPY(
-      from = paste0(read.dcf(path)[1], "_*.tar.gz"),
+      from = paste0(pkg_name, "_*.tar.gz"),
       to = "/app.tar.gz"
     )
     dock$RUN(

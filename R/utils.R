@@ -153,7 +153,7 @@ cat_info <- function(...) {
   ok <- (
     grepl("^[0-9]+\\.[0-9]+(\\.[0-9]+)?(-[A-Za-z0-9._]+)?$", x) ||
       identical(x, "r-devel") ||
-      grepl("^[0-9]+\\.[0-9]+(\\.[0-9]+)?\\sPatched$", x)
+      grepl("^[0-9]+\\.[0-9]+(\\.[0-9]+)? Patched$", x)
   )
   if (!ok) {
     stop(

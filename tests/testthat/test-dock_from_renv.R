@@ -243,6 +243,18 @@ test_that(".validate_r_version accepts R-devel, release-candidate and Patched lo
     dockerfiler:::.validate_r_version(""),
     "r_version"
   )
+  # The "<X.Y.Z> Patched" branch matches a single literal space only:
+  # a newline or tab between the version and "Patched" would otherwise
+  # slip through (R's `\\s` matches `\n` / `\t`) and produce a
+  # two-line FROM directive in the generated Dockerfile.
+  expect_error(
+    dockerfiler:::.validate_r_version("4.5.0\nPatched"),
+    "r_version"
+  )
+  expect_error(
+    dockerfiler:::.validate_r_version("4.5.0\tPatched"),
+    "r_version"
+  )
 })
 
 test_that(".patch_rprofile_for_ppm matches all three current PPM host shapes", {
@@ -1150,6 +1162,39 @@ test_that("dock_from_renv rejects a lockfile path whose basename contains shell 
       renv_version = "0.0.0"
     ),
     "lockfile"
+  )
+})
+
+test_that("dock_from_renv validates the renv version read from the lockfile, not only the user-supplied one", {
+  skip_if(is_rdevel, "skip on R-devel")
+  # `renv_version` is interpolated raw into the generated
+  # `R -e 'remotes::install_version("renv", version = "<x>")'` line, which
+  # runs as root at `docker build` time. `.validate_renv_version()` must be
+  # applied to the value resolved from `lock$Packages$renv$Version` (an
+  # untrusted lockfile a user may have received from a colleague, a vendored
+  # project, or a CI cache), not only to a user-supplied `renv_version=`.
+  # A crafted lockfile carrying `'1.0.0"); system("..."); ("'` would
+  # otherwise break out of the inner R string and execute arbitrary code.
+  lock <- jsonlite::read_json(
+    system.file("renv_with_1.0.0.lock", package = "dockerfiler"),
+    simplifyVector = TRUE,
+    simplifyDataFrame = FALSE,
+    simplifyMatrix = FALSE
+  )
+  lock$Packages$renv$Version <- '1.0.0"); system("touch /tmp/dockerfiler_pwned"); ("'
+  malicious_lf <- file.path(dir_build, "malicious-renv.lock")
+  jsonlite::write_json(lock, path = malicious_lf, auto_unbox = TRUE, pretty = TRUE)
+  on.exit(unlink(malicious_lf), add = TRUE)
+
+  expect_error(
+    dock_from_renv(
+      lockfile = malicious_lf,
+      FROM = "rocker/verse",
+      user = NULL,
+      sysreqs = FALSE
+      # NOTE: no `renv_version =` -> the value comes from the lockfile.
+    ),
+    "renv_version"
   )
 })
 

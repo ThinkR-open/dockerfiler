@@ -56,6 +56,25 @@
   executes attacker-controlled commands at `docker build` time.
   This closes the post-#106 audit follow-up for all five sites
   surfaced by Copilot review.
+- Fixed a long-standing code-injection path in `dock_from_renv()`:
+  the `renv` package version resolved from the lockfile
+  (`lock$Packages$renv$Version`) was interpolated raw into the
+  generated `R -e 'remotes::install_version("renv", version = "<x>")'`
+  line without passing through `.validate_renv_version()`. A crafted
+  `renv.lock` could break out of the inner R string and execute
+  arbitrary code as root at `docker build` time. The user-supplied
+  `renv_version=` argument has been validated since the 0.3.0
+  shell-context hardening above, but the lockfile-fallback path was
+  missed; the bug itself predates 0.3.0 (it existed while the
+  vendored `{renv}` parser was in use). The validator is now applied
+  to the resolved value whatever its source. Found by an internal
+  security audit before release.
+- Tightened the `.validate_r_version()` "`X.Y.Z Patched`" branch to
+  require a single literal space (it previously used `\s`, which in R
+  also matches a newline or tab): a lockfile whose `R$Version` carried
+  an embedded newline would pass validation and then emit a two-line
+  `FROM` directive. Not exploitable for command injection, but it
+  could silently break `docker build`.
 
 ## New features
 

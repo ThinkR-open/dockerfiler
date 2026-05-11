@@ -90,6 +90,18 @@ A focused 0.3.0 release. Headline bullets (full details in
   format raise an explicit error at function entry rather than
   silently producing a malformed Dockerfile or one that could
   execute attacker-controlled commands at `docker build` time.
+* A code-injection path in `dock_from_renv()` was found by an
+  internal audit and fixed before this submission: the `renv`
+  version resolved from the lockfile was interpolated into the
+  generated `R -e 'remotes::install_version("renv", version =
+  "<x>")'` line without the validation that was already applied
+  to a user-supplied `renv_version=`. A crafted `renv.lock`
+  could break out of the inner R string and run arbitrary code
+  as root at `docker build` time. The validator is now applied
+  to the resolved value whatever its source. (The bug predates
+  this release; no published `{dockerfiler}` version carried the
+  0.3.0 changeset, so there is nothing to coordinate with CRAN
+  beyond noting it here.)
 
 ### Bug fixes
 

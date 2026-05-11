@@ -248,7 +248,15 @@ dock_from_renv <- function(
   # get renv version
 
   if (missing(renv_version)) {
+    # The lockfile is untrusted input: its `Packages$renv$Version` is
+    # interpolated into the generated `R -e
+    # 'remotes::install_version(...)'` line, which runs as root at
+    # `docker build` time. Validate it with the same regex applied to a
+    # user-supplied `renv_version` (which is validated at function entry).
     renv_version <- lock$Packages$renv$Version
+    if (!is.null(renv_version)) {
+      .validate_renv_version(renv_version)
+    }
   }
 
   message("renv version = ",

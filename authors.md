@@ -2,10 +2,10 @@
 
 ## Authors
 
-- **Colin Fay**. Maintainer, author.
-  [](https://orcid.org/0000-0001-7343-1846)
+- **Colin Fay**. Author. [](https://orcid.org/0000-0001-7343-1846)
 
-- **Vincent Guyader**. Author. [](https://orcid.org/0000-0003-0671-9270)
+- **Vincent Guyader**. Maintainer, author.
+  [](https://orcid.org/0000-0003-0671-9270)
 
 - **Josiah Parry**. Author. [](https://orcid.org/0000-0001-9910-865X)
 

@@ -11,8 +11,12 @@ public = list(
 Dockerfile = character(),
 #' @description
 #' Create a new Dockerfile object.
-#' @param FROM The base image.
-#' @param AS The name of the image.
+#' @param FROM The base image. Default `"rocker/r-base"`. (Note: the
+#'   high-level generators [dock_from_desc()] and [dock_from_renv()]
+#'   use a different default, `rocker/r-ver` tagged with your R
+#'   version.)
+#' @param AS Optional build-stage name (`FROM ... AS <name>`). Default
+#'   `NULL` (no `AS`).
 #' @return A Dockerfile object.
 initialize = function(FROM = "rocker/r-base",
 AS = NULL) {
@@ -80,8 +84,8 @@ LABEL = function(key, value) {
 self$Dockerfile <- c(self$Dockerfile, add_label(key, value))
 },
 #' @description
-#' Add a ENV command.
-#' @param key,value The key and value of the label.
+#' Add an ENV command.
+#' @param key,value The key and value of the environment variable.
 #' @return the Dockerfile object, invisibly.
 ENV = function(key, value) {
 self$Dockerfile <- c(self$Dockerfile, add_env(key, value))

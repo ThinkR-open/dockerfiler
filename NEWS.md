@@ -29,8 +29,9 @@
   appended at codegen time (e.g. `rocker/r-ver:4.5.0`). Apple
   Silicon and ARM Linux hosts (Ampere, AWS Graviton) now build
   natively without Rosetta. Pass the legacy `FROM = "rocker/r-base"`
-  to opt out. Closes #47.
-- `dock_from_renv()` default `repos` flips from
+  to opt out. `dock_from_desc()`'s default `FROM` was already
+  `rocker/r-ver:<R version>` and is unchanged. Closes #47.
+- `dock_from_renv()` and `dock_from_desc()` default `repos` flips from
   `"https://cran.rstudio.com/"` (source-only CRAN mirror) to
   `"https://p3m.dev/cran/latest"` (Posit Public Package Manager),
   with automatic rewrite to the `__linux__/$VERSION_CODENAME/` shape
@@ -151,13 +152,16 @@
   function arguments, so the branch was unreachable; the success path
   always ran when `build()` returned. The branch is removed; failures
   of `pkgbuild::build()` propagate normally via `stop()`. Closes #98.
-- Small polish bundle (no behavioural changes for end users): fix two
-  `length(x > 0)` typos in `dock_from_desc()` (intent was
-  `length(x) > 0`); drop a duplicate `@export` tag in `dockerignore.R`;
-  use the new `dock$ARG(name, default = ...)` form internally instead
-  of inlining the `=`; tighten a previously brittle regression test
-  that checked for any occurrence of `"remotes"` in the generated
-  Dockerfile.
+- `dock_from_desc()`: fixed two `length(x > 0)` typos in the dependency
+  handling (the intent was `length(x) > 0`); the conditions now behave
+  as documented.
+- The `<pkg>_*.tar.gz` cleanup glob in `dock_from_desc(build_from_source = FALSE)`
+  is now built with `glob2rx()`, so a dot in a package name (e.g.
+  `R.utils`) is matched literally and a sibling package's tarball is no
+  longer swept up.
+- Internal tidy-ups with no user-visible effect: dropped a duplicate
+  `@export` in `dockerignore.R`; the codegen now uses the new
+  `dock$ARG(name, default = ...)` form instead of inlining the `=`.
 
 
 # dockerfiler 0.2.6

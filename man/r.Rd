@@ -2,20 +2,23 @@
 % Please edit documentation in R/rthis.R
 \name{r}
 \alias{r}
-\title{Turn an R call into an Unix call}
+\title{Turn an R expression into a shell \verb{R -e '...'} call}
 \usage{
 r(code)
 }
 \arguments{
-\item{code}{the function to call}
+\item{code}{an R expression (captured unevaluated) to wrap.}
 }
 \value{
-an unix R call
+a length-1 character string of the form \verb{R -e '...'},
+shell-quoted with \code{\link[base:shQuote]{base::shQuote()}}.
 }
 \description{
-Turn an R call into an Unix call
+Captures an R expression unevaluated and renders it as a single
+shell-quoted \verb{R -e '...'} string, suitable for a \link{Dockerfile}
+\verb{$RUN()} directive.
 }
 \examples{
 r(print("yeay"))
-r(install.packages("plumber", repo = "http://cran.irsn.fr/"))
+r(install.packages("plumber", repos = "http://cran.irsn.fr/"))
 }

@@ -120,6 +120,36 @@ withr::with_dir(
 
     })
 
+    test_that("dock_from_desc default repos is p3m.dev/cran/latest", {
+      fmls <- formals(dock_from_desc)
+      expect_equal(
+        deparse(fmls$repos),
+        'c(CRAN = "https://p3m.dev/cran/latest")'
+      )
+    })
+
+    test_that("dock_from_desc with the default repos triggers the PPM binary rewrite (codename + UA + os-release prefix)", {
+      skip_if(is_rdevel, "skip on R-devel")
+      out <- dock_from_desc(
+        file.path(".", "DESCRIPTION__"),
+        sysreqs = FALSE
+      )
+      df <- paste(out$Dockerfile, collapse = "\n")
+      # The default p3m.dev URL must be rewritten to the
+      # `__linux__/$VERSION_CODENAME/` shape so the build pulls Linux
+      # binaries instead of compiling from source.
+      expect_match(
+        df,
+        "https://p3m\\.dev/cran/__linux__/\\$VERSION_CODENAME/latest"
+      )
+      # The HTTPUserAgent line must be emitted (PPM serves source if it
+      # is missing, even with a `__linux__/` URL).
+      expect_match(df, "HTTPUserAgent = sprintf\\('R \\(")
+      # The RUN that uses $VERSION_CODENAME must be prefixed so the var
+      # is resolved from /etc/os-release at build time.
+      expect_match(df, "\\. /etc/os-release && ")
+    })
+
     test_that("dock_from_desc(strict_install = TRUE) prepends options(warn = 2) to every install RUN", {
       skip_if(is_rdevel, "skip on R-devel")
       out <- dock_from_desc(

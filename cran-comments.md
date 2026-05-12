@@ -20,15 +20,6 @@ clock skew on the build VM; the package itself is unaffected.)
   CRAN submission; the win-builder result will follow by email
   and will be forwarded to CRAN if it surfaces anything new.
 
-## Maintainer change
-
-This release changes the maintainer from Colin Fay
-(`contact@colinfay.me`) to Vincent Guyader
-(`vincent@thinkr.fr`). Both remain listed as authors. The
-previous maintainer (Colin Fay) is aware of this submission and
-will confirm the maintainer change by replying to the automated
-email from CRAN's submission system.
-
 ## Major changes since 0.2.6
 
 A focused 0.3.0 release. Headline bullets (full details in
@@ -138,10 +129,9 @@ its summary table.
 
 ## Other notes
 
-* Test coverage stands at 99.84% (320+ tests). The single
-  uncovered line is a defensive `stop()` guard in
-  `dock_from_desc()` that fires only when `{pkgbuild}` is not
-  installed; since `{pkgbuild}` is in `Imports`, the guard is
-  unreachable in normal package use.
+* Test coverage stands at 99.65% (`covr::package_coverage()`). The
+  handful of uncovered lines are defensive `stop()` guards that are
+  unreachable in normal package use; chiefly the `{pkgbuild}`-not-
+  installed guard in `dock_from_desc()` (`{pkgbuild}` is in `Imports`).
 * No URLs in the package metadata or vignettes 404 (verified
   with `urlchecker::url_check()` prior to submission).

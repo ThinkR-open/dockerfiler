@@ -20,3 +20,9 @@ A vector of system requirements.
 This function retrieves information about the
 system requirements using the \code{pak::pkg_sysreqs()}.
 }
+\examples{
+\dontrun{
+get_sysreqs("glue")
+get_sysreqs(c("curl", "xml2"))
+}
+}

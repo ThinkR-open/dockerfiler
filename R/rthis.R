@@ -1,13 +1,18 @@
-#' Turn an R call into an Unix call
+#' Turn an R expression into a shell `R -e '...'` call
 #'
-#' @param code the function to call
+#' Captures an R expression unevaluated and renders it as a single
+#' shell-quoted `R -e '...'` string, suitable for a [Dockerfile]
+#' `$RUN()` directive.
 #'
-#' @return an unix R call
+#' @param code an R expression (captured unevaluated) to wrap.
+#'
+#' @return a length-1 character string of the form `R -e '...'`,
+#'   shell-quoted with [base::shQuote()].
 #' @export
 #'
 #' @examples
 #' r(print("yeay"))
-#' r(install.packages("plumber", repo = "http://cran.irsn.fr/"))
+#' r(install.packages("plumber", repos = "http://cran.irsn.fr/"))
 r <- function(code) {
   code <- paste(trimws(deparse(substitute(code))), collapse = " ")
   glue("R -e {shQuote(code, type = 'sh')}")

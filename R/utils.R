@@ -313,6 +313,63 @@ cat_info <- function(...) {
 }
 
 #' @noRd
+.validate_pkg_name <- function(x) {
+  if (!is.character(x) || length(x) != 1L || is.na(x)) {
+    stop(
+      "the package name read from the DESCRIPTION must be a single ",
+      "string, got: ",
+      deparse(x)
+    )
+  }
+  # CRAN package-name grammar: a letter, then letters / digits / dots.
+  # `read.dcf()` joins DCF continuation lines with `\n`, so a crafted
+  # `Package:` field could otherwise smuggle a newline (and an extra
+  # Dockerfile directive) into the `COPY <pkg>_*.tar.gz` line generated
+  # for `build_from_source = FALSE`. This grammar excludes whitespace,
+  # newlines and every shell / Dockerfile metacharacter.
+  if (!grepl("^[a-zA-Z][a-zA-Z0-9.]*$", x)) {
+    stop(
+      "the package name read from the DESCRIPTION must match the CRAN ",
+      "package-name grammar /^[a-zA-Z][a-zA-Z0-9.]*$/ ",
+      "(letters, digits and dots only, starting with a letter), got: ",
+      deparse(x)
+    )
+  }
+  invisible()
+}
+
+#' @noRd
+.validate_pkg_names <- function(x) {
+  if (length(x) == 0L) {
+    return(invisible())
+  }
+  if (!is.character(x)) {
+    stop(
+      "the package names read from the DESCRIPTION dependency fields ",
+      "must be a character vector, got: ",
+      deparse(x)
+    )
+  }
+  # Same CRAN package-name grammar as `.validate_pkg_name()`, applied to
+  # every Imports / Depends / Suggests / LinkingTo / Enhances entry.
+  # `desc::desc_get_deps()` joins DCF continuation lines with `\n`, so a
+  # crafted dependency field could otherwise smuggle a newline (and an
+  # extra Dockerfile directive) into the generated
+  # `remotes::install_version("<name>", ...)` install RUN.
+  bad <- is.na(x) | !grepl("^[a-zA-Z][a-zA-Z0-9.]*$", x)
+  if (any(bad)) {
+    stop(
+      "package names read from the DESCRIPTION dependency fields must ",
+      "match the CRAN package-name grammar /^[a-zA-Z][a-zA-Z0-9.]*$/ ",
+      "(letters, digits and dots only, starting with a letter); ",
+      "invalid: ",
+      paste(vapply(x[bad], deparse, character(1)), collapse = ", ")
+    )
+  }
+  invisible()
+}
+
+#' @noRd
 .validate_renv_paths_cache <- function(x) {
   if (is.null(x)) {
     return(invisible())

@@ -20,5 +20,5 @@ shell-quoted \verb{R -e '...'} string, suitable for a \link{Dockerfile}
 }
 \examples{
 r(print("yeay"))
-r(install.packages("plumber", repos = "http://cran.irsn.fr/"))
+r(install.packages("plumber", repos = "https://cloud.r-project.org"))
 }

@@ -36,9 +36,14 @@
   version from the `renv.lock` file is now appended at codegen time
   (e.g. `rocker/r-ver:4.5.0`). Apple Silicon and ARM Linux hosts
   (Ampere, AWS Graviton) now build natively without Rosetta. Pass the
-  legacy `FROM = "rocker/r-base"` to opt out. Closes
+  legacy `FROM = "rocker/r-base"` to opt out.
+  [`dock_from_desc()`](https://thinkr-open.github.io/dockerfiler/reference/dockerfiles.md)’s
+  default `FROM` was already `rocker/r-ver:<R version>` and is
+  unchanged. Closes
   [\#47](https://github.com/ThinkR-open/dockerfiler/issues/47).
 - [`dock_from_renv()`](https://thinkr-open.github.io/dockerfiler/reference/dock_from_renv.md)
+  and
+  [`dock_from_desc()`](https://thinkr-open.github.io/dockerfiler/reference/dockerfiles.md)
   default `repos` flips from `"https://cran.rstudio.com/"` (source-only
   CRAN mirror) to `"https://p3m.dev/cran/latest"` (Posit Public Package
   Manager), with automatic rewrite to the `__linux__/$VERSION_CODENAME/`
@@ -182,14 +187,17 @@
   [`pkgbuild::build()`](https://pkgbuild.r-lib.org/reference/build.html)
   propagate normally via [`stop()`](https://rdrr.io/r/base/stop.html).
   Closes [\#98](https://github.com/ThinkR-open/dockerfiler/issues/98).
-- Small polish bundle (no behavioural changes for end users): fix two
-  `length(x > 0)` typos in
-  [`dock_from_desc()`](https://thinkr-open.github.io/dockerfiler/reference/dockerfiles.md)
-  (intent was `length(x) > 0`); drop a duplicate `@export` tag in
-  `dockerignore.R`; use the new `dock$ARG(name, default = ...)` form
-  internally instead of inlining the `=`; tighten a previously brittle
-  regression test that checked for any occurrence of `"remotes"` in the
-  generated Dockerfile.
+- [`dock_from_desc()`](https://thinkr-open.github.io/dockerfiler/reference/dockerfiles.md):
+  fixed two `length(x > 0)` typos in the dependency handling (the intent
+  was `length(x) > 0`); the conditions now behave as documented.
+- The `<pkg>_*.tar.gz` cleanup glob in
+  `dock_from_desc(build_from_source = FALSE)` is now built with
+  [`glob2rx()`](https://rdrr.io/r/utils/glob2rx.html), so a dot in a
+  package name (e.g. `R.utils`) is matched literally and a sibling
+  package’s tarball is no longer swept up.
+- Internal tidy-ups with no user-visible effect: dropped a duplicate
+  `@export` in `dockerignore.R`; the codegen now uses the new
+  `dock$ARG(name, default = ...)` form instead of inlining the `=`.
 
 ## dockerfiler 0.2.6
 

@@ -1,6 +1,9 @@
-# Turn an R call into an Unix call
+# Turn an R expression into a shell `R -e '...'` call
 
-Turn an R call into an Unix call
+Captures an R expression unevaluated and renders it as a single
+shell-quoted `R -e '...'` string, suitable for a
+[Dockerfile](https://thinkr-open.github.io/dockerfiler/reference/Dockerfile.md)
+`$RUN()` directive.
 
 ## Usage
 
@@ -12,17 +15,18 @@ r(code)
 
 - code:
 
-  the function to call
+  an R expression (captured unevaluated) to wrap.
 
 ## Value
 
-an unix R call
+a length-1 character string of the form `R -e '...'`, shell-quoted with
+[`base::shQuote()`](https://rdrr.io/r/base/shQuote.html).
 
 ## Examples
 
 ``` r
 r(print("yeay"))
 #> R -e 'print("yeay")'
-r(install.packages("plumber", repo = "http://cran.irsn.fr/"))
-#> R -e 'install.packages("plumber", repo = "http://cran.irsn.fr/")'
+r(install.packages("plumber", repos = "http://cran.irsn.fr/"))
+#> R -e 'install.packages("plumber", repos = "http://cran.irsn.fr/")'
 ```

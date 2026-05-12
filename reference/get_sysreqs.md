@@ -27,3 +27,12 @@ get_sysreqs(packages, quiet = TRUE, batch_n = 30)
 ## Value
 
 A vector of system requirements.
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+get_sysreqs("glue")
+get_sysreqs(c("curl", "xml2"))
+} # }
+```

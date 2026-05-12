@@ -71,11 +71,12 @@
 <p>Or from CRAN with :</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"dockerfiler"</span><span class="op">)</span></span></code></pre></div>
+<p>See <code><a href="articles/dockerfiler.html">vignette("dockerfiler")</a></code> for a longer walkthrough.</p>
 </div>
 <div class="section level2">
 <h2 id="basic-workflow">Basic workflow<a class="anchor" aria-label="anchor" href="#basic-workflow"></a>
 </h2>
-<p>By default, Dockerfiles are created with <code>FROM "rocker/r-base"</code>.</p>
+<p>By default, <code>Dockerfile$new()</code> creates a Dockerfile with <code>FROM "rocker/r-base"</code>. (The high-level generators <code><a href="reference/dockerfiles.html">dock_from_desc()</a></code> and <code><a href="reference/dock_from_renv.html">dock_from_renv()</a></code> use a different default: <code>rocker/r-ver</code> tagged with your R version; see below.)</p>
 <p>You can set another FROM in <code>new()</code></p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://thinkr-open.github.io/dockerfiler/">dockerfiler</a></span><span class="op">)</span></span>
@@ -194,10 +195,16 @@
 <li>Build Dockerfile</li>
 </ul>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">my_dock</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/dock_from_renv.html">dock_from_renv</a></span><span class="op">(</span></span>
-<span>  lockfile <span class="op">=</span> <span class="va">the_lockfile</span>,</span>
-<span>  FROM <span class="op">=</span> <span class="st">"rocker/verse"</span></span>
-<span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">my_dock</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/dock_from_renv.html">dock_from_renv</a></span><span class="op">(</span>lockfile <span class="op">=</span> <span class="va">the_lockfile</span><span class="op">)</span></span>
+<span><span class="va">my_dock</span></span></code></pre></div>
+<p>By default the generated Dockerfile is <code>FROM rocker/r-ver:&lt;your R version&gt;</code> (multi-arch: linux/amd64 + linux/arm64), pulls pre-compiled Linux binaries from Posit Public Package Manager (<code>https://p3m.dev/cran/latest</code>, rewritten to the <code>__linux__/$VERSION_CODENAME/</code> shape at build time), and runs the container as the non-root <code>rstudio</code> user. Pass <code>FROM = "rocker/r-base"</code>, <code>repos = c(CRAN = "https://cran.rstudio.com/")</code>, or <code>user = NULL</code> to restore the previous behaviour. <code><a href="reference/dockerfiles.html">dock_from_desc()</a></code> uses the same <code>FROM</code> / <code>repos</code> defaults.</p>
+</div>
+<div class="section level2">
+<h2 id="parse-an-existing-dockerfile">Parse an existing Dockerfile<a class="anchor" aria-label="anchor" href="#parse-an-existing-dockerfile"></a>
+</h2>
+<p>Already have a Dockerfile? <code><a href="reference/parse_dockerfile.html">parse_dockerfile()</a></code> reads it back into a <code>Dockerfile</code> object you can edit and re-<code>$write()</code>.</p>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">my_dock</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/parse_dockerfile.html">parse_dockerfile</a></span><span class="op">(</span><span class="st">"Dockerfile"</span><span class="op">)</span></span>
 <span><span class="va">my_dock</span></span></code></pre></div>
 </div>
 <div class="section level2">
@@ -243,8 +250,8 @@
 <div class="developers">
 <h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
-<li>Colin Fay <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0001-7343-1846" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
-<li>Vincent Guyader <br><small class="roles"> Maintainer, author </small> <a href="https://orcid.org/0000-0003-0671-9270" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
+<li>Colin Fay <br><small class="roles"> Maintainer, author </small> <a href="https://orcid.org/0000-0001-7343-1846" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
+<li>Vincent Guyader <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0003-0671-9270" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
 <li>Josiah Parry <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0001-9910-865X" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
 <li>Sébastien Rochette <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0002-1565-9313" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
 </ul>

@@ -80,8 +80,11 @@
 <div class="section level3">
 <h3 id="basic-workflow">Basic workflow<a class="anchor" aria-label="anchor" href="#basic-workflow"></a>
 </h3>
-<p>By default, Dockerfiles are created with
-<code>FROM "rocker/r-base"</code>.</p>
+<p>By default, <code>Dockerfile$new()</code> creates a Dockerfile with
+<code>FROM "rocker/r-base"</code>. (The high-level generators
+<code><a href="../reference/dockerfiles.html">dock_from_desc()</a></code> and <code><a href="../reference/dock_from_renv.html">dock_from_renv()</a></code> use a
+different default: <code>rocker/r-ver</code> tagged with your R version;
+see below.)</p>
 <p>You can set another FROM in <code>new()</code></p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://thinkr-open.github.io/dockerfiler/">dockerfiler</a></span><span class="op">)</span></span>
@@ -91,7 +94,7 @@
 <p>Wrap your raw R Code inside the <code><a href="../reference/r.html">r()</a></code> function to turn it
 into a bash command with <code>R -e</code>.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">my_dock</span><span class="op">$</span><span class="fu">RUN</span><span class="op">(</span><span class="fu"><a href="../reference/r.html">r</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"attempt"</span>, repo <span class="op">=</span> <span class="st">"http://cran.irsn.fr/"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">my_dock</span><span class="op">$</span><span class="fu">RUN</span><span class="op">(</span><span class="fu"><a href="../reference/r.html">r</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"attempt"</span>, repos <span class="op">=</span> <span class="st">"http://cran.irsn.fr/"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>Classical Docker stuffs:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">my_dock</span><span class="op">$</span><span class="fu">RUN</span><span class="op">(</span><span class="st">"mkdir /usr/scripts"</span><span class="op">)</span></span>
@@ -105,7 +108,7 @@ into a bash command with <code>R -e</code>.</p>
 <code class="sourceCode R"><span><span class="va">my_dock</span></span>
 <span><span class="co">#&gt; FROM rocker/r-base</span></span>
 <span><span class="co">#&gt; MAINTAINER Colin FAY &lt;contact@colinfay.me&gt;</span></span>
-<span><span class="co">#&gt; RUN R -e 'install.packages("attempt", repo = "http://cran.irsn.fr/")'</span></span>
+<span><span class="co">#&gt; RUN R -e 'install.packages("attempt", repos = "http://cran.irsn.fr/")'</span></span>
 <span><span class="co">#&gt; RUN mkdir /usr/scripts</span></span>
 <span><span class="co">#&gt; RUN cd /usr/scripts</span></span>
 <span><span class="co">#&gt; COPY plumberfile.R /usr/scripts/plumber.R</span></span>
@@ -121,7 +124,7 @@ positions of the two cmd you want to switch :</p>
 <span><span class="va">my_dock</span></span>
 <span><span class="co">#&gt; FROM rocker/r-base</span></span>
 <span><span class="co">#&gt; MAINTAINER Colin FAY &lt;contact@colinfay.me&gt;</span></span>
-<span><span class="co">#&gt; RUN R -e 'install.packages("attempt", repo = "http://cran.irsn.fr/")'</span></span>
+<span><span class="co">#&gt; RUN R -e 'install.packages("attempt", repos = "http://cran.irsn.fr/")'</span></span>
 <span><span class="co">#&gt; RUN mkdir /usr/scripts</span></span>
 <span><span class="co">#&gt; RUN cd /usr/scripts</span></span>
 <span><span class="co">#&gt; COPY plumberfile.R /usr/scripts/plumber.R</span></span>
@@ -134,7 +137,7 @@ positions of the two cmd you want to switch :</p>
 <span><span class="va">my_dock</span></span>
 <span><span class="co">#&gt; FROM rocker/r-base</span></span>
 <span><span class="co">#&gt; MAINTAINER Colin FAY &lt;contact@colinfay.me&gt;</span></span>
-<span><span class="co">#&gt; RUN R -e 'install.packages("attempt", repo = "http://cran.irsn.fr/")'</span></span>
+<span><span class="co">#&gt; RUN R -e 'install.packages("attempt", repos = "http://cran.irsn.fr/")'</span></span>
 <span><span class="co">#&gt; RUN mkdir /usr/scripts</span></span>
 <span><span class="co">#&gt; RUN cd /usr/scripts</span></span>
 <span><span class="co">#&gt; COPY plumberfile.R /usr/scripts/plumber.R</span></span>
@@ -146,7 +149,7 @@ positions of the two cmd you want to switch :</p>
 <span><span class="va">my_dock</span></span>
 <span><span class="co">#&gt; FROM rocker/r-base</span></span>
 <span><span class="co">#&gt; MAINTAINER Colin FAY &lt;contact@colinfay.me&gt;</span></span>
-<span><span class="co">#&gt; RUN R -e 'install.packages("attempt", repo = "http://cran.irsn.fr/")'</span></span>
+<span><span class="co">#&gt; RUN R -e 'install.packages("attempt", repos = "http://cran.irsn.fr/")'</span></span>
 <span><span class="co">#&gt; RUN mkdir /usr/scripts</span></span>
 <span><span class="co">#&gt; CMD Rscript /usr/scripts/torun.R</span></span></code></pre></div>
 <p><code>add_after</code> add a command after a given line.</p>
@@ -170,9 +173,45 @@ the dependencies and the package.</p>
 <span><span class="va">my_dock</span><span class="op">$</span><span class="fu">CMD</span><span class="op">(</span><span class="fu"><a href="../reference/r.html">r</a></span><span class="op">(</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://thinkr-open.github.io/dockerfiler/">dockerfiler</a></span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">my_dock</span><span class="op">$</span><span class="fu">add_after</span><span class="op">(</span></span>
-<span>  cmd <span class="op">=</span> <span class="st">"RUN R -e 'remotes::install_cran(\"rlang\")'"</span>, </span>
+<span>  cmd <span class="op">=</span> <span class="st">"RUN R -e 'remotes::install_cran(\"rlang\")'"</span>,</span>
 <span>  after <span class="op">=</span> <span class="fl">3</span></span>
 <span><span class="op">)</span></span></code></pre></div>
+<p><code><a href="../reference/dockerfiles.html">dock_from_desc()</a></code> defaults to
+<code>FROM rocker/r-ver:&lt;your R version&gt;</code> and pulls Linux
+binaries from Posit Public Package Manager
+(<code>https://p3m.dev/cran/latest</code>). Pass
+<code>FROM = "rocker/r-base"</code> or
+<code>repos = c(CRAN = "https://cran.rstudio.com/")</code> to opt
+out.</p>
+</div>
+<div class="section level3">
+<h3 id="create-a-dockerfile-from-an-renv-lock">Create a Dockerfile from an renv.lock<a class="anchor" aria-label="anchor" href="#create-a-dockerfile-from-an-renv-lock"></a>
+</h3>
+<p>If your project uses <a href="https://rstudio.github.io/renv/" class="external-link">renv</a>,
+<code><a href="../reference/dock_from_renv.html">dock_from_renv()</a></code> turns the <code>renv.lock</code> into a
+Dockerfile that restores the exact pinned versions.</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">my_dock</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dock_from_renv.html">dock_from_renv</a></span><span class="op">(</span>lockfile <span class="op">=</span> <span class="st">"renv.lock"</span><span class="op">)</span></span>
+<span><span class="va">my_dock</span></span></code></pre></div>
+<p>By default the generated Dockerfile is
+<code>FROM rocker/r-ver:&lt;your R version&gt;</code> (multi-arch amd64
++ arm64), pulls Linux binaries from Posit Public Package Manager, and
+runs the container as the non-root <code>rstudio</code> user. Pass
+<code>FROM = "rocker/r-base"</code>,
+<code>repos = c(CRAN = "https://cran.rstudio.com/")</code>, or
+<code>user = NULL</code> to restore the previous behaviour.</p>
+</div>
+<div class="section level3">
+<h3 id="parse-an-existing-dockerfile">Parse an existing Dockerfile<a class="anchor" aria-label="anchor" href="#parse-an-existing-dockerfile"></a>
+</h3>
+<p>Already have a Dockerfile? <code><a href="../reference/parse_dockerfile.html">parse_dockerfile()</a></code> reads it
+back into a <code>Dockerfile</code> object you can edit and
+re-<code>$write()</code>.</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">my_dock</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/parse_dockerfile.html">parse_dockerfile</a></span><span class="op">(</span><span class="st">"Dockerfile"</span><span class="op">)</span></span>
+<span><span class="va">my_dock</span></span>
+<span><span class="va">my_dock</span><span class="op">$</span><span class="fu">RUN</span><span class="op">(</span><span class="fu"><a href="../reference/r.html">r</a></span><span class="op">(</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://thinkr-open.github.io/dockerfiler/">dockerfiler</a></span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">my_dock</span><span class="op">$</span><span class="fu">write</span><span class="op">(</span><span class="st">"Dockerfile"</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

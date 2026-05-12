@@ -80,11 +80,17 @@ Create a new Dockerfile object.
 
 - `FROM`:
 
-  The base image.
+  The base image. Default `"rocker/r-base"`. (Note: the high-level
+  generators
+  [`dock_from_desc()`](https://thinkr-open.github.io/dockerfiler/reference/dockerfiles.md)
+  and
+  [`dock_from_renv()`](https://thinkr-open.github.io/dockerfiler/reference/dock_from_renv.md)
+  use a different default, `rocker/r-ver` tagged with your R version.)
 
 - `AS`:
 
-  The name of the image.
+  Optional build-stage name (`FROM ... AS <name>`). Default `NULL` (no
+  `AS`).
 
 #### Returns
 
@@ -277,7 +283,7 @@ the Dockerfile object, invisibly.
 
 ### Method `ENV()`
 
-Add a ENV command.
+Add an ENV command.
 
 #### Usage
 
@@ -287,7 +293,7 @@ Add a ENV command.
 
 - `key, value`:
 
-  The key and value of the label.
+  The key and value of the environment variable.
 
 #### Returns
 

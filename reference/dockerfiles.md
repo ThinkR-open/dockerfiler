@@ -10,7 +10,7 @@ dock_from_desc(
   FROM = paste0("rocker/r-ver:", R.Version()$major, ".", R.Version()$minor),
   AS = NULL,
   sysreqs = TRUE,
-  repos = c(CRAN = "https://cran.rstudio.com/"),
+  repos = c(CRAN = "https://p3m.dev/cran/latest"),
   expand = FALSE,
   update_tar_gz = TRUE,
   build_from_source = TRUE,
@@ -37,8 +37,9 @@ dock_from_desc(
 
 - AS:
 
-  The AS of the Dockerfile. Default it NULL. When non-NULL, validated as
-  a simple build-stage name (`^[a-zA-Z0-9][a-zA-Z0-9._-]*$`).
+  The build-stage name of the Dockerfile (`FROM ... AS <name>`). Default
+  is `NULL` (no `AS`). When non-`NULL`, validated as a simple
+  build-stage name (`^[a-zA-Z0-9][a-zA-Z0-9._-]*$`).
 
 - sysreqs:
 
@@ -47,11 +48,20 @@ dock_from_desc(
 - repos:
 
   character. The URL(s) of the repositories to use for
-  `options("repos")`. Each value must look like an http(s) URL (no
-  quotes, spaces or newlines); each name (when set) must be a simple
-  identifier (`^[A-Za-z][A-Za-z0-9._-]*$`). Other values raise an error
-  to prevent injection into the generated `echo "options(...)"` shell
-  command.
+  `options("repos")`. Default is
+  `c(CRAN = "https://p3m.dev/cran/latest")` (Posit Public Package
+  Manager). When `repos` is a single `CRAN`-keyed PPM URL
+  (`packagemanager.posit.co`, `packagemanager.rstudio.com`, or
+  `p3m.dev`), the codegen rewrites it to the
+  `__linux__/$VERSION_CODENAME/` shape (codename resolved from
+  `/etc/os-release` at image build time) and adds the strict
+  `HTTPUserAgent` PPM requires, so the build pulls pre-compiled Linux
+  binaries instead of compiling from source. Pass the legacy
+  `c(CRAN = "https://cran.rstudio.com/")` to opt out. Each value must
+  look like an http(s) URL (no quotes, spaces or newlines); each name
+  (when set) must be a simple identifier (`^[A-Za-z][A-Za-z0-9._-]*$`).
+  Other values raise an error to prevent injection into the generated
+  `echo "options(...)"` shell command.
 
 - expand:
 
@@ -103,3 +113,41 @@ dock_from_desc(
 ## Value
 
 Dockerfile
+
+## Details
+
+Two install strategies are available for the package itself:
+
+- `build_from_source = TRUE` (the default): the generated Dockerfile
+  mounts the source folder and installs from it directly.
+  `update_tar_gz` is ignored.
+
+- `build_from_source = FALSE`: a source tarball
+  (`<pkg>_<version>.tar.gz`) is `COPY`'d into the image and installed
+  with
+  [`remotes::install_local()`](https://remotes.r-lib.org/reference/install_local.html).
+  When `update_tar_gz = TRUE`, a fresh tarball is built with
+  [`pkgbuild::build()`](https://pkgbuild.r-lib.org/reference/build.html)
+  first (and any stale `<pkg>_*.tar.gz` in the current directory is
+  removed); when `update_tar_gz = FALSE`, an already-built tarball is
+  expected alongside the `DESCRIPTION`.
+
+The package name and its dependency-field names are read from the
+`DESCRIPTION` and validated against the CRAN package-name grammar before
+being interpolated into the generated directives.
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+# From the DESCRIPTION of the package in the working directory:
+dock <- dock_from_desc("DESCRIPTION")
+dock
+
+# Pull source packages from the classic CRAN mirror instead of PPM:
+dock_from_desc(
+  "DESCRIPTION",
+  repos = c(CRAN = "https://cran.rstudio.com/")
+)
+} # }
+```

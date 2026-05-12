@@ -30,9 +30,19 @@ Or from CRAN with :
 install.packages("dockerfiler")
 ```
 
+See
+[`vignette("dockerfiler")`](https://thinkr-open.github.io/dockerfiler/articles/dockerfiler.md)
+for a longer walkthrough.
+
 ## Basic workflow
 
-By default, Dockerfiles are created with `FROM "rocker/r-base"`.
+By default, `Dockerfile$new()` creates a Dockerfile with
+`FROM "rocker/r-base"`. (The high-level generators
+[`dock_from_desc()`](https://thinkr-open.github.io/dockerfiler/reference/dockerfiles.md)
+and
+[`dock_from_renv()`](https://thinkr-open.github.io/dockerfiler/reference/dock_from_renv.md)
+use a different default: `rocker/r-ver` tagged with your R version; see
+below.)
 
 You can set another FROM in `new()`
 
@@ -204,10 +214,30 @@ renv::snapshot(
 
 ``` r
 
-my_dock <- dock_from_renv(
-  lockfile = the_lockfile,
-  FROM = "rocker/verse"
-)
+my_dock <- dock_from_renv(lockfile = the_lockfile)
+my_dock
+```
+
+By default the generated Dockerfile is
+`FROM rocker/r-ver:<your R version>` (multi-arch: linux/amd64 +
+linux/arm64), pulls pre-compiled Linux binaries from Posit Public
+Package Manager (`https://p3m.dev/cran/latest`, rewritten to the
+`__linux__/$VERSION_CODENAME/` shape at build time), and runs the
+container as the non-root `rstudio` user. Pass `FROM = "rocker/r-base"`,
+`repos = c(CRAN = "https://cran.rstudio.com/")`, or `user = NULL` to
+restore the previous behaviour.
+[`dock_from_desc()`](https://thinkr-open.github.io/dockerfiler/reference/dockerfiles.md)
+uses the same `FROM` / `repos` defaults.
+
+## Parse an existing Dockerfile
+
+Already have a Dockerfile?
+[`parse_dockerfile()`](https://thinkr-open.github.io/dockerfiler/reference/parse_dockerfile.md)
+reads it back into a `Dockerfile` object you can edit and re-`$write()`.
+
+``` r
+
+my_dock <- parse_dockerfile("Dockerfile")
 my_dock
 ```
 

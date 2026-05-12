@@ -32,7 +32,8 @@ Wrap an R expression into the shell-safe `R -e '...'` invocation used
 inside a `RUN` directive.
 
 - [`r()`](https://thinkr-open.github.io/dockerfiler/reference/r.md) :
-  Turn an R call into an Unix call
+
+  Turn an R expression into a shell `R -e '...'` call
 
 ## System requirements
 

@@ -20,15 +20,6 @@ clock skew on the build VM; the package itself is unaffected.)
   CRAN submission; the win-builder result will follow by email
   and will be forwarded to CRAN if it surfaces anything new.
 
-## Maintainer change
-
-This release changes the maintainer from Colin Fay
-(`contact@colinfay.me`) to Vincent Guyader
-(`vincent@thinkr.fr`). Both remain listed as authors. The
-previous maintainer (Colin Fay) is aware of this submission and
-will confirm the maintainer change by replying to the automated
-email from CRAN's submission system.
-
 ## Major changes since 0.2.6
 
 A focused 0.3.0 release. Headline bullets (full details in

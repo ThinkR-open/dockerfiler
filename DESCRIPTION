@@ -2,9 +2,9 @@ Package: dockerfiler
 Title: Easy Dockerfile Creation from R
 Version: 0.3.0
 Authors@R: c(
-    person("Colin", "Fay", , "contact@colinfay.me", role = "aut",
+    person("Colin", "Fay", , "contact@colinfay.me", role = c("cre", "aut"),
            comment = c(ORCID = "0000-0001-7343-1846")),
-    person("Vincent", "Guyader", , "vincent@thinkr.fr", role = c("cre", "aut"),
+    person("Vincent", "Guyader", , "vincent@thinkr.fr", role = "aut",
            comment = c(ORCID = "0000-0003-0671-9270")),
     person("Josiah", "Parry", , "josiah.parry@gmail.com", role = "aut",
            comment = c(ORCID = "0000-0001-9910-865X")),

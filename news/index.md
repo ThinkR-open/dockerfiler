@@ -85,6 +85,26 @@
   an embedded newline would pass validation and then emit a two-line
   `FROM` directive. Not exploitable for command injection, but it could
   silently break `docker build`.
+- Fixed a long-standing code-injection path in
+  [`dock_from_desc()`](https://thinkr-open.github.io/dockerfiler/reference/dockerfiles.md):
+  package names read from the `DESCRIPTION` were interpolated into
+  generated Dockerfile directives without validation.
+  [`read.dcf()`](https://rdrr.io/r/base/dcf.html) and
+  [`desc::desc_get_deps()`](https://desc.r-lib.org/reference/desc_get_deps.html)
+  both join DCF continuation lines with `\n`, so a crafted `Package:`
+  field, or a crafted `Imports:` / `Depends:` / `Suggests:` /
+  `LinkingTo:` entry, could carry a continuation line that injects an
+  extra Dockerfile directive (e.g. a `RUN`) executing as root at
+  `docker build` time – the `Package:` field via the
+  `COPY <pkg>_*.tar.gz /app.tar.gz` line and the tar.gz-cleanup glob on
+  the `build_from_source = FALSE` path, and the dependency names via the
+  `remotes::install_version("<name>", ...)` install RUNs on the default
+  `build_from_source = TRUE` path. Both the package name and every
+  dependency-field name are now validated against the CRAN package-name
+  grammar at function entry. The bug predates 0.3.0. Found by the same
+  internal security audit as the
+  [`dock_from_renv()`](https://thinkr-open.github.io/dockerfiler/reference/dock_from_renv.md)
+  fix above.
 
 ### New features
 

@@ -12,7 +12,7 @@
 #'
 #' @examples
 #' r(print("yeay"))
-#' r(install.packages("plumber", repos = "http://cran.irsn.fr/"))
+#' r(install.packages("plumber", repos = "https://cloud.r-project.org"))
 r <- function(code) {
   code <- paste(trimws(deparse(substitute(code))), collapse = " ")
   glue("R -e {shQuote(code, type = 'sh')}")

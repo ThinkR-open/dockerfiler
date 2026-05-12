@@ -4,7 +4,7 @@ author: "Colin Fay"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{getting_started}
+  %\VignetteIndexEntry{Getting started with dockerfiler}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -53,7 +53,7 @@ my_dock$MAINTAINER("Colin FAY", "contact@colinfay.me")
 Wrap your raw R Code inside the `r()` function to turn it into a bash command with `R -e`.
 
 ```{r}
-my_dock$RUN(r(install.packages("attempt", repos = "http://cran.irsn.fr/")))
+my_dock$RUN(r(install.packages("attempt", repos = "https://cloud.r-project.org")))
 ```
 
 Classical Docker stuffs:
@@ -131,7 +131,7 @@ pulls Linux binaries from Posit Public Package Manager
 (`https://p3m.dev/cran/latest`). Pass `FROM = "rocker/r-base"` or
 `repos = c(CRAN = "https://cran.rstudio.com/")` to opt out.
 
-## Create a Dockerfile from an renv.lock
+## Create a Dockerfile from a renv.lock
 
 If your project uses `{renv}`, `dock_from_renv()` turns the `renv.lock`
 into a Dockerfile that restores the exact pinned versions.

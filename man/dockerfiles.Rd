@@ -9,7 +9,7 @@ dock_from_desc(
   FROM = paste0("rocker/r-ver:", R.Version()$major, ".", R.Version()$minor),
   AS = NULL,
   sysreqs = TRUE,
-  repos = c(CRAN = "https://cran.rstudio.com/"),
+  repos = c(CRAN = "https://p3m.dev/cran/latest"),
   expand = FALSE,
   update_tar_gz = TRUE,
   build_from_source = TRUE,
@@ -28,17 +28,26 @@ dash, underscore, optional \verb{:tag} and / or \verb{@sha256:<hex>}); other
 values raise an error to prevent shell-metacharacter injection
 into the generated FROM directive.}
 
-\item{AS}{The AS of the Dockerfile. Default it NULL. When non-NULL,
-validated as a simple build-stage name (\verb{^[a-zA-Z0-9][a-zA-Z0-9._-]*$}).}
+\item{AS}{The build-stage name of the Dockerfile (\verb{FROM ... AS <name>}).
+Default is \code{NULL} (no \code{AS}). When non-\code{NULL}, validated as a simple
+build-stage name (\verb{^[a-zA-Z0-9][a-zA-Z0-9._-]*$}).}
 
 \item{sysreqs}{boolean. If TRUE, the Dockerfile will contain sysreq installation.}
 
 \item{repos}{character. The URL(s) of the repositories to use for
-\code{options("repos")}. Each value must look like an http(s) URL (no
-quotes, spaces or newlines); each name (when set) must be a simple
-identifier (\verb{^[A-Za-z][A-Za-z0-9._-]*$}). Other values raise an
-error to prevent injection into the generated \verb{echo "options(...)"}
-shell command.}
+\code{options("repos")}. Default is \code{c(CRAN = "https://p3m.dev/cran/latest")}
+(Posit Public Package Manager). When \code{repos} is a single \code{CRAN}-keyed
+PPM URL (\code{packagemanager.posit.co}, \code{packagemanager.rstudio.com}, or
+\code{p3m.dev}), the codegen rewrites it to the
+\verb{__linux__/$VERSION_CODENAME/} shape (codename resolved from
+\verb{/etc/os-release} at image build time) and adds the strict
+\code{HTTPUserAgent} PPM requires, so the build pulls pre-compiled Linux
+binaries instead of compiling from source. Pass the legacy
+\code{c(CRAN = "https://cran.rstudio.com/")} to opt out. Each value must
+look like an http(s) URL (no quotes, spaces or newlines); each name
+(when set) must be a simple identifier (\verb{^[A-Za-z][A-Za-z0-9._-]*$}).
+Other values raise an error to prevent injection into the generated
+\verb{echo "options(...)"} shell command.}
 
 \item{expand}{boolean. If \code{TRUE} each system requirement will have its own \code{RUN} line.}
 
@@ -80,4 +89,36 @@ Dockerfile
 }
 \description{
 Create a Dockerfile from a DESCRIPTION
+}
+\details{
+Two install strategies are available for the package itself:
+\itemize{
+\item \code{build_from_source = TRUE} (the default): the generated Dockerfile
+mounts the source folder and installs from it directly. \code{update_tar_gz}
+is ignored.
+\item \code{build_from_source = FALSE}: a source tarball (\verb{<pkg>_<version>.tar.gz})
+is \code{COPY}'d into the image and installed with
+\code{remotes::install_local()}. When \code{update_tar_gz = TRUE}, a fresh
+tarball is built with \code{pkgbuild::build()} first (and any stale
+\verb{<pkg>_*.tar.gz} in the current directory is removed); when
+\code{update_tar_gz = FALSE}, an already-built tarball is expected
+alongside the \code{DESCRIPTION}.
+}
+
+The package name and its dependency-field names are read from the
+\code{DESCRIPTION} and validated against the CRAN package-name grammar
+before being interpolated into the generated directives.
+}
+\examples{
+\dontrun{
+# From the DESCRIPTION of the package in the working directory:
+dock <- dock_from_desc("DESCRIPTION")
+dock
+
+# Pull source packages from the classic CRAN mirror instead of PPM:
+dock_from_desc(
+  "DESCRIPTION",
+  repos = c(CRAN = "https://cran.rstudio.com/")
+)
+}
 }

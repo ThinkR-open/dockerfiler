@@ -61,9 +61,13 @@ Create a new Dockerfile object.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{FROM}}{The base image.}
+\item{\code{FROM}}{The base image. Default \code{"rocker/r-base"}. (Note: the
+high-level generators \code{\link[=dock_from_desc]{dock_from_desc()}} and \code{\link[=dock_from_renv]{dock_from_renv()}}
+use a different default, \code{rocker/r-ver} tagged with your R
+version.)}
 
-\item{\code{AS}}{The name of the image.}
+\item{\code{AS}}{Optional build-stage name (\verb{FROM ... AS <name>}). Default
+\code{NULL} (no \code{AS}).}
 }
 \if{html}{\out{</div>}}
 }
@@ -245,7 +249,7 @@ the Dockerfile object, invisibly.
 \if{html}{\out{<a id="method-Dockerfile-ENV"></a>}}
 \if{latex}{\out{\hypertarget{method-Dockerfile-ENV}{}}}
 \subsection{Method \code{ENV()}}{
-Add a ENV command.
+Add an ENV command.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Dockerfile$ENV(key, value)}\if{html}{\out{</div>}}
 }
@@ -253,7 +257,7 @@ Add a ENV command.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{key, value}}{The key and value of the label.}
+\item{\code{key, value}}{The key and value of the environment variable.}
 }
 \if{html}{\out{</div>}}
 }

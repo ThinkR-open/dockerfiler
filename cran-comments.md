@@ -129,10 +129,9 @@ its summary table.
 
 ## Other notes
 
-* Test coverage stands at 99.84% (320+ tests). The single
-  uncovered line is a defensive `stop()` guard in
-  `dock_from_desc()` that fires only when `{pkgbuild}` is not
-  installed; since `{pkgbuild}` is in `Imports`, the guard is
-  unreachable in normal package use.
+* Test coverage stands at 99.65% (`covr::package_coverage()`). The
+  handful of uncovered lines are defensive `stop()` guards that are
+  unreachable in normal package use; chiefly the `{pkgbuild}`-not-
+  installed guard in `dock_from_desc()` (`{pkgbuild}` is in `Imports`).
 * No URLs in the package metadata or vignettes 404 (verified
   with `urlchecker::url_check()` prior to submission).

@@ -14,6 +14,12 @@
 #' @export
 #'
 #' @return A vector of system requirements.
+#'
+#' @examples
+#' \dontrun{
+#' get_sysreqs("glue")
+#' get_sysreqs(c("curl", "xml2"))
+#' }
 get_sysreqs <- function(
   packages,
   quiet = TRUE,

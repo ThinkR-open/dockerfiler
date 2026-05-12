@@ -67,7 +67,7 @@ function to turn it into a bash command with `R -e`.
 
 ``` r
 
-my_dock$RUN(r(install.packages("attempt", repos = "http://cran.irsn.fr/")))
+my_dock$RUN(r(install.packages("attempt", repos = "https://cloud.r-project.org")))
 ```
 
 Classical Docker stuffs:

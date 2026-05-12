@@ -27,6 +27,6 @@ a length-1 character string of the form `R -e '...'`, shell-quoted with
 ``` r
 r(print("yeay"))
 #> R -e 'print("yeay")'
-r(install.packages("plumber", repos = "http://cran.irsn.fr/"))
-#> R -e 'install.packages("plumber", repos = "http://cran.irsn.fr/")'
+r(install.packages("plumber", repos = "https://cloud.r-project.org"))
+#> R -e 'install.packages("plumber", repos = "https://cloud.r-project.org")'
 ```

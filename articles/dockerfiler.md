@@ -47,7 +47,7 @@ function to turn it into a bash command with `R -e`.
 
 ``` r
 
-my_dock$RUN(r(install.packages("attempt", repos = "http://cran.irsn.fr/")))
+my_dock$RUN(r(install.packages("attempt", repos = "https://cloud.r-project.org")))
 ```
 
 Classical Docker stuffs:
@@ -69,7 +69,7 @@ See your Dockerfile :
 my_dock
 #> FROM rocker/r-base
 #> MAINTAINER Colin FAY <contact@colinfay.me>
-#> RUN R -e 'install.packages("attempt", repos = "http://cran.irsn.fr/")'
+#> RUN R -e 'install.packages("attempt", repos = "https://cloud.r-project.org")'
 #> RUN mkdir /usr/scripts
 #> RUN cd /usr/scripts
 #> COPY plumberfile.R /usr/scripts/plumber.R
@@ -89,7 +89,7 @@ my_dock$switch_cmd(8, 7)
 my_dock
 #> FROM rocker/r-base
 #> MAINTAINER Colin FAY <contact@colinfay.me>
-#> RUN R -e 'install.packages("attempt", repos = "http://cran.irsn.fr/")'
+#> RUN R -e 'install.packages("attempt", repos = "https://cloud.r-project.org")'
 #> RUN mkdir /usr/scripts
 #> RUN cd /usr/scripts
 #> COPY plumberfile.R /usr/scripts/plumber.R
@@ -106,7 +106,7 @@ my_dock$remove_cmd(8)
 my_dock
 #> FROM rocker/r-base
 #> MAINTAINER Colin FAY <contact@colinfay.me>
-#> RUN R -e 'install.packages("attempt", repos = "http://cran.irsn.fr/")'
+#> RUN R -e 'install.packages("attempt", repos = "https://cloud.r-project.org")'
 #> RUN mkdir /usr/scripts
 #> RUN cd /usr/scripts
 #> COPY plumberfile.R /usr/scripts/plumber.R
@@ -122,7 +122,7 @@ my_dock$remove_cmd(5:7)
 my_dock
 #> FROM rocker/r-base
 #> MAINTAINER Colin FAY <contact@colinfay.me>
-#> RUN R -e 'install.packages("attempt", repos = "http://cran.irsn.fr/")'
+#> RUN R -e 'install.packages("attempt", repos = "https://cloud.r-project.org")'
 #> RUN mkdir /usr/scripts
 #> CMD Rscript /usr/scripts/torun.R
 ```
@@ -167,7 +167,7 @@ binaries from Posit Public Package Manager
 (`https://p3m.dev/cran/latest`). Pass `FROM = "rocker/r-base"` or
 `repos = c(CRAN = "https://cran.rstudio.com/")` to opt out.
 
-### Create a Dockerfile from an renv.lock
+### Create a Dockerfile from a renv.lock
 
 If your project uses [renv](https://rstudio.github.io/renv/),
 [`dock_from_renv()`](https://thinkr-open.github.io/dockerfiler/reference/dock_from_renv.md)

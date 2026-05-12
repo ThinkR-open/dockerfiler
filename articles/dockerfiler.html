@@ -94,7 +94,7 @@ see below.)</p>
 <p>Wrap your raw R Code inside the <code><a href="../reference/r.html">r()</a></code> function to turn it
 into a bash command with <code>R -e</code>.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">my_dock</span><span class="op">$</span><span class="fu">RUN</span><span class="op">(</span><span class="fu"><a href="../reference/r.html">r</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"attempt"</span>, repos <span class="op">=</span> <span class="st">"http://cran.irsn.fr/"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">my_dock</span><span class="op">$</span><span class="fu">RUN</span><span class="op">(</span><span class="fu"><a href="../reference/r.html">r</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"attempt"</span>, repos <span class="op">=</span> <span class="st">"https://cloud.r-project.org"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>Classical Docker stuffs:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">my_dock</span><span class="op">$</span><span class="fu">RUN</span><span class="op">(</span><span class="st">"mkdir /usr/scripts"</span><span class="op">)</span></span>
@@ -108,7 +108,7 @@ into a bash command with <code>R -e</code>.</p>
 <code class="sourceCode R"><span><span class="va">my_dock</span></span>
 <span><span class="co">#&gt; FROM rocker/r-base</span></span>
 <span><span class="co">#&gt; MAINTAINER Colin FAY &lt;contact@colinfay.me&gt;</span></span>
-<span><span class="co">#&gt; RUN R -e 'install.packages("attempt", repos = "http://cran.irsn.fr/")'</span></span>
+<span><span class="co">#&gt; RUN R -e 'install.packages("attempt", repos = "https://cloud.r-project.org")'</span></span>
 <span><span class="co">#&gt; RUN mkdir /usr/scripts</span></span>
 <span><span class="co">#&gt; RUN cd /usr/scripts</span></span>
 <span><span class="co">#&gt; COPY plumberfile.R /usr/scripts/plumber.R</span></span>
@@ -124,7 +124,7 @@ positions of the two cmd you want to switch :</p>
 <span><span class="va">my_dock</span></span>
 <span><span class="co">#&gt; FROM rocker/r-base</span></span>
 <span><span class="co">#&gt; MAINTAINER Colin FAY &lt;contact@colinfay.me&gt;</span></span>
-<span><span class="co">#&gt; RUN R -e 'install.packages("attempt", repos = "http://cran.irsn.fr/")'</span></span>
+<span><span class="co">#&gt; RUN R -e 'install.packages("attempt", repos = "https://cloud.r-project.org")'</span></span>
 <span><span class="co">#&gt; RUN mkdir /usr/scripts</span></span>
 <span><span class="co">#&gt; RUN cd /usr/scripts</span></span>
 <span><span class="co">#&gt; COPY plumberfile.R /usr/scripts/plumber.R</span></span>
@@ -137,7 +137,7 @@ positions of the two cmd you want to switch :</p>
 <span><span class="va">my_dock</span></span>
 <span><span class="co">#&gt; FROM rocker/r-base</span></span>
 <span><span class="co">#&gt; MAINTAINER Colin FAY &lt;contact@colinfay.me&gt;</span></span>
-<span><span class="co">#&gt; RUN R -e 'install.packages("attempt", repos = "http://cran.irsn.fr/")'</span></span>
+<span><span class="co">#&gt; RUN R -e 'install.packages("attempt", repos = "https://cloud.r-project.org")'</span></span>
 <span><span class="co">#&gt; RUN mkdir /usr/scripts</span></span>
 <span><span class="co">#&gt; RUN cd /usr/scripts</span></span>
 <span><span class="co">#&gt; COPY plumberfile.R /usr/scripts/plumber.R</span></span>
@@ -149,7 +149,7 @@ positions of the two cmd you want to switch :</p>
 <span><span class="va">my_dock</span></span>
 <span><span class="co">#&gt; FROM rocker/r-base</span></span>
 <span><span class="co">#&gt; MAINTAINER Colin FAY &lt;contact@colinfay.me&gt;</span></span>
-<span><span class="co">#&gt; RUN R -e 'install.packages("attempt", repos = "http://cran.irsn.fr/")'</span></span>
+<span><span class="co">#&gt; RUN R -e 'install.packages("attempt", repos = "https://cloud.r-project.org")'</span></span>
 <span><span class="co">#&gt; RUN mkdir /usr/scripts</span></span>
 <span><span class="co">#&gt; CMD Rscript /usr/scripts/torun.R</span></span></code></pre></div>
 <p><code>add_after</code> add a command after a given line.</p>
@@ -185,7 +185,7 @@ binaries from Posit Public Package Manager
 out.</p>
 </div>
 <div class="section level3">
-<h3 id="create-a-dockerfile-from-an-renv-lock">Create a Dockerfile from an renv.lock<a class="anchor" aria-label="anchor" href="#create-a-dockerfile-from-an-renv-lock"></a>
+<h3 id="create-a-dockerfile-from-a-renv-lock">Create a Dockerfile from a renv.lock<a class="anchor" aria-label="anchor" href="#create-a-dockerfile-from-a-renv-lock"></a>
 </h3>
 <p>If your project uses <a href="https://rstudio.github.io/renv/" class="external-link">renv</a>,
 <code><a href="../reference/dock_from_renv.html">dock_from_renv()</a></code> turns the <code>renv.lock</code> into a

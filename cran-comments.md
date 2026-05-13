@@ -20,10 +20,11 @@ clock skew on the build VM; the package itself is unaffected.)
   CRAN submission; the win-builder result will follow by email
   and will be forwarded to CRAN if it surfaces anything new.
 
-## Major changes since 0.2.6
+## Major changes in 1.0.0
 
-A focused 0.3.0 release. Headline bullets (full details in
-`NEWS.md`):
+First major release. Version bumped from the 0.2.x development line
+to 1.0.0 to signal API maturity after the stabilisation cycle
+described below. Headline bullets (full details in `NEWS.md`):
 
 ### Breaking changes
 
@@ -91,7 +92,7 @@ A focused 0.3.0 release. Headline bullets (full details in
   as root at `docker build` time. The validator is now applied
   to the resolved value whatever its source. (The bug predates
   this release; no published `{dockerfiler}` version carried the
-  0.3.0 changeset, so there is nothing to coordinate with CRAN
+  1.0.0 changeset, so there is nothing to coordinate with CRAN
   beyond noting it here.)
 
 ### Bug fixes
@@ -116,7 +117,7 @@ local `{golem}` checkout was additionally grepped explicitly:
 the only `dockerfiler` references are to the public API
 (`dock_from_renv`, `dock_from_desc`, `Dockerfile`,
 `get_sysreqs`), whose signatures are preserved across this
-release. The other 0.3.0 changes (default flip of `FROM` to
+release. The other 1.0.0 changes (default flip of `FROM` to
 `rocker/r-ver`, of `repos` to `p3m.dev/cran/latest`, and of
 `user` to `"rstudio"`) are behavioural-default changes and do
 not break downstream call sites.

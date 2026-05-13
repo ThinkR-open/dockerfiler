@@ -1,4 +1,12 @@
-# dockerfiler 0.3.0
+# dockerfiler 1.0.0
+
+First major release. The version is bumped to 1.0.0 to signal API
+maturity after a stabilisation cycle that overhauled the
+input-validation surface, hardened the codegen against `renv.lock` /
+`DESCRIPTION` injection, removed the vendored copy of `{renv}`, and
+flipped the high-level generators' defaults to multi-arch
+`rocker/r-ver` + binary packages from Posit Public Package Manager.
+See below.
 
 ## Breaking changes
 
@@ -64,9 +72,9 @@
   line without passing through `.validate_renv_version()`. A crafted
   `renv.lock` could break out of the inner R string and execute
   arbitrary code as root at `docker build` time. The user-supplied
-  `renv_version=` argument has been validated since the 0.3.0
+  `renv_version=` argument has been validated since the 1.0.0
   shell-context hardening above, but the lockfile-fallback path was
-  missed; the bug itself predates 0.3.0 (it existed while the
+  missed; the bug itself predates 1.0.0 (it existed while the
   vendored `{renv}` parser was in use). The validator is now applied
   to the resolved value whatever its source. Found by an internal
   security audit before release.
@@ -89,7 +97,7 @@
   via the `remotes::install_version("<name>", ...)` install RUNs on
   the default `build_from_source = TRUE` path. Both the package name
   and every dependency-field name are now validated against the CRAN
-  package-name grammar at function entry. The bug predates 0.3.0.
+  package-name grammar at function entry. The bug predates 1.0.0.
   Found by the same internal security audit as the `dock_from_renv()`
   fix above.
 

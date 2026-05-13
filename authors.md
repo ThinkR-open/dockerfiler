@@ -15,7 +15,7 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/ThinkR-open/dockerfiler/blob/master/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/ThinkR-open/dockerfiler/blob/v1.0.0/DESCRIPTION)
 
 Fay C, Guyader V, Parry J, Rochette S (2026). *dockerfiler: Easy
 Dockerfile Creation from R*. R package version 1.0.0,

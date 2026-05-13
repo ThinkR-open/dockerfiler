@@ -10,7 +10,7 @@ You’re reading the doc about version :
 ``` r
 
 desc::desc_get_version()
-#> [1] '0.3.0'
+#> [1] '1.0.0'
 ```
 
 ## Installation

@@ -18,13 +18,13 @@ Source:
 [`DESCRIPTION`](https://github.com/ThinkR-open/dockerfiler/blob/master/DESCRIPTION)
 
 Fay C, Guyader V, Parry J, Rochette S (2026). *dockerfiler: Easy
-Dockerfile Creation from R*. R package version 0.3.0,
+Dockerfile Creation from R*. R package version 1.0.0,
 <https://thinkr-open.github.io/dockerfiler/>.
 
     @Manual{,
       title = {dockerfiler: Easy Dockerfile Creation from R},
       author = {Colin Fay and Vincent Guyader and Josiah Parry and Sébastien Rochette},
       year = {2026},
-      note = {R package version 0.3.0},
+      note = {R package version 1.0.0},
       url = {https://thinkr-open.github.io/dockerfiler/},
     }

@@ -39,7 +39,7 @@ cat_info <- function(...) {
 #' default) and an `ENV GITHUB_PAT=${GITHUB_PAT}` propagation so any
 #' subsequent RUN inherits the value. For `"none"` and `"secret"`, no
 #' top-level directive is emitted (in `"secret"` mode the secret is
-#' mounted RUN-by-RUN by [.github_pat_run_prefix()]).
+#' mounted RUN-by-RUN by `.github_pat_run_prefix()`).
 #' Side-effects only: modifies `dock` in place.
 #' @noRd
 .github_pat_setup <- function(dock, mode) {
@@ -54,7 +54,7 @@ cat_info <- function(...) {
 #'
 #' Returns a string to prepend to a RUN command body. Empty string for
 #' modes `"none"` and `"build_arg"` (the latter relies on the ENV set
-#' by [.github_pat_setup()]); a `--mount=type=secret,...` fragment plus
+#' by `.github_pat_setup()`); a `--mount=type=secret,...` fragment plus
 #' a shell `GITHUB_PAT=$(cat ...)` prefix for mode `"secret"`.
 #'
 #' The file-read pattern (`cat /run/secrets/github_pat`) is preferred

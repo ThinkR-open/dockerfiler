@@ -1,7 +1,7 @@
 template:
   package: golemversetemplate
 
-url: https://github.com/ThinkR-open/golemversetemplate
+url: https://github.com/ThinkR-open/dockerfiler
 
 reference:
 - title: "Dockerfile builders"

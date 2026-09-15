@@ -82,9 +82,9 @@ Create a new Dockerfile object.
 
   The base image. Default `"rocker/r-base"`. (Note: the high-level
   generators
-  [`dock_from_desc()`](https://thinkr-open.github.io/dockerfiler/reference/dockerfiles.md)
+  [`dock_from_desc()`](https://github.com/ThinkR-open/golemversetemplate/reference/dockerfiles.md)
   and
-  [`dock_from_renv()`](https://thinkr-open.github.io/dockerfiler/reference/dock_from_renv.md)
+  [`dock_from_renv()`](https://github.com/ThinkR-open/golemversetemplate/reference/dock_from_renv.md)
   use a different default, `rocker/r-ver` tagged with your R version.)
 
 - `AS`:

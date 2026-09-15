@@ -3,4 +3,4 @@
 ### All vignettes
 
 - [Getting started with
-  dockerfiler](https://thinkr-open.github.io/dockerfiler/articles/dockerfiler.md):
+  dockerfiler](https://github.com/ThinkR-open/golemversetemplate/articles/dockerfiler.md):

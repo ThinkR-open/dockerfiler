@@ -2,6 +2,8 @@
 
 ## dockerfiler 1.0.0
 
+CRAN release: 2026-05-14
+
 First major release. The version is bumped to 1.0.0 to signal API
 maturity after a stabilisation cycle that overhauled the
 input-validation surface, hardened the codegen against `renv.lock` /
@@ -22,7 +24,7 @@ Posit Public Package Manager. See below.
   (install the latest renv from the configured repos), aligned with the
   existing `renv_version = NULL` behaviour. Closes
   [\#94](https://github.com/ThinkR-open/dockerfiler/issues/94).
-- [`dock_from_renv()`](https://thinkr-open.github.io/dockerfiler/reference/dock_from_renv.md)
+- [`dock_from_renv()`](https://github.com/ThinkR-open/golemversetemplate/reference/dock_from_renv.md)
   now defaults to running the runtime container as the `rstudio` user
   (previously root). The generated Dockerfile gains a defensive
   `RUN id -u rstudio || useradd -m -d /home/rstudio -s /bin/bash rstudio`
@@ -38,20 +40,20 @@ Posit Public Package Manager. See below.
   previous root behaviour. debian/ubuntu only; for alpine-based images
   you must pass `user = NULL` and create the user yourself. Closes
   [\#100](https://github.com/ThinkR-open/dockerfiler/issues/100).
-- [`dock_from_renv()`](https://thinkr-open.github.io/dockerfiler/reference/dock_from_renv.md)
+- [`dock_from_renv()`](https://github.com/ThinkR-open/golemversetemplate/reference/dock_from_renv.md)
   default `FROM` flips from `"rocker/r-base"` (amd64-only) to
   `"rocker/r-ver"` (multi-arch: linux/amd64 + linux/arm64), and the R
   version from the `renv.lock` file is now appended at codegen time
   (e.g. `rocker/r-ver:4.5.0`). Apple Silicon and ARM Linux hosts
   (Ampere, AWS Graviton) now build natively without Rosetta. Pass the
   legacy `FROM = "rocker/r-base"` to opt out.
-  [`dock_from_desc()`](https://thinkr-open.github.io/dockerfiler/reference/dockerfiles.md)’s
+  [`dock_from_desc()`](https://github.com/ThinkR-open/golemversetemplate/reference/dockerfiles.md)’s
   default `FROM` was already `rocker/r-ver:<R version>` and is
   unchanged. Closes
   [\#47](https://github.com/ThinkR-open/dockerfiler/issues/47).
-- [`dock_from_renv()`](https://thinkr-open.github.io/dockerfiler/reference/dock_from_renv.md)
+- [`dock_from_renv()`](https://github.com/ThinkR-open/golemversetemplate/reference/dock_from_renv.md)
   and
-  [`dock_from_desc()`](https://thinkr-open.github.io/dockerfiler/reference/dockerfiles.md)
+  [`dock_from_desc()`](https://github.com/ThinkR-open/golemversetemplate/reference/dockerfiles.md)
   default `repos` flips from `"https://cran.rstudio.com/"` (source-only
   CRAN mirror) to `"https://p3m.dev/cran/latest"` (Posit Public Package
   Manager), with automatic rewrite to the `__linux__/$VERSION_CODENAME/`
@@ -65,9 +67,9 @@ Posit Public Package Manager. See below.
 
 ### Security
 
-- [`dock_from_desc()`](https://thinkr-open.github.io/dockerfiler/reference/dockerfiles.md)
+- [`dock_from_desc()`](https://github.com/ThinkR-open/golemversetemplate/reference/dockerfiles.md)
   and
-  [`dock_from_renv()`](https://thinkr-open.github.io/dockerfiler/reference/dock_from_renv.md)
+  [`dock_from_renv()`](https://github.com/ThinkR-open/golemversetemplate/reference/dock_from_renv.md)
   now validate every user-supplied parameter that flows into a
   Dockerfile shell context (`FROM`, `AS`, `repos` values and names,
   `extra_sysreqs`, `renv_version`, `renv_paths_cache`, `lockfile`
@@ -79,7 +81,7 @@ Posit Public Package Manager. See below.
   This closes the post-#106 audit follow-up for all five sites surfaced
   by Copilot review.
 - Fixed a long-standing code-injection path in
-  [`dock_from_renv()`](https://thinkr-open.github.io/dockerfiler/reference/dock_from_renv.md):
+  [`dock_from_renv()`](https://github.com/ThinkR-open/golemversetemplate/reference/dock_from_renv.md):
   the `renv` package version resolved from the lockfile
   (`lock$Packages$renv$Version`) was interpolated raw into the generated
   `R -e 'remotes::install_version("renv", version = "<x>")'` line
@@ -99,7 +101,7 @@ Posit Public Package Manager. See below.
   `FROM` directive. Not exploitable for command injection, but it could
   silently break `docker build`.
 - Fixed a long-standing code-injection path in
-  [`dock_from_desc()`](https://thinkr-open.github.io/dockerfiler/reference/dockerfiles.md):
+  [`dock_from_desc()`](https://github.com/ThinkR-open/golemversetemplate/reference/dockerfiles.md):
   package names read from the `DESCRIPTION` were interpolated into
   generated Dockerfile directives without validation.
   [`read.dcf()`](https://rdrr.io/r/base/dcf.html) and
@@ -116,7 +118,7 @@ Posit Public Package Manager. See below.
   dependency-field name are now validated against the CRAN package-name
   grammar at function entry. The bug predates 1.0.0. Found by the same
   internal security audit as the
-  [`dock_from_renv()`](https://thinkr-open.github.io/dockerfiler/reference/dock_from_renv.md)
+  [`dock_from_renv()`](https://github.com/ThinkR-open/golemversetemplate/reference/dock_from_renv.md)
   fix above.
 
 ### New features
@@ -124,9 +126,9 @@ Posit Public Package Manager. See below.
 - `dock$ARG()` and the internal `add_arg()` helper gain a `default`
   parameter to emit `ARG <name>=<default>` instead of `ARG <name>`.
   Closes [\#8](https://github.com/ThinkR-open/dockerfiler/issues/8).
-- [`dock_from_desc()`](https://thinkr-open.github.io/dockerfiler/reference/dockerfiles.md)
+- [`dock_from_desc()`](https://github.com/ThinkR-open/golemversetemplate/reference/dockerfiles.md)
   and
-  [`dock_from_renv()`](https://thinkr-open.github.io/dockerfiler/reference/dock_from_renv.md)
+  [`dock_from_renv()`](https://github.com/ThinkR-open/golemversetemplate/reference/dock_from_renv.md)
   gain a `github_pat` parameter (default `"none"`) controlling how a
   GitHub PAT is provided to
   [`remotes::install_github()`](https://remotes.r-lib.org/reference/install_github.html)
@@ -140,7 +142,7 @@ Posit Public Package Manager. See below.
   secret mounts (the PAT is never persisted in image metadata;
   recommended for published images). Closes
   [\#18](https://github.com/ThinkR-open/dockerfiler/issues/18).
-- [`dock_from_renv()`](https://thinkr-open.github.io/dockerfiler/reference/dock_from_renv.md)
+- [`dock_from_renv()`](https://github.com/ThinkR-open/golemversetemplate/reference/dock_from_renv.md)
   gains a `renv_paths_cache` parameter that controls the
   `RENV_PATHS_CACHE` build-arg default, the propagated `ENV` value, and
   the cache mount target. When `NULL` (the default), the path is
@@ -149,7 +151,7 @@ Posit Public Package Manager. See below.
   cache location at image build time with
   `--build-arg RENV_PATHS_CACHE=...` without regenerating the
   Dockerfile.
-- [`dock_from_desc()`](https://thinkr-open.github.io/dockerfiler/reference/dockerfiles.md)
+- [`dock_from_desc()`](https://github.com/ThinkR-open/golemversetemplate/reference/dockerfiles.md)
   gains a `strict_install` parameter (default `TRUE`). When `TRUE`,
   every install RUN in the generated Dockerfile is prefixed with
   `options(warn = 2);` so any R warning during install (missing CRAN
@@ -164,10 +166,10 @@ Posit Public Package Manager. See below.
 
 ### Bug fixes
 
-- [`r()`](https://thinkr-open.github.io/dockerfiler/reference/r.md) no
-  longer silently rewrites user code. The previous implementation called
-  `gsub(" [2,]", " ", code)` (a typo for `{2,}`) which deleted any digit
-  `2` or comma preceded by a space: `r(c(1, 2, 3))` returned
+- [`r()`](https://github.com/ThinkR-open/golemversetemplate/reference/r.md)
+  no longer silently rewrites user code. The previous implementation
+  called `gsub(" [2,]", " ", code)` (a typo for `{2,}`) which deleted
+  any digit `2` or comma preceded by a space: `r(c(1, 2, 3))` returned
   `R -e 'c(1, , 3)'`. The replacement approach
   (`gsub("[ ]{2,}", " ", code)`) still collapsed runs of spaces inside
   string literals (`r(cat("a b"))` would emit `R -e 'cat("a b")'`). The
@@ -177,10 +179,10 @@ Posit Public Package Manager. See below.
   [`deparse()`](https://rdrr.io/r/base/deparse.html) is removed,
   internal whitespace is preserved. Closes
   [\#95](https://github.com/ThinkR-open/dockerfiler/issues/95).
-- [`r()`](https://thinkr-open.github.io/dockerfiler/reference/r.md) now
-  wraps the deparsed R expression with `shQuote(., type = "sh")` instead
-  of inlining it inside a hand-rolled single-quoted shell string.
-  Apostrophes inside string literals no longer break the emitted
+- [`r()`](https://github.com/ThinkR-open/golemversetemplate/reference/r.md)
+  now wraps the deparsed R expression with `shQuote(., type = "sh")`
+  instead of inlining it inside a hand-rolled single-quoted shell
+  string. Apostrophes inside string literals no longer break the emitted
   command: `r(message("don't"))` used to emit `R -e 'message("don't")'`,
   which the shell refuses to parse (unterminated quoted string). The new
   wrapping is shell-safe by construction.
@@ -195,7 +197,7 @@ Posit Public Package Manager. See below.
   [`pkgbuild::build()`](https://pkgbuild.r-lib.org/reference/build.html)
   propagate normally via [`stop()`](https://rdrr.io/r/base/stop.html).
   Closes [\#98](https://github.com/ThinkR-open/dockerfiler/issues/98).
-- [`dock_from_desc()`](https://thinkr-open.github.io/dockerfiler/reference/dockerfiles.md):
+- [`dock_from_desc()`](https://github.com/ThinkR-open/golemversetemplate/reference/dockerfiles.md):
   fixed two `length(x > 0)` typos in the dependency handling (the intent
   was `length(x) > 0`); the conditions now behave as documented.
 - The `<pkg>_*.tar.gz` cleanup glob in
@@ -209,7 +211,7 @@ Posit Public Package Manager. See below.
 
 ## dockerfiler 0.2.6
 
-- [`dock_from_renv()`](https://thinkr-open.github.io/dockerfiler/reference/dock_from_renv.md)
+- [`dock_from_renv()`](https://github.com/ThinkR-open/golemversetemplate/reference/dock_from_renv.md)
   now auto-configures the generated Dockerfile to fetch Linux binaries
   from Posit Package Manager when `repos` is a single CRAN-keyed PPM
   URL. Four things happen: the PPM URL is rewritten to include
@@ -226,7 +228,7 @@ Posit Public Package Manager. See below.
   on rewrite. Non-PPM repos (including internal mirrors not on the
   official PPM hosts) and multi-entry `repos` vectors are left
   untouched.
-- [`dock_from_renv()`](https://thinkr-open.github.io/dockerfiler/reference/dock_from_renv.md)
+- [`dock_from_renv()`](https://github.com/ThinkR-open/golemversetemplate/reference/dock_from_renv.md)
   no longer installs `remotes` when `renv_version = NULL`, since
   `remotes` was only needed for the `install_version()` path.
 
@@ -249,7 +251,7 @@ CRAN release: 2024-08-23
   [@HenningLorenzen-ext-bayer](https://github.com/HenningLorenzen-ext-bayer),
   this enable to use of older R versions
 - update
-  [`dock_from_renv()`](https://thinkr-open.github.io/dockerfiler/reference/dock_from_renv.md)
+  [`dock_from_renv()`](https://github.com/ThinkR-open/golemversetemplate/reference/dock_from_renv.md)
   test to catch all output lines
 
 ## dockerfiler 0.2.2
@@ -270,13 +272,13 @@ CRAN release: 2023-11-13
 - fix : remove `renv:::lockfile` and use `lockfile_read` instead
 
 - feat: Added
-  [`dock_from_renv()`](https://thinkr-open.github.io/dockerfiler/reference/dock_from_renv.md),
+  [`dock_from_renv()`](https://github.com/ThinkR-open/golemversetemplate/reference/dock_from_renv.md),
   to create a Dockerfile from a renv.lock file
   ([@JosiahParry](https://github.com/JosiahParry),
   [@statnmap](https://github.com/statnmap))
 
 - feat: Added
-  [`parse_dockerfile()`](https://thinkr-open.github.io/dockerfiler/reference/parse_dockerfile.md),
+  [`parse_dockerfile()`](https://github.com/ThinkR-open/golemversetemplate/reference/parse_dockerfile.md),
   to Create a Dockerfile object from a Dockerfile file
   ([@JosiahParry](https://github.com/JosiahParry))
 
@@ -301,7 +303,7 @@ CRAN release: 2022-07-06
 CRAN release: 2021-09-03
 
 - new version of
-  [`dock_from_desc()`](https://thinkr-open.github.io/dockerfiler/reference/dockerfiles.md)
+  [`dock_from_desc()`](https://github.com/ThinkR-open/golemversetemplate/reference/dockerfiles.md)
 
 ## dockerfiler 0.1.3.9000
 
@@ -313,5 +315,5 @@ CRAN release: 2019-03-19
 
 - Added the `add_after()` R6 method
 - Added
-  [`dock_from_desc()`](https://thinkr-open.github.io/dockerfiler/reference/dockerfiles.md),
+  [`dock_from_desc()`](https://github.com/ThinkR-open/golemversetemplate/reference/dockerfiles.md),
   to create a Dockerfile from a DESCRIPTION

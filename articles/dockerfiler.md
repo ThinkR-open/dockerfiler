@@ -25,9 +25,9 @@ install.packages("dockerfiler")
 
 By default, `Dockerfile$new()` creates a Dockerfile with
 `FROM "rocker/r-base"`. (The high-level generators
-[`dock_from_desc()`](https://thinkr-open.github.io/dockerfiler/reference/dockerfiles.md)
+[`dock_from_desc()`](https://github.com/ThinkR-open/golemversetemplate/reference/dockerfiles.md)
 and
-[`dock_from_renv()`](https://thinkr-open.github.io/dockerfiler/reference/dock_from_renv.md)
+[`dock_from_renv()`](https://github.com/ThinkR-open/golemversetemplate/reference/dock_from_renv.md)
 use a different default: `rocker/r-ver` tagged with your R version; see
 below.)
 
@@ -42,7 +42,7 @@ my_dock$MAINTAINER("Colin FAY", "contact@colinfay.me")
 ```
 
 Wrap your raw R Code inside the
-[`r()`](https://thinkr-open.github.io/dockerfiler/reference/r.md)
+[`r()`](https://github.com/ThinkR-open/golemversetemplate/reference/r.md)
 function to turn it into a bash command with `R -e`.
 
 ``` r
@@ -161,7 +161,7 @@ my_dock$add_after(
 )
 ```
 
-[`dock_from_desc()`](https://thinkr-open.github.io/dockerfiler/reference/dockerfiles.md)
+[`dock_from_desc()`](https://github.com/ThinkR-open/golemversetemplate/reference/dockerfiles.md)
 defaults to `FROM rocker/r-ver:<your R version>` and pulls Linux
 binaries from Posit Public Package Manager
 (`https://p3m.dev/cran/latest`). Pass `FROM = "rocker/r-base"` or
@@ -170,7 +170,7 @@ binaries from Posit Public Package Manager
 ### Create a Dockerfile from a renv.lock
 
 If your project uses [renv](https://rstudio.github.io/renv/),
-[`dock_from_renv()`](https://thinkr-open.github.io/dockerfiler/reference/dock_from_renv.md)
+[`dock_from_renv()`](https://github.com/ThinkR-open/golemversetemplate/reference/dock_from_renv.md)
 turns the `renv.lock` into a Dockerfile that restores the exact pinned
 versions.
 
@@ -190,7 +190,7 @@ restore the previous behaviour.
 ### Parse an existing Dockerfile
 
 Already have a Dockerfile?
-[`parse_dockerfile()`](https://thinkr-open.github.io/dockerfiler/reference/parse_dockerfile.md)
+[`parse_dockerfile()`](https://github.com/ThinkR-open/golemversetemplate/reference/parse_dockerfile.md)
 reads it back into a `Dockerfile` object you can edit and re-`$write()`.
 
 ``` r

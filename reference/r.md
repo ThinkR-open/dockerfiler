@@ -2,7 +2,7 @@
 
 Captures an R expression unevaluated and renders it as a single
 shell-quoted `R -e '...'` string, suitable for a
-[Dockerfile](https://thinkr-open.github.io/dockerfiler/reference/Dockerfile.md)
+[Dockerfile](https://github.com/ThinkR-open/golemversetemplate/reference/Dockerfile.md)
 `$RUN()` directive.
 
 ## Usage

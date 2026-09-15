@@ -31,16 +31,16 @@ install.packages("dockerfiler")
 ```
 
 See
-[`vignette("dockerfiler")`](https://github.com/ThinkR-open/golemversetemplate/articles/dockerfiler.md)
+[`vignette("dockerfiler")`](https://github.com/ThinkR-open/dockerfiler/articles/dockerfiler.md)
 for a longer walkthrough.
 
 ## Basic workflow
 
 By default, `Dockerfile$new()` creates a Dockerfile with
 `FROM "rocker/r-base"`. (The high-level generators
-[`dock_from_desc()`](https://github.com/ThinkR-open/golemversetemplate/reference/dockerfiles.md)
+[`dock_from_desc()`](https://github.com/ThinkR-open/dockerfiler/reference/dockerfiles.md)
 and
-[`dock_from_renv()`](https://github.com/ThinkR-open/golemversetemplate/reference/dock_from_renv.md)
+[`dock_from_renv()`](https://github.com/ThinkR-open/dockerfiler/reference/dock_from_renv.md)
 use a different default: `rocker/r-ver` tagged with your R version; see
 below.)
 
@@ -62,7 +62,7 @@ my_dock$COMMENT("Install required R package.")
 ```
 
 Wrap your raw R Code inside the
-[`r()`](https://github.com/ThinkR-open/golemversetemplate/reference/r.md)
+[`r()`](https://github.com/ThinkR-open/dockerfiler/reference/r.md)
 function to turn it into a bash command with `R -e`.
 
 ``` r
@@ -226,13 +226,13 @@ Package Manager (`https://p3m.dev/cran/latest`, rewritten to the
 container as the non-root `rstudio` user. Pass `FROM = "rocker/r-base"`,
 `repos = c(CRAN = "https://cran.rstudio.com/")`, or `user = NULL` to
 restore the previous behaviour.
-[`dock_from_desc()`](https://github.com/ThinkR-open/golemversetemplate/reference/dockerfiles.md)
+[`dock_from_desc()`](https://github.com/ThinkR-open/dockerfiler/reference/dockerfiles.md)
 uses the same `FROM` / `repos` defaults.
 
 ## Parse an existing Dockerfile
 
 Already have a Dockerfile?
-[`parse_dockerfile()`](https://github.com/ThinkR-open/golemversetemplate/reference/parse_dockerfile.md)
+[`parse_dockerfile()`](https://github.com/ThinkR-open/dockerfiler/reference/parse_dockerfile.md)
 reads it back into a `Dockerfile` object you can edit and re-`$write()`.
 
 ``` r
@@ -251,5 +251,5 @@ encounter a bug or want to suggest an enhancement, please [open an
 issue](https://github.com/ThinkR-open/dockerfiler/issues).
 
 Please note that this project is released with a [Contributor Code of
-Conduct](https://github.com/ThinkR-open/golemversetemplate/CODE_OF_CONDUCT.md).
+Conduct](https://github.com/ThinkR-open/dockerfiler/CODE_OF_CONDUCT.md).
 By participating in this project you agree to abide by its terms.

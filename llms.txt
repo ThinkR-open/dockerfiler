@@ -31,16 +31,16 @@ install.packages("dockerfiler")
 ```
 
 See
-[`vignette("dockerfiler")`](https://github.com/ThinkR-open/golemversetemplate/articles/dockerfiler.md)
+[`vignette("dockerfiler")`](https://github.com/ThinkR-open/dockerfiler/articles/dockerfiler.md)
 for a longer walkthrough.
 
 ## Basic workflow
 
 By default, `Dockerfile$new()` creates a Dockerfile with
 `FROM "rocker/r-base"`. (The high-level generators
-[`dock_from_desc()`](https://github.com/ThinkR-open/golemversetemplate/reference/dockerfiles.md)
+[`dock_from_desc()`](https://github.com/ThinkR-open/dockerfiler/reference/dockerfiles.md)
 and
-[`dock_from_renv()`](https://github.com/ThinkR-open/golemversetemplate/reference/dock_from_renv.md)
+[`dock_from_renv()`](https://github.com/ThinkR-open/dockerfiler/reference/dock_from_renv.md)
 use a different default: `rocker/r-ver` tagged with your R version; see
 below.)
 
@@ -62,7 +62,7 @@ my_dock$COMMENT("Install required R package.")
 ```
 
 Wrap your raw R Code inside the
-[`r()`](https://github.com/ThinkR-open/golemversetemplate/reference/r.md)
+[`r()`](https://github.com/ThinkR-open/dockerfiler/reference/r.md)
 function to turn it into a bash command with `R -e`.
 
 ``` r
@@ -226,13 +226,13 @@ Package Manager (`https://p3m.dev/cran/latest`, rewritten to the
 container as the non-root `rstudio` user. Pass `FROM = "rocker/r-base"`,
 `repos = c(CRAN = "https://cran.rstudio.com/")`, or `user = NULL` to
 restore the previous behaviour.
-[`dock_from_desc()`](https://github.com/ThinkR-open/golemversetemplate/reference/dockerfiles.md)
+[`dock_from_desc()`](https://github.com/ThinkR-open/dockerfiler/reference/dockerfiles.md)
 uses the same `FROM` / `repos` defaults.
 
 ## Parse an existing Dockerfile
 
 Already have a Dockerfile?
-[`parse_dockerfile()`](https://github.com/ThinkR-open/golemversetemplate/reference/parse_dockerfile.md)
+[`parse_dockerfile()`](https://github.com/ThinkR-open/dockerfiler/reference/parse_dockerfile.md)
 reads it back into a `Dockerfile` object you can edit and re-`$write()`.
 
 ``` r
@@ -251,7 +251,7 @@ encounter a bug or want to suggest an enhancement, please [open an
 issue](https://github.com/ThinkR-open/dockerfiler/issues).
 
 Please note that this project is released with a [Contributor Code of
-Conduct](https://github.com/ThinkR-open/golemversetemplate/CODE_OF_CONDUCT.md).
+Conduct](https://github.com/ThinkR-open/dockerfiler/CODE_OF_CONDUCT.md).
 By participating in this project you agree to abide by its terms.
 
 # Package index
@@ -262,15 +262,15 @@ High-level entry points that produce a `Dockerfile` object, either from
 a project descriptor (DESCRIPTION, renv.lock) or by parsing an existing
 Dockerfile. Most users start here.
 
-- [`dock_from_desc()`](https://github.com/ThinkR-open/golemversetemplate/reference/dockerfiles.md)
+- [`dock_from_desc()`](https://github.com/ThinkR-open/dockerfiler/reference/dockerfiles.md)
   : Create a Dockerfile from a DESCRIPTION
 
-- [`dock_from_renv()`](https://github.com/ThinkR-open/golemversetemplate/reference/dock_from_renv.md)
+- [`dock_from_renv()`](https://github.com/ThinkR-open/dockerfiler/reference/dock_from_renv.md)
   :
 
   Create a Dockerfile from an `renv.lock` file
 
-- [`parse_dockerfile()`](https://github.com/ThinkR-open/golemversetemplate/reference/parse_dockerfile.md)
+- [`parse_dockerfile()`](https://github.com/ThinkR-open/dockerfiler/reference/parse_dockerfile.md)
   : Parse a Dockerfile
 
 ## Dockerfile R6 class
@@ -279,7 +279,7 @@ Low-level imperative API for building a `Dockerfile` directive by
 directive. The high-level builders above are thin wrappers over this
 class.
 
-- [`Dockerfile`](https://github.com/ThinkR-open/golemversetemplate/reference/Dockerfile.md)
+- [`Dockerfile`](https://github.com/ThinkR-open/dockerfiler/reference/Dockerfile.md)
   : A Dockerfile template
 
 ## R-to-shell helper
@@ -287,8 +287,7 @@ class.
 Wrap an R expression into the shell-safe `R -e '...'` invocation used
 inside a `RUN` directive.
 
-- [`r()`](https://github.com/ThinkR-open/golemversetemplate/reference/r.md)
-  :
+- [`r()`](https://github.com/ThinkR-open/dockerfiler/reference/r.md) :
 
   Turn an R expression into a shell `R -e '...'` call
 
@@ -298,16 +297,16 @@ Resolve and compact Debian/Ubuntu system dependencies for the R packages
 your Dockerfile installs. Usually called internally by the builders;
 exposed for advanced use.
 
-- [`get_sysreqs()`](https://github.com/ThinkR-open/golemversetemplate/reference/get_sysreqs.md)
+- [`get_sysreqs()`](https://github.com/ThinkR-open/dockerfiler/reference/get_sysreqs.md)
   : Get system requirements
-- [`compact_sysreqs()`](https://github.com/ThinkR-open/golemversetemplate/reference/compact_sysreqs.md)
+- [`compact_sysreqs()`](https://github.com/ThinkR-open/dockerfiler/reference/compact_sysreqs.md)
   : Compact Sysreqs
 
 ## Project setup
 
 Helpers for the surrounding project (not the Dockerfile itself).
 
-- [`docker_ignore_add()`](https://github.com/ThinkR-open/golemversetemplate/reference/docker_ignore_add.md)
+- [`docker_ignore_add()`](https://github.com/ThinkR-open/dockerfiler/reference/docker_ignore_add.md)
   : Create a dockerignore file
 
 # Articles
@@ -315,4 +314,4 @@ Helpers for the surrounding project (not the Dockerfile itself).
 ### All vignettes
 
 - [Getting started with
-  dockerfiler](https://github.com/ThinkR-open/golemversetemplate/articles/dockerfiler.md):
+  dockerfiler](https://github.com/ThinkR-open/dockerfiler/articles/dockerfiler.md):

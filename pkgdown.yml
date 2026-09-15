@@ -3,7 +3,7 @@ pkgdown: 2.2.1
 pkgdown_sha: ~
 articles:
   dockerfiler: dockerfiler.html
-last_built: 2026-09-15T10:25Z
+last_built: 2026-09-15T11:07Z
 urls:
-  reference: https://github.com/ThinkR-open/golemversetemplate/reference
-  article: https://github.com/ThinkR-open/golemversetemplate/articles
+  reference: https://github.com/ThinkR-open/dockerfiler/reference
+  article: https://github.com/ThinkR-open/dockerfiler/articles

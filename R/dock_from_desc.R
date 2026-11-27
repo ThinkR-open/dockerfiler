@@ -30,6 +30,25 @@ base_pkg_ <- c(
   "utils"
 )
 
+# System requirements of the package described by the DESCRIPTION at
+# `path` and of its dependencies, Suggests included. Given the package
+# as a `local::` reference, pak reads the whole DESCRIPTION, `Remotes`
+# included. The file is copied as `DESCRIPTION` in a temporary
+# directory because `local::` expects that file name.
+.desc_sysreqs <- function(path) {
+  pkg_dir <- tempfile()
+  dir.create(pkg_dir)
+  on.exit(unlink(pkg_dir, recursive = TRUE))
+  file.copy(path, file.path(pkg_dir, "DESCRIPTION"))
+  raw_output <- pak::pkg_sysreqs(
+    paste0("local::", pkg_dir),
+    dependencies = TRUE,
+    sysreqs_platform = "debian"
+  )
+  out <- unlist(raw_output$packages$system_packages)
+  sort(unique(out[!is.na(out)]))
+}
+
 quote_not_na <- function(x){
   x[!is.na(x)] <- paste0('\"',x[!is.na(x)],'\"')
   x
@@ -186,11 +205,7 @@ dock_from_desc <- function(
       bullet_col = "green"
     )
 
-    system_requirement <- unique(
-      get_sysreqs(
-        packages = packages
-      )
-    )
+    system_requirement <- .desc_sysreqs(path)
     cat_green_tick("Done") # TODO animated version ?
   } else {
     system_requirement <- NULL

@@ -714,6 +714,8 @@ test_that("dock_from_desc computes sysreqs for a dependency listed in Remotes", 
   skip_on_cran()
   skip_if_offline()
   skip_if(is_rdevel, "skip on R-devel")
+  # pak::pkg_sysreqs() returns no system_packages on macOS CI hosts.
+  skip_on_os("mac")
   path <- file.path(tempfile(), "demo")
   dir.create(path, recursive = TRUE)
   on.exit(unlink(dirname(path), recursive = TRUE), add = TRUE)

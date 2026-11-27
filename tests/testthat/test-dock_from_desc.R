@@ -347,7 +347,7 @@ withr::with_dir(
           build_from_source = FALSE,
           update_tar_gz = FALSE
         ),
-        get_sysreqs = function(...) character(0)
+        .desc_sysreqs = function(...) character(0)
       )
       df <- paste(my_dock$Dockerfile, collapse = "\n")
       expect_match(df, "tar.gz", fixed = TRUE)
@@ -366,7 +366,7 @@ withr::with_dir(
           build_from_source = FALSE,
           update_tar_gz = TRUE
         ),
-        get_sysreqs = function(...) character(0),
+        .desc_sysreqs = function(...) character(0),
         build = function(path, dest_path, vignettes) {
           build_called <<- TRUE
           fake <- file.path(dest_path, "fakepkg_0.0.0.tar.gz")
@@ -426,7 +426,7 @@ withr::with_dir(
             },
             .package = "remotes"
           ),
-          get_sysreqs = function(...) character(0),
+          .desc_sysreqs = function(...) character(0),
           build = function(path, dest_path, vignettes) {
             fake <- file.path(dest_path, "R.utils_1.0.0.tar.gz")
             file.create(fake)
@@ -470,7 +470,7 @@ withr::with_dir(
             build_from_source = FALSE,
             update_tar_gz = FALSE
           ),
-          get_sysreqs = function(...) character(0)
+          .desc_sysreqs = function(...) character(0)
         ),
         "package name"
       )
@@ -505,7 +505,7 @@ withr::with_dir(
       expect_error(
         testthat::with_mocked_bindings(
           code = dock_from_desc(file.path(evil_dir, "DESCRIPTION")),
-          get_sysreqs = function(...) character(0)
+          .desc_sysreqs = function(...) character(0)
         ),
         "package name"
       )
@@ -709,3 +709,27 @@ withr::with_dir(
 )
 
 unlink(descdir, recursive = TRUE)
+
+test_that("dock_from_desc computes sysreqs for a dependency listed in Remotes", {
+  skip_on_cran()
+  skip_if_offline()
+  skip_if(is_rdevel, "skip on R-devel")
+  path <- file.path(tempfile(), "demo")
+  dir.create(path, recursive = TRUE)
+  on.exit(unlink(dirname(path), recursive = TRUE), add = TRUE)
+  writeLines(
+    c(
+      "Package: demo",
+      "Version: 0.0.1",
+      "Title: Demo",
+      "Description: Demo.",
+      "License: MIT",
+      "Imports:",
+      "    emo",
+      "Remotes:",
+      "    hadley/emo"
+    ),
+    file.path(path, "DESCRIPTION")
+  )
+  expect_true("libicu-dev" %in% .desc_sysreqs(file.path(path, "DESCRIPTION")))
+})

@@ -1,3 +1,14 @@
+# dockerfiler 1.0.1
+
+## Bug fixes
+
+- `dock_from_desc()` with `sysreqs = TRUE` no longer fails when the
+  `DESCRIPTION` depends on a package that is not on CRAN but listed in
+  `Remotes`. System requirements are now computed by
+  `pak::pkg_sysreqs()` from the package itself as a `local::`
+  reference, so pak reads the whole `DESCRIPTION`, `Remotes` included.
+  Closes #122.
+
 # dockerfiler 1.0.0
 
 First major release. The version is bumped to 1.0.0 to signal API

@@ -1,5 +1,18 @@
 # Changelog
 
+## dockerfiler 1.0.1
+
+### Bug fixes
+
+- [`dock_from_desc()`](https://github.com/ThinkR-open/dockerfiler/reference/dockerfiles.md)
+  with `sysreqs = TRUE` no longer fails when the `DESCRIPTION` depends
+  on a package that is not on CRAN but listed in `Remotes`. System
+  requirements are now computed by
+  [`pak::pkg_sysreqs()`](https://pak.r-lib.org/reference/pkg_sysreqs.html)
+  from the package itself as a `local::` reference, so pak reads the
+  whole `DESCRIPTION`, `Remotes` included. Closes
+  [\#122](https://github.com/ThinkR-open/dockerfiler/issues/122).
+
 ## dockerfiler 1.0.0
 
 CRAN release: 2026-05-14
@@ -16,7 +29,7 @@ Posit Public Package Manager. See below.
 
 - The vendored copy of [renv](https://rstudio.github.io/renv/) (~30,000
   lines under `inst/vendor/`) is removed. Lockfiles are now parsed with
-  [`jsonlite::read_json()`](https://jeroen.r-universe.dev/jsonlite/reference/read_json.html)
+  [`jsonlite::read_json()`](https://rdrr.io/pkg/jsonlite/man/read_json.html)
   (already in Imports). The exported `dockerfiler::renv` symbol is
   removed: it was a public-API surface only because the vendor pattern
   required it. The fallback `renv_version` value, when both the user
